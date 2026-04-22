@@ -54,13 +54,13 @@ input, select, textarea { font-family: 'Inter', sans-serif; }
 .sidebar {
   width: var(--sidebar-w);
   min-height: 100vh;
-  background: linear-gradient(180deg, var(--saffron) 0%, #D4560F 40%, #B84A0C 100%);
+  background: #BA5726;
   position: fixed;
   left: 0; top: 0; bottom: 0;
   display: flex; flex-direction: column;
   z-index: 200;
   overflow-y: auto;
-  box-shadow: 4px 0 24px rgba(232,98,26,0.25);
+  box-shadow: 4px 0 24px rgba(232,98,26,0.22);
 }
 .sidebar-brand {
   padding: 24px 20px 20px;
@@ -107,7 +107,7 @@ input, select, textarea { font-family: 'Inter', sans-serif; }
 .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
 .nav-badge {
   margin-left: auto; font-size: 0.65rem; font-weight: 700;
-  background: #fff; color: var(--saffron);
+  background: rgba(255,255,255,0.95); color: var(--saffron-dark);
   padding: 2px 7px; border-radius: 50px;
 }
 
@@ -694,10 +694,6 @@ tr:hover td { background: var(--ivory); }
 .modal p { font-size: 0.85rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 24px; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
-/* ─── SUCCESS TOAST ─── */
-.toast { position: fixed; bottom: 28px; right: 28px; background: var(--brown-dark); color: #fff; padding: 14px 22px; border-radius: 12px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 8px 24px rgba(30,15,0,0.3); z-index: 1000; transform: translateY(120%); transition: transform 0.3s; display: flex; align-items: center; gap: 10px; }
-.toast.show { transform: translateY(0); }
-.toast-icon { font-size: 1.1rem; }
 
 /* ─── PRICING CALENDAR ─── */
 .pricing-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
@@ -1648,45 +1644,17 @@ tr:hover td { background: var(--ivory); }
         <div class="report-icon saffron">📄</div>
         <div class="report-info">
           <h4>Daily Distribution List</h4>
-          <p>Export a PDF list of all confirmed attendees for a specific meal and date. For kitchen and serving volunteers.</p>
+          <p>Export a PDF list of all confirmed attendees for a specific date and location. For kitchen and serving volunteers.</p>
           <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <select class="filter-select">
-              <option>Breakfast — Apr 21</option>
-              <option>Lunch — Apr 21</option>
-              <option>Dinner — Apr 21</option>
-              <option>Sunday Khichdi — Apr 27</option>
-            </select>
-            <select class="filter-select">
-              <option>All Locations</option>
-              <option>Thiruvanmiyur</option>
-              <option>NLBR</option>
+            <input type="date" class="filter-select" id="report-dist-date" style="min-width:140px">
+            <select class="filter-select" id="report-dist-loc">
+              <option value="">All Locations</option>
+              <option value="Thiruvanmiyur">Thiruvanmiyur</option>
+              <option value="NLBR">NLBR</option>
             </select>
           </div>
           <div class="report-actions">
-            <button class="btn btn-primary btn-sm" onclick="exportPDF()">⬇️ Print / Save PDF</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="report-card">
-        <div class="report-icon gold">📊</div>
-        <div class="report-info">
-          <h4>Festival Invitation List</h4>
-          <p>Excel export of mobile numbers and names for sending future festival invitations and event announcements.</p>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <select class="filter-select">
-              <option>All Registrants</option>
-              <option>Thiruvanmiyur Only</option>
-              <option>NLBR Only</option>
-            </select>
-            <select class="filter-select">
-              <option>All Time</option>
-              <option>Last 30 Days</option>
-              <option>Last 90 Days</option>
-            </select>
-          </div>
-          <div class="report-actions">
-            <button class="btn btn-primary btn-sm" onclick="exportCSV('all')">⬇️ Export CSV / Excel</button>
+            <button class="btn btn-primary btn-sm" onclick="printDistributionList()">⬇️ Print / Save PDF</button>
           </div>
         </div>
       </div>
@@ -1699,24 +1667,6 @@ tr:hover td { background: var(--ivory); }
           <div class="report-actions">
             <button class="btn btn-danger btn-sm" onclick="showPage('registrations'); document.getElementById('filter-bulk').value='bulk'; filterTable()">🔍 View Bulk Orders</button>
             <button class="btn btn-ghost btn-sm" onclick="exportCSV('bulk')">⬇️ Export CSV</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="report-card">
-        <div class="report-icon green">📈</div>
-        <div class="report-info">
-          <h4>Capacity Analytics</h4>
-          <p>Summary of fill rates by location and meal type. Useful for planning future slot limits.</p>
-          <div style="display:flex;gap:8px;margin-bottom:12px">
-            <select class="filter-select">
-              <option>This Week</option>
-              <option>This Month</option>
-              <option>Last 3 Months</option>
-            </select>
-          </div>
-          <div class="report-actions">
-            <button class="btn btn-success btn-sm" onclick="exportCSV('all')">⬇️ Export CSV</button>
           </div>
         </div>
       </div>
@@ -1972,11 +1922,6 @@ tr:hover td { background: var(--ivory); }
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast">
-  <span class="toast-icon">✅</span>
-  <span id="toast-msg">Done</span>
-</div>
 
 <script>
 // ─── DATA ───
@@ -2413,6 +2358,128 @@ function exportPDF() {
   window.print();
 }
 
+function printDistributionList() {
+  var dateVal  = document.getElementById('report-dist-date').value;
+  var locVal   = document.getElementById('report-dist-loc').value;
+
+  var dateLabel = dateVal
+    ? new Date(dateVal + 'T12:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+    : 'All Dates';
+  var locLabel = locVal || 'All Locations';
+
+  var meals = [
+    { key: 'Breakfast',      label: 'Breakfast' },
+    { key: 'Lunch',          label: 'Lunch' },
+    { key: 'Dinner',         label: 'Dinner' },
+    { key: 'Sunday Khichdi', label: 'Sunday Khichdi' }
+  ];
+
+  function buildMealSection(meal) {
+    var filtered = registrations.filter(function(r) {
+      return (!dateVal || r.date === dateVal) && (!locVal || r.loc === locVal) && r.meal === meal.key;
+    });
+    var total = filtered.reduce(function(s, r) { return s + r.qty; }, 0);
+    var rows = filtered.length
+      ? filtered.map(function(r, i) {
+          return '<tr>'
+            + '<td>' + (i + 1) + '</td>'
+            + '<td>' + r.id + '</td>'
+            + '<td><strong>' + r.name + '</strong></td>'
+            + '<td>' + r.mobile + '</td>'
+            + '<td>' + r.loc + '</td>'
+            + '<td>' + r.cat + '</td>'
+            + '<td style="text-align:center;font-weight:700">' + r.qty + '</td>'
+            + '</tr>';
+        }).join('')
+      : '<tr><td colspan="7" style="text-align:center;padding:14px;color:#aaa;font-style:italic">No registrations for this meal</td></tr>';
+
+    return '<div class="meal-section">'
+      + '<div class="meal-heading">'
+      + meal.label
+      + (filtered.length ? '<span class="meal-count">' + filtered.length + ' bookings &nbsp;&bull;&nbsp; ' + total + ' coupons total</span>' : '')
+      + '</div>'
+      + '<table><thead><tr>'
+      + '<th>#</th><th>Coupon ID</th><th>Name</th><th>Mobile</th><th>Location</th><th>Category</th><th>Qty</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table>'
+      + '</div>';
+  }
+
+  var html = [
+    '<!DOCTYPE html><html><head><meta charset="UTF-8">',
+    '<title>Distribution List</title>',
+    '<style>',
+    '* { box-sizing: border-box; margin: 0; padding: 0; }',
+    'body { font-family: Arial, sans-serif; padding: 28px 32px; color: #1a0a00; font-size: 12px; background: #fff; }',
+    /* header */
+    '.header { display: flex; align-items: center; gap: 18px; padding-bottom: 16px; border-bottom: 3px solid #D86A32; margin-bottom: 24px; }',
+    '.logo-circle { width: 52px; height: 52px; background: #D86A32; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }',
+    '.logo-circle svg { width: 28px; height: 28px; fill: #fff; }',
+    '.org-name { font-size: 18px; font-weight: 700; color: #D86A32; line-height: 1.2; }',
+    '.org-sub { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #888; margin-top: 3px; }',
+    '.header-right { margin-left: auto; text-align: right; }',
+    '.doc-title { font-size: 13px; font-weight: 700; color: #333; }',
+    '.meta { margin-top: 5px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }',
+    '.meta-pill { background: #fff3ec; border: 1px solid #f0c8a0; border-radius: 4px; padding: 3px 9px; font-size: 10px; color: #8a4010; }',
+    /* meal sections */
+    '.meal-section { margin-bottom: 24px; }',
+    '.meal-heading { background: #D86A32; color: #fff; padding: 8px 14px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }',
+    '.meal-count { font-size: 10px; font-weight: 400; opacity: 0.88; }',
+    'table { width: 100%; border-collapse: collapse; }',
+    'thead { background: #fff3ec; }',
+    'th { padding: 6px 10px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: #D86A32; border-bottom: 1.5px solid #f0c8a0; }',
+    'td { padding: 6px 10px; border-bottom: 1px solid #f0e8dc; font-size: 11px; }',
+    'tr:last-child td { border-bottom: 2px solid #f0c8a0; }',
+    'tr:nth-child(even) td { background: #fffaf6; }',
+    '.footer { text-align: center; margin-top: 28px; font-size: 9px; color: #bbb; border-top: 1px solid #eee; padding-top: 10px; }',
+    '@media print {',
+    '  body { padding: 16px; }',
+    '  .meal-section { page-break-inside: avoid; }',
+    '  .meal-heading { -webkit-print-color-adjust: exact; print-color-adjust: exact; }',
+    '  thead { -webkit-print-color-adjust: exact; print-color-adjust: exact; }',
+    '}',
+    '</style></head><body>',
+    '<div class="header">',
+    '  <div class="logo-circle">',
+    '    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+    '      <path d="M12 2C9.5 5 7 7.5 7 10.5a5 5 0 0010 0C17 7.5 14.5 5 12 2z"/>',
+    '      <path d="M12 13c-2.5 3-5 5.5-5 8.5h10c0-3-2.5-5.5-5-8.5z" opacity=".6"/>',
+    '    </svg>',
+    '  </div>',
+    '  <div>',
+    '    <div class="org-name">Hare Krishna Movement</div>',
+    '    <div class="org-sub">Chennai &middot; Prasadam Seva</div>',
+    '  </div>',
+    '  <div class="header-right">',
+    '    <div class="doc-title">Daily Distribution List</div>',
+    '    <div class="meta">',
+    '      <span class="meta-pill">Date: ' + dateLabel + '</span>',
+    '      <span class="meta-pill">Location: ' + locLabel + '</span>',
+    '    </div>',
+    '  </div>',
+    '</div>',
+    meals.map(buildMealSection).join(''),
+    '<div class="footer">Generated on ' + new Date().toLocaleString('en-IN') + ' &nbsp;&bull;&nbsp; HKM Prasadam Management &nbsp;&bull;&nbsp; Hare Krishna!</div>',
+    '</body></html>'
+  ].join('\n');
+
+  /* use hidden iframe — works without popup blocker issues */
+  var old = document.getElementById('dist-print-frame');
+  if (old) old.parentNode.removeChild(old);
+
+  var iframe = document.createElement('iframe');
+  iframe.id = 'dist-print-frame';
+  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
+  document.body.appendChild(iframe);
+
+  var doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+
+  setTimeout(function() {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  }, 350);
+}
+
 // ─── SLOT OVERRIDES ───
 function renderSlotOverrides() {
   if (!slots.length) {
@@ -2477,14 +2544,7 @@ function toggleSwitch(el, lblId) {
 }
 
 // ─── TOAST ───
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
-}
+function showToast(msg) {}
 
 // ════════════════════════════════════════
 // PRICING CALENDAR
@@ -2746,6 +2806,12 @@ window.addEventListener('load', function() {
   initDateDisplay();
   renderAllTable();
   updateDashboardStats();
+  var today = new Date();
+  var yyyy = today.getFullYear();
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
+  var dd = String(today.getDate()).padStart(2, '0');
+  var el = document.getElementById('report-dist-date');
+  if (el) el.value = yyyy + '-' + mm + '-' + dd;
 });
 
 // ════════════════════════════════════════
