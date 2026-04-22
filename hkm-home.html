@@ -1,0 +1,1466 @@
+t<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKM Chennai — Prasadam Seva</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --saffron: #E8621A;
+  --saffron-light: #F4893A;
+  --saffron-pale: #FEF0E6;
+  --saffron-dark: #C44D0D;
+  --gold: #C9920A;
+  --gold-light: #F0C842;
+  --gold-pale: #FFF9E6;
+  --maroon: #7B1D1D;
+  --maroon-light: #9B2D2D;
+  --cream: #FBF6EE;
+  --ivory: #FDFAF4;
+  --brown-dark: #3B1F0A;
+  --brown-mid: #6B3A1F;
+  --text-dark: #1E0F00;
+  --text-mid: #5A3A1A;
+  --text-light: #9A7A5A;
+  --border: #E8D8C0;
+  --border-light: #F2E8D8;
+  --white: #FFFFFF;
+  --green: #2D7A3A;
+  --green-pale: #EBF7ED;
+  --red-pale: #FDECEA;
+  --red: #C0392B;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--text-dark); }
+h1,h2,h3,h4,h5 { font-family: 'Cormorant Garamond', serif; line-height: 1.2; }
+a { text-decoration: none; }
+button { cursor: pointer; font-family: 'Inter', sans-serif; }
+input, select, textarea { font-family: 'Inter', sans-serif; }
+
+/* ─── VIEWS ─── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ─── HEADER ─── */
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: linear-gradient(135deg, var(--saffron) 0%, #F07A20 40%, var(--gold) 100%);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 4px 20px rgba(232,98,26,0.35);
+  height: 68px;
+  display: flex; align-items: center;
+  padding: 0 40px;
+  gap: 24px;
+}
+.header-logo {
+  display: flex; align-items: center; gap: 12px; text-decoration: none;
+}
+.header-lotus {
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.22);
+  border: 1.5px solid rgba(255,255,255,0.4);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.15rem;
+  box-shadow: 0 2px 8px rgba(60,20,0,0.15);
+  flex-shrink: 0;
+}
+.header-brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(60,20,0,0.25);
+}
+.header-brand-sub {
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.85); margin-top: 1px;
+}
+.header-nav {
+  display: flex; align-items: center; gap: 4px; margin-left: auto;
+}
+.nav-link {
+  padding: 7px 14px; border-radius: 8px;
+  font-size: 0.82rem; font-weight: 500;
+  color: rgba(255,255,255,0.88);
+  background: none; border: none;
+  transition: all 0.18s; cursor: pointer;
+}
+.nav-link:hover { color: #fff; background: rgba(255,255,255,0.18); }
+.nav-link.active {
+  color: #fff;
+  background: rgba(255,255,255,0.22);
+  border: 1px solid rgba(255,255,255,0.4);
+  font-weight: 600;
+}
+.btn-admin {
+  margin-left: 8px;
+  padding: 8px 18px; border-radius: 8px;
+  font-size: 0.82rem; font-weight: 700;
+  background: var(--brown-dark);
+  color: #fff; border: none;
+  box-shadow: 0 3px 12px rgba(30,10,0,0.35);
+  transition: all 0.18s;
+}
+.btn-admin:hover { background: var(--maroon); transform: translateY(-1px); box-shadow: 0 5px 16px rgba(30,10,0,0.4); }
+.hamburger-pub { display: none; background: none; border: none; padding: 6px; cursor: pointer; flex-direction: column; gap: 4px; margin-left: auto; }
+.hamburger-pub span { display: block; width: 20px; height: 2px; background: #fff; border-radius: 2px; }
+@media (max-width: 820px) {
+  .site-header { padding: 0 20px; }
+  .header-nav { display: none; }
+  .header-nav.open { display: flex; flex-direction: column; position: fixed; top: 68px; left: 0; right: 0; background: var(--brown-dark); padding: 16px; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 199; }
+  .hamburger-pub { display: flex; }
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 30% 60%, #FFCBA8 0%, #FFD9BC 30%, #FFE8D4 60%, #FFF3EC 100%);
+  display: flex; align-items: center; justify-content: center;
+  padding: 120px 40px 80px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.55) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-content {
+  max-width: 660px; text-align: center; position: relative; z-index: 1;
+}
+/* ISKCON Logo box */
+.hero-logo-box {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 20px;
+  box-shadow: 0 4px 24px rgba(60,20,0,0.12);
+  margin-bottom: 36px;
+  gap: 14px;
+}
+.hero-logo-emblem {
+  width: 52px; height: 52px;
+  background: #C9920A;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hero-logo-emblem svg { width: 36px; height: 36px; }
+.hero-logo-text { text-align: left; }
+.hero-logo-srila { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #555; margin-bottom: 1px; }
+.hero-logo-iskcon { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; color: #1a2a6c; line-height: 1; letter-spacing: 0.04em; }
+.hero-logo-location { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #C9920A; margin-top: 2px; }
+
+.hero-title {
+  font-size: 4rem; font-weight: 700;
+  color: var(--brown-dark); line-height: 1.05; margin-bottom: 10px;
+}
+.hero-subtitle {
+  font-size: 1.25rem; font-weight: 700;
+  color: var(--saffron); margin-bottom: 18px; letter-spacing: 0.01em;
+}
+.hero-desc {
+  font-size: 0.97rem; color: #888;
+  line-height: 1.75; max-width: 480px; margin: 0 auto 36px;
+}
+.hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.btn-hero-primary {
+  padding: 14px 34px; border-radius: 50px; border: none;
+  background: var(--saffron);
+  color: #fff; font-size: 0.95rem; font-weight: 700;
+  box-shadow: 0 6px 20px rgba(232,98,26,0.35);
+  transition: all 0.2s;
+}
+.btn-hero-primary:hover { background: var(--saffron-dark); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(232,98,26,0.45); }
+.btn-hero-ghost {
+  padding: 14px 34px; border-radius: 50px;
+  background: #fff;
+  color: var(--text-dark); font-size: 0.95rem; font-weight: 600;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  transition: all 0.2s;
+}
+.btn-hero-ghost:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.12); transform: translateY(-2px); }
+.hero-scroll {
+  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: rgba(60,20,0,0.3); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.hero-scroll-arrow { animation: bounce 2s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+/* ─── SECTION COMMON ─── */
+section { padding: 88px 40px; }
+.section-tag {
+  display: inline-block;
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--saffron); background: var(--saffron-pale);
+  padding: 4px 14px; border-radius: 50px; margin-bottom: 14px;
+}
+.section-title { font-size: 2.5rem; color: var(--brown-dark); margin-bottom: 10px; }
+.section-sub { font-size: 0.92rem; color: var(--text-light); line-height: 1.7; max-width: 520px; }
+
+/* ─── WAYS TO SERVE ─── */
+.serve-section { background: var(--ivory); }
+.serve-header { text-align: center; margin-bottom: 52px; }
+.serve-header .section-sub { margin: 0 auto; }
+.serve-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px;
+  max-width: 1100px; margin: 0 auto;
+}
+.serve-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 30px 24px;
+  transition: all 0.22s; position: relative; overflow: hidden;
+}
+.serve-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--saffron), var(--gold));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.28s ease;
+}
+.serve-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(60,20,0,0.1); border-color: var(--saffron); }
+.serve-card:hover::before { transform: scaleX(1); }
+.serve-icon {
+  width: 58px; height: 58px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; margin-bottom: 18px;
+}
+.serve-icon.s1 { background: var(--saffron-pale); }
+.serve-icon.s2 { background: var(--gold-pale); }
+.serve-icon.s3 { background: var(--green-pale); }
+.serve-icon.s4 { background: #fdeaea; }
+.serve-card h4 { font-size: 1.15rem; color: var(--brown-dark); margin-bottom: 10px; }
+.serve-card p  { font-size: 0.8rem; color: var(--text-light); line-height: 1.65; }
+@media (max-width: 900px) { .serve-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .serve-grid { grid-template-columns: 1fr; } }
+
+/* ─── START SEVA ─── */
+.seva-section {
+  background: radial-gradient(ellipse at 30% 60%, #FFCBA8 0%, #FFD9BC 30%, #FFE8D4 60%, #FFF3EC 100%);
+  text-align: center; position: relative; overflow: hidden;
+}
+.seva-section::before {
+  content: '✦  ॐ  ✦';
+  position: absolute; top: 28px; left: 50%; transform: translateX(-50%);
+  font-size: 0.75rem; letter-spacing: 0.3em; color: rgba(180,90,20,0.2);
+}
+.seva-inner {
+  max-width: 680px; margin: 0 auto;
+  position: relative;
+}
+.seva-lotus { font-size: 2.6rem; margin-bottom: 8px; }
+.seva-tag {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--saffron); margin-bottom: 24px; display: block;
+}
+.seva-quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.65rem; font-style: italic; font-weight: 400;
+  color: var(--brown-dark); line-height: 1.65;
+  max-width: 560px; margin: 0 auto 16px;
+}
+.seva-attribution {
+  font-size: 0.82rem; color: var(--text-light);
+  letter-spacing: 0.06em; margin-bottom: 32px;
+}
+.seva-divider {
+  width: 48px; height: 2px;
+  background: linear-gradient(to right, var(--saffron), var(--gold));
+  border-radius: 2px; margin: 0 auto 28px;
+}
+.btn-seva {
+  padding: 14px 40px; border-radius: 50px; border: none;
+  background: var(--saffron);
+  color: #fff; font-size: 0.95rem; font-weight: 700;
+  box-shadow: 0 6px 20px rgba(232,98,26,0.3); transition: all 0.2s;
+}
+.btn-seva:hover { background: var(--saffron-dark); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(232,98,26,0.4); }
+
+/* ─── ABOUT ─── */
+.about-section { background: var(--cream); }
+.about-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+}
+.about-text h2 { font-size: 2.4rem; color: var(--brown-dark); margin-bottom: 18px; }
+.about-text p  { font-size: 0.88rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 16px; }
+.about-read-more {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--saffron); font-size: 0.85rem; font-weight: 600;
+  background: none; border: none; padding: 0; transition: gap 0.18s;
+}
+.about-read-more:hover { gap: 10px; }
+.about-visual {
+  background: linear-gradient(135deg, var(--saffron-pale) 0%, var(--gold-pale) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+  aspect-ratio: 4/3;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; padding: 32px;
+}
+.about-visual-lotus { font-size: 5rem; }
+.about-visual-text { font-family: 'Cormorant Garamond',serif; font-size: 1.15rem; color: var(--brown-mid); text-align: center; line-height: 1.6; }
+.about-stats {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 32px;
+}
+.about-stat { text-align: center; background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 16px 12px; }
+.about-stat-num { font-family: 'Cormorant Garamond',serif; font-size: 2rem; font-weight: 700; color: var(--saffron); }
+.about-stat-label { font-size: 0.7rem; color: var(--text-light); margin-top: 3px; }
+@media (max-width: 820px) { .about-inner { grid-template-columns: 1fr; gap: 36px; } }
+
+/* ─── FOOTER ─── */
+.site-footer {
+  background: var(--brown-dark);
+  color: rgba(255,255,255,0.6);
+  padding: 52px 40px 28px;
+}
+.footer-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px;
+  padding-bottom: 36px; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.footer-brand-name { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:#fff; margin-bottom:8px; }
+.footer-brand-sub  { font-size:0.75rem; line-height:1.7; color:rgba(255,255,255,0.5); max-width:280px; }
+.footer-contact { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+.footer-contact-item { display: flex; align-items: center; gap: 9px; font-size: 0.78rem; color: rgba(255,255,255,0.55); }
+.footer-col-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 14px; }
+.footer-links { display: flex; flex-direction: column; gap: 9px; }
+.footer-links button {
+  background: none; border: none; padding: 0;
+  font-size: 0.82rem; color: rgba(255,255,255,0.55);
+  text-align: left; cursor: pointer; transition: color 0.18s;
+}
+.footer-links button:hover { color: var(--gold-light); }
+.footer-bottom {
+  max-width: 1100px; margin: 24px auto 0;
+  font-size: 0.72rem; color: rgba(255,255,255,0.25);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+}
+@media (max-width: 820px) { .footer-inner { grid-template-columns: 1fr 1fr; } section { padding: 60px 20px; } .hero { padding: 100px 20px 70px; } .site-header { padding: 0 20px; } }
+@media (max-width: 540px) { .footer-inner { grid-template-columns: 1fr; } .hero-title { font-size: 2.6rem; } .hero-subtitle { font-size: 1.2rem; } .serve-grid { grid-template-columns: 1fr; } }
+
+/* ─── REGISTRATION VIEW ─── */
+#view-register {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 30% 60%, #FFCBA8 0%, #FFD9BC 30%, #FFE8D4 60%, #FFF3EC 100%);
+  padding-top: 68px;
+}
+.reg-page-header {
+  background: transparent;
+  padding: 36px 40px 8px;
+  text-align: center;
+}
+.reg-page-header .reg-logo-box {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; border-radius: 10px;
+  padding: 10px 18px; gap: 12px;
+  box-shadow: 0 4px 20px rgba(60,20,0,0.1);
+  margin-bottom: 22px;
+}
+.reg-page-header h2 {
+  font-size: 2.4rem; color: var(--brown-dark);
+  margin-bottom: 8px; font-weight: 700;
+}
+.reg-page-header p { font-size: 0.88rem; color: #888; }
+.reg-page-body {
+  max-width: 680px; margin: 0 auto; padding: 28px 20px 48px;
+}
+/* Form card wrapper */
+.reg-form-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 36px rgba(60,20,0,0.09);
+  padding: 32px 36px;
+  border: 1px solid rgba(232,210,190,0.5);
+}
+@media (max-width: 600px) { .reg-form-card { padding: 22px 18px; } }
+
+/* ─── PAYMENT VIEW ─── */
+#view-payment {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 30% 60%, #FFCBA8 0%, #FFD9BC 30%, #FFE8D4 60%, #FFF3EC 100%);
+  padding-top: 68px;
+}
+.payment-wrap {
+  max-width: 560px; margin: 0 auto; padding: 36px 20px 48px;
+}
+.payment-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+  box-shadow: 0 4px 24px rgba(60,20,0,0.08); margin-bottom: 20px;
+}
+.payment-card-header {
+  background: linear-gradient(135deg, var(--brown-dark), var(--brown-mid));
+  padding: 22px 28px; color: #fff;
+}
+.payment-card-header h3 { font-size: 1.3rem; color: #fff; margin-bottom: 3px; }
+.payment-card-header p  { font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+.order-bar {
+  background: var(--saffron-pale); border-bottom: 1px solid rgba(232,98,26,0.15);
+  padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.order-id-tag { font-size: 0.68rem; font-weight: 700; color: var(--saffron-dark); letter-spacing: 0.06em; }
+.order-name   { font-size: 0.9rem; font-weight: 600; color: var(--brown-dark); }
+.order-meta   { font-size: 0.73rem; color: var(--text-light); margin-top: 2px; }
+.order-total  { font-size: 1.4rem; font-weight: 700; color: var(--saffron); font-family:'Cormorant Garamond',serif; }
+.qr-area {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 28px 24px 20px; border-bottom: 1px solid var(--border-light);
+}
+.qr-box {
+  width: 200px; height: 200px;
+  border: 3px solid var(--brown-dark); border-radius: 14px; overflow: hidden;
+  background: #fff; padding: 6px;
+  box-shadow: 0 4px 20px rgba(60,20,0,0.15); margin-bottom: 14px;
+}
+.qr-box svg { width: 100%; height: 100%; }
+.qr-upi-label { font-size: 0.82rem; font-weight: 600; color: var(--text-mid); background: var(--cream); border: 1px solid var(--border); border-radius: 50px; padding: 6px 18px; }
+.qr-hint { font-size: 0.7rem; color: var(--text-light); margin-top: 8px; text-align: center; }
+.pay-form-body { padding: 22px 24px; }
+.form-group { margin-bottom: 18px; }
+.form-label  { display: block; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mid); margin-bottom: 7px; }
+.form-label .req { color: var(--saffron); }
+.form-input  { width: 100%; padding: 11px 14px; border: 1.5px solid #E8D8C0; border-radius: 9px; font-size: 0.88rem; color: var(--text-dark); background: #FDFAF6; outline: none; transition: all 0.2s; }
+.form-input:focus { border-color: var(--saffron); background: #fff; box-shadow: 0 0 0 3px rgba(232,98,26,0.1); }
+.form-input::placeholder { color: var(--text-light); }
+.proof-drop {
+  border: 2px dashed var(--border); border-radius: 10px; padding: 24px;
+  text-align: center; cursor: pointer; transition: all 0.2s; background: var(--cream); position: relative;
+}
+.proof-drop:hover, .proof-drop.has-file { border-color: var(--saffron); background: var(--saffron-pale); }
+.proof-drop input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.proof-icon  { font-size: 2rem; margin-bottom: 8px; }
+.proof-main  { font-size: 0.82rem; font-weight: 600; color: var(--text-mid); }
+.proof-sub   { font-size: 0.72rem; color: var(--text-light); margin-top: 3px; }
+.proof-name  { font-size: 0.76rem; color: var(--saffron); font-weight: 600; margin-top: 6px; display: none; }
+.btn-full {
+  width: 100%; padding: 14px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, var(--saffron), var(--gold));
+  color: #fff; font-size: 0.95rem; font-weight: 700;
+  box-shadow: 0 4px 16px rgba(232,98,26,0.3); transition: all 0.2s;
+}
+.btn-full:hover { opacity: 0.92; transform: translateY(-1px); }
+.btn-back { width: 100%; padding: 10px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; color: var(--text-mid); font-size: 0.84rem; font-weight: 500; margin-top: 10px; transition: all 0.18s; }
+.btn-back:hover { background: var(--cream); }
+
+/* ─── SUCCESS VIEW ─── */
+#view-success { min-height: 100vh; background: radial-gradient(ellipse at 30% 60%, #FFCBA8 0%, #FFD9BC 30%, #FFE8D4 60%, #FFF3EC 100%); padding-top: 68px; }
+.success-wrap { max-width: 480px; width: 100%; text-align: center; padding: 48px 24px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+.success-icon {
+  width: 96px; height: 96px; border-radius: 50%;
+  background: linear-gradient(135deg, #ebf7ed, #d4edda);
+  border: 3px solid #b2dfbc;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem; margin: 0 auto 28px;
+  animation: popIn 0.45s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.success-title { font-size: 2.2rem; color: var(--brown-dark); margin-bottom: 12px; }
+.success-body  { font-size: 0.88rem; color: var(--text-mid); line-height: 1.75; margin-bottom: 28px; }
+.success-ref {
+  display: inline-block;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px 28px; margin-bottom: 24px;
+}
+.success-ref-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-light); margin-bottom: 5px; }
+.success-ref-val   { font-size: 1.1rem; font-weight: 700; color: var(--saffron); letter-spacing: 0.06em; }
+.status-pill {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--gold-pale); border: 1.5px solid #f0d870;
+  border-radius: 50px; padding: 8px 22px;
+  font-size: 0.82rem; font-weight: 600; color: var(--gold); margin-bottom: 32px;
+}
+.pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.next-steps {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 24px; text-align: left; margin-bottom: 32px;
+}
+.next-steps-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-light); margin-bottom: 14px; }
+.next-step-item { display: flex; align-items: flex-start; gap: 12px; font-size: 0.82rem; color: var(--text-mid); margin-bottom: 10px; line-height: 1.5; }
+.next-step-item:last-child { margin-bottom: 0; }
+.step-num { color: var(--saffron); font-weight: 700; flex-shrink: 0; }
+.success-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ─── REGISTRATION FORM ELEMENTS ─── */
+.form-row     { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-select  { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 0.88rem; color: var(--text-dark); background: var(--cream); outline: none; transition: all 0.2s; }
+.form-select:focus { border-color: var(--saffron); background: #fff; }
+.pill-group   { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.pill-opt input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
+.pill-opt label { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 50px; font-size: 0.82rem; font-weight: 500; border: 1.5px solid var(--border); color: var(--text-mid); background: var(--cream); cursor: pointer; transition: all 0.18s; user-select: none; }
+.pill-opt input[type=radio]:checked + label { background: linear-gradient(135deg, var(--saffron), var(--gold)); border-color: transparent; color: #fff; box-shadow: 0 2px 10px rgba(232,98,26,0.3); }
+.qty-stepper  { display: flex; align-items: center; gap: 0; border: 1.5px solid var(--border); border-radius: 9px; overflow: hidden; width: fit-content; }
+.qty-btn      { background: var(--cream); border: none; width: 38px; height: 40px; font-size: 1.1rem; font-weight: 600; color: var(--text-mid); cursor: pointer; transition: background 0.15s; }
+.qty-btn:hover { background: var(--border); }
+.qty-input    { width: 60px; height: 40px; border: none; border-left: 1.5px solid var(--border); border-right: 1.5px solid var(--border); text-align: center; font-size: 0.95rem; font-weight: 600; color: var(--text-dark); background: #fff; outline: none; }
+.hr-step { border: none; border-top: 1px solid var(--border-light); margin: 8px 0 20px; }
+.step-tag { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--saffron); }
+.bulk-warning { display: none; background: var(--saffron-pale); border: 1px solid rgba(232,98,26,0.25); border-radius: 8px; padding: 10px 14px; font-size: 0.78rem; color: var(--saffron-dark); margin-top: 8px; }
+.bulk-warning.show { display: block; }
+
+/* price box */
+.price-box { border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 24px; }
+.price-rows { background: var(--cream); padding: 14px 18px; }
+.price-row  { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border-light); font-size: 0.82rem; }
+.price-row:last-child { border-bottom: none; padding-bottom: 4px; }
+.price-row-key { color: var(--text-mid); font-weight: 500; }
+.price-row-val { font-weight: 700; color: var(--text-dark); }
+.price-row.total .price-row-key { font-weight: 700; color: var(--brown-dark); font-size: 0.88rem; }
+.price-row.total .price-row-val { color: var(--saffron); font-size: 1.08rem; }
+.price-timing { background: var(--gold-pale); border-top: 1px solid #f0d870; padding: 10px 18px; display: flex; flex-direction: column; gap: 5px; }
+.price-timing-row { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: var(--brown-mid); font-weight: 500; }
+.price-note { font-size: 0.74rem; color: var(--maroon); font-weight: 500; }
+.price-terms { background: #fff; border-top: 1px solid var(--border-light); padding: 14px 18px; }
+.terms-text { font-size: 0.72rem; color: var(--text-light); line-height: 1.6; text-align: center; margin-bottom: 14px; }
+.terms-text a { color: var(--saffron); font-weight: 600; }
+
+/* ─── BOOKINGS VIEW ─── */
+#view-bookings {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 30% 60%, #FFCBA8 0%, #FFD9BC 30%, #FFE8D4 60%, #FFF3EC 100%);
+  padding-top: 68px;
+}
+.bookings-wrap { max-width: 760px; margin: 0 auto; padding: 36px 20px 56px; }
+.bookings-page-header { text-align: center; margin-bottom: 28px; }
+.bookings-page-header h2 { font-size: 2.2rem; color: var(--brown-dark); margin-bottom: 6px; }
+.bookings-page-header p  { font-size: 0.88rem; color: #888; }
+.bookings-card {
+  background: #fff; border-radius: 18px;
+  box-shadow: 0 8px 36px rgba(60,20,0,0.09);
+  border: 1px solid rgba(232,210,190,0.5);
+  overflow: hidden;
+}
+.bookings-card-header {
+  padding: 18px 24px; border-bottom: 1px solid var(--border-light);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+}
+.bookings-card-header h3 { font-size: 1.05rem; color: var(--brown-dark); }
+.bk-empty { padding: 52px 24px; text-align: center; color: var(--text-light); font-size: 0.88rem; }
+.bk-empty-icon { font-size: 2.8rem; margin-bottom: 12px; }
+.bk-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 24px; border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s;
+}
+.bk-item:last-child { border-bottom: none; }
+.bk-item:hover { background: #FDFAF6; }
+.bk-id {
+  font-size: 0.72rem; font-weight: 700; color: var(--saffron);
+  letter-spacing: 0.05em; flex-shrink: 0; width: 96px;
+}
+.bk-info { flex: 1; min-width: 0; }
+.bk-name { font-size: 0.9rem; font-weight: 600; color: var(--brown-dark); }
+.bk-meta { font-size: 0.74rem; color: var(--text-light); margin-top: 3px; }
+.bk-status { flex-shrink: 0; }
+.bk-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 13px; border-radius: 50px;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em;
+}
+.bk-badge.pending  { background: #FFF9E6; color: #C9920A; border: 1px solid #f0d870; }
+.bk-badge.approved { background: #EBF7ED; color: #2D7A3A; border: 1px solid #b2dfbc; }
+.bk-badge.declined { background: #FDECEA; color: #C0392B; border: 1px solid #f5c6c2; }
+.bk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.bk-view-btn {
+  width: 36px; height: 36px; border-radius: 9px; border: 1.5px solid var(--border);
+  background: var(--cream); color: var(--text-mid); font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.18s; flex-shrink: 0;
+}
+.bk-view-btn:hover { border-color: var(--saffron); background: var(--saffron-pale); color: var(--saffron); }
+.bk-view-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+/* ─── COUPON MODAL ─── */
+.coupon-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(30,15,0,0.55); z-index: 500;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(4px); padding: 20px;
+}
+.coupon-overlay.show { display: flex; }
+.coupon-modal {
+  background: #fff; border-radius: 20px; overflow: hidden;
+  max-width: 460px; width: 100%;
+  box-shadow: 0 24px 64px rgba(30,15,0,0.3);
+  animation: slideUp 0.28s ease;
+}
+@keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
+.coupon-modal-top {
+  background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 50%, var(--saffron) 100%);
+  padding: 28px 28px 24px; text-align: center; position: relative;
+}
+.coupon-modal-top::before {
+  content: '✦ ॐ ✦'; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  font-size: 0.6rem; letter-spacing: 0.28em; color: rgba(255,255,255,0.3);
+}
+.coupon-modal-lotus { font-size: 2.2rem; margin-bottom: 8px; }
+.coupon-modal-org   { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+.coupon-modal-title { font-family:'Cormorant Garamond',serif; font-size: 1.5rem; color: #fff; font-weight: 700; margin-bottom: 2px; }
+.coupon-modal-sub   { font-size: 0.72rem; color: rgba(255,255,255,0.6); }
+.coupon-modal-body  { padding: 22px 28px; }
+.coupon-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border-light); }
+.coupon-row:last-child { border-bottom: none; }
+.coupon-key { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-light); }
+.coupon-val { font-size: 0.88rem; font-weight: 600; color: var(--text-dark); text-align: right; }
+.coupon-qr-strip {
+  background: var(--cream); border-top: 1px dashed var(--border);
+  padding: 18px 28px; display: flex; align-items: center; gap: 18px;
+}
+.coupon-qr-mini { width: 64px; height: 64px; flex-shrink: 0; }
+.coupon-qr-mini svg { width: 100%; height: 100%; }
+.coupon-uid-big { font-size: 1.1rem; font-weight: 700; color: var(--saffron); letter-spacing: 0.08em; }
+.coupon-uid-sub { font-size: 0.7rem; color: var(--text-light); margin-top: 3px; }
+.coupon-status-banner {
+  padding: 10px 28px; text-align: center; font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.coupon-status-banner.pending  { background: #FFF9E6; color: #C9920A; }
+.coupon-status-banner.approved { background: #EBF7ED; color: #2D7A3A; }
+.coupon-modal-footer {
+  padding: 14px 28px 20px; display: flex; gap: 10px; justify-content: flex-end;
+  border-top: 1px solid var(--border-light);
+}
+
+/* btn variants */
+.btn-sm   { padding: 6px 14px; font-size: 0.78rem; border-radius: 7px; border: none; font-weight: 600; cursor: pointer; }
+.btn-ghost-sm { background: var(--cream); color: var(--text-mid); border: 1px solid var(--border); }
+.btn-ghost-sm:hover { background: var(--border); }
+.btn-primary-sm { background: linear-gradient(135deg, var(--saffron), var(--gold)); color: #fff; }
+
+/* toast */
+.toast { position: fixed; bottom: 28px; right: 28px; background: var(--brown-dark); color: #fff; padding: 14px 22px; border-radius: 12px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 8px 24px rgba(30,15,0,0.3); z-index: 1000; transform: translateY(120%); transition: transform 0.3s; display: flex; align-items: center; gap: 10px; }
+.toast.show { transform: translateY(0); }
+
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .reg-page-header, .reg-page-body { padding-left: 20px; padding-right: 20px; } }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     STICKY HEADER
+══════════════════════════════════ -->
+<header class="site-header" id="site-header">
+  <a class="header-logo" href="#" onclick="showView('landing')">
+    <div class="header-lotus">🪷</div>
+    <div>
+      <div class="header-brand-name">HKM Chennai</div>
+      <div class="header-brand-sub">Prasadam Seva</div>
+    </div>
+  </a>
+
+  <nav class="header-nav" id="header-nav">
+    <button class="nav-link" onclick="showView('landing'); closeNav()">Home</button>
+    <button class="nav-link" onclick="scrollToSection('seva-section'); closeNav()">Donate</button>
+    <button class="nav-link" onclick="scrollToSection('about-section'); closeNav()">About</button>
+    <button class="nav-link" id="nav-register" onclick="showView('register'); closeNav()">Prasadam Coupons</button>
+    <button class="nav-link" onclick="showView('bookings'); closeNav()" id="nav-bookings">My Bookings</button>
+    <button class="nav-link" onclick="scrollToSection('footer-section'); closeNav()">Contact</button>
+    <button class="btn-admin" onclick="window.location.href='hkm-prasadam-v2.html'">🔐 Admin</button>
+  </nav>
+
+  <button class="hamburger-pub" id="hamburger-pub" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- ══════════════════════════════════
+     VIEW: LANDING PAGE
+══════════════════════════════════ -->
+<div class="view active" id="view-landing">
+
+  <!-- HERO -->
+  <section class="hero" id="hero-section">
+    <div class="hero-content">
+
+      <!-- ISKCON Logo -->
+      <div class="hero-logo-box">
+        <div class="hero-logo-emblem">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Tilak symbol simplified -->
+            <ellipse cx="18" cy="18" rx="15" ry="15" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+            <path d="M18 6 C18 6, 11 13, 11 20 C11 24.4 14.1 27 18 27 C21.9 27 25 24.4 25 20 C25 13 18 6 18 6Z" fill="white" opacity="0.9"/>
+            <path d="M18 10 C18 10, 13.5 15.5 13.5 20 C13.5 22.8 15.5 24.5 18 24.5 C20.5 24.5 22.5 22.8 22.5 20 C22.5 15.5 18 10 18 10Z" fill="#C9920A"/>
+            <path d="M18 14 L18 24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="hero-logo-text">
+          <div class="hero-logo-srila">Srila Prabhupada's</div>
+          <div class="hero-logo-iskcon">ISKCON</div>
+          <div class="hero-logo-location">Thiruvanmiyur – Chennai</div>
+        </div>
+      </div>
+
+      <h1 class="hero-title">Prasadam Seva</h1>
+      <div class="hero-subtitle">Serve with Devotion</div>
+      <p class="hero-desc">
+        Offer prasadam and receive Krishna's blessings. Every meal served is an act of love and devotion.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-hero-primary" onclick="showView('register')">🙏 Donate Now</button>
+        <button class="btn-hero-ghost" onclick="scrollToSection('about-section')">Learn More</button>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <span class="hero-scroll-arrow">↓</span>
+    </div>
+  </section>
+
+  <!-- WAYS TO SERVE -->
+  <section class="serve-section" id="serve-section">
+    <div class="serve-header">
+      <div class="section-tag">How to Participate</div>
+      <h2 class="section-title">Ways to Serve</h2>
+      <p class="section-sub">Choose how you'd like to contribute towards Krishna's prasadam seva</p>
+    </div>
+    <div class="serve-grid">
+      <div class="serve-card">
+        <div class="serve-icon s1">🍛</div>
+        <h4>Annadanam Seva</h4>
+        <p>Sponsor daily prasadam for devotees and guests visiting the temple.</p>
+      </div>
+      <div class="serve-card">
+        <div class="serve-icon s2">🎉</div>
+        <h4>Festival Seva</h4>
+        <p>Contribute towards grand festival prasadam during Janmashtami, Gaura Purnima & more.</p>
+      </div>
+      <div class="serve-card">
+        <div class="serve-icon s3">🌿</div>
+        <h4>Daily Seva</h4>
+        <p>Support the daily operations of the temple kitchen serving hundreds every day.</p>
+      </div>
+      <div class="serve-card">
+        <div class="serve-icon s4">🤝</div>
+        <h4>Community Feeding</h4>
+        <p>Help us serve free meals to the underprivileged through our food distribution programs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEVA QUOTE -->
+  <section class="seva-section" id="seva-section">
+    <div class="seva-inner">
+      <div class="seva-lotus">🪷</div>
+      <span class="seva-tag">Start Your Seva</span>
+      <div class="seva-divider"></div>
+      <p class="seva-quote">
+        "If one offers Me with love and devotion a leaf, a flower, a fruit, or water, I will accept it."
+      </p>
+      <div class="seva-attribution">— Bhagavad Gita 9.26</div>
+      <button class="btn-seva" onclick="showView('register')">🙏 Book Prasadam Coupon</button>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section" id="about-section">
+    <div class="about-inner">
+      <div class="about-text">
+        <div class="section-tag">About Us</div>
+        <h2>About HKM Chennai</h2>
+        <p>
+          Hare Krishna Movement Chennai is dedicated to propagating the teachings of Lord Sri Krishna
+          as presented in the Bhagavad Gita and Srimad Bhagavatam. Our mission includes serving
+          sanctified prasadam (food offered to Lord Krishna) to thousands of people every day.
+        </p>
+        <p>
+          Through our Annadanam program, we serve nutritious and delicious prasadam to devotees,
+          visitors, and the underprivileged, believing that no one within a 10-mile radius of the
+          temple should go hungry.
+        </p>
+        <button class="about-read-more" onclick="scrollToSection('footer-section')">Read More →</button>
+        <div class="about-stats">
+          <div class="about-stat">
+            <div class="about-stat-num">500+</div>
+            <div class="about-stat-label">Meals Daily</div>
+          </div>
+          <div class="about-stat">
+            <div class="about-stat-num">2</div>
+            <div class="about-stat-label">HKM Centres</div>
+          </div>
+          <div class="about-stat">
+            <div class="about-stat-num">365</div>
+            <div class="about-stat-label">Days a Year</div>
+          </div>
+        </div>
+      </div>
+      <div class="about-visual">
+        <div class="about-visual-lotus">🪷</div>
+        <div class="about-visual-text">
+          Hare Krishna Hare Krishna<br>
+          Krishna Krishna Hare Hare<br>
+          Hare Rama Hare Rama<br>
+          Rama Rama Hare Hare
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer" id="footer-section">
+    <div class="footer-inner">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div class="header-lotus" style="width:34px;height:34px;font-size:1rem">🪷</div>
+          <div class="footer-brand-name">Hare Krishna Movement Chennai</div>
+        </div>
+        <div class="footer-brand-sub">
+          Spreading the message of Bhagavad Gita and Srimad Bhagavatam.
+          Serving sanctified prasadam to one and all.
+        </div>
+        <div class="footer-contact">
+          <div class="footer-contact-item">📧 krishnamrita@hkmchennai.org</div>
+          <div class="footer-contact-item">📞 7418420108</div>
+          <div class="footer-contact-item">📍 Hare Krishna Movement Chennai</div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <div class="footer-links">
+          <button onclick="showView('landing')">Home</button>
+          <button onclick="showView('register')">Donate</button>
+          <button onclick="scrollToSection('about-section')">About</button>
+          <button onclick="showView('register')">Prasadam Coupons</button>
+          <button onclick="scrollToSection('footer-section')">Contact</button>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Our Centres</div>
+        <div class="footer-links">
+          <button>HKM Thiruvanmiyur</button>
+          <button>HKM NLBR</button>
+        </div>
+        <div style="margin-top:24px">
+          <div class="footer-col-title">Admin</div>
+          <div class="footer-links">
+            <button onclick="window.location.href='hkm-prasadam-v2.html'">🔐 Admin Panel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Hare Krishna Movement Chennai. All rights reserved.</span>
+      <span>Hare Krishna 🪷</span>
+    </div>
+  </footer>
+
+</div><!-- /view-landing -->
+
+
+<!-- ══════════════════════════════════
+     VIEW: REGISTRATION FORM
+══════════════════════════════════ -->
+<div class="view" id="view-register">
+  <div class="reg-page-header">
+    <!-- Mini logo -->
+    <div class="reg-logo-box">
+      <div style="width:36px;height:36px;background:#C9920A;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="24" height="24" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 4 C18 4, 10 13, 10 21 C10 25.4 13.5 28 18 28 C22.5 28 26 25.4 26 21 C26 13 18 4 18 4Z" fill="white" opacity="0.9"/>
+          <path d="M18 9 C18 9, 13 16 13 21 C13 23.8 15.2 25.5 18 25.5 C20.8 25.5 23 23.8 23 21 C23 16 18 9 18 9Z" fill="#C9920A"/>
+          <path d="M18 13 L18 25" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div style="text-align:left">
+        <div style="font-size:0.55rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#888">Srila Prabhupada's</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:#1a2a6c;line-height:1">ISKCON</div>
+        <div style="font-size:0.55rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#C9920A;margin-top:1px">Thiruvanmiyur – Chennai</div>
+      </div>
+    </div>
+    <h2>Prasadam Coupon Booking</h2>
+    <p>Fill in your details to reserve your sacred meal coupon</p>
+  </div>
+  <div class="reg-page-body">
+  <div class="reg-form-card">
+    <div style="margin-bottom:8px"><span class="step-tag">Step 1 — Personal Details</span></div>
+    <div class="form-row" style="margin-bottom:0">
+      <div class="form-group">
+        <label class="form-label">Full Name <span class="req">*</span></label>
+        <input class="form-input" id="r-name" type="text" placeholder="e.g. Radhakrishna Das" oninput="updatePriceBox()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mobile Number <span class="req">*</span></label>
+        <input class="form-input" id="r-mobile" type="tel" placeholder="10-digit mobile" maxlength="10" oninput="updatePriceBox()">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email Address <span style="font-size:0.68rem;color:var(--text-light);font-weight:400;text-transform:none;letter-spacing:0">(for digital coupon delivery)</span></label>
+      <input class="form-input" id="r-email" type="email" placeholder="e.g. devotee@example.com">
+    </div>
+
+    <hr class="hr-step">
+    <div style="margin-bottom:8px"><span class="step-tag">Step 2 — Location</span></div>
+    <div class="form-group">
+      <label class="form-label">HKM Centre <span class="req">*</span></label>
+      <div class="pill-group" id="r-loc-group">
+        <div class="pill-opt">
+          <input type="radio" name="r-location" id="r-loc-thiru" value="Thiruvanmiyur" onchange="updatePriceBox()">
+          <label for="r-loc-thiru">📍 HKM Thiruvanmiyur</label>
+        </div>
+        <div class="pill-opt">
+          <input type="radio" name="r-location" id="r-loc-nlbr" value="NLBR" onchange="updatePriceBox()">
+          <label for="r-loc-nlbr">📍 HKM NLBR</label>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hr-step">
+    <div style="margin-bottom:8px"><span class="step-tag">Step 3 — Meal Details</span></div>
+    <div class="form-group">
+      <label class="form-label">Prasadam Category <span class="req">*</span></label>
+      <div class="pill-group">
+        <div class="pill-opt">
+          <input type="radio" name="r-category" id="r-cat-gen" value="General">
+          <label for="r-cat-gen">🍱 General</label>
+        </div>
+        <div class="pill-opt">
+          <input type="radio" name="r-category" id="r-cat-fest" value="Festival">
+          <label for="r-cat-fest">🎉 Festival</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Meal Type <span class="req">*</span></label>
+      <div class="pill-group">
+        <div class="pill-opt">
+          <input type="radio" name="r-meal" id="r-meal-b" value="Breakfast" onchange="updatePriceBox()">
+          <label for="r-meal-b">🌅 Breakfast</label>
+        </div>
+        <div class="pill-opt">
+          <input type="radio" name="r-meal" id="r-meal-l" value="Lunch" onchange="updatePriceBox()">
+          <label for="r-meal-l">☀️ Lunch</label>
+        </div>
+        <div class="pill-opt">
+          <input type="radio" name="r-meal" id="r-meal-d" value="Dinner" onchange="updatePriceBox()">
+          <label for="r-meal-d">🌙 Dinner</label>
+        </div>
+        <div class="pill-opt">
+          <input type="radio" name="r-meal" id="r-meal-k" value="Sunday Khichdi" onchange="updatePriceBox()">
+          <label for="r-meal-k">🥘 Sunday Khichdi</label>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hr-step">
+    <div style="margin-bottom:8px"><span class="step-tag">Step 4 — Date & Quantity</span></div>
+    <div class="form-row" style="margin-bottom:0">
+      <div class="form-group">
+        <label class="form-label">Event Date <span class="req">*</span></label>
+        <input class="form-input" id="r-date" type="date" onchange="updatePriceBox()" min="2026-04-22">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Number of Coupons <span class="req">*</span></label>
+        <div class="qty-stepper">
+          <button class="qty-btn" onclick="changeRQty(-1)">−</button>
+          <input class="qty-input" id="r-qty" type="number" value="1" min="1" max="10" oninput="updatePriceBox(); checkRBulk()">
+          <button class="qty-btn" onclick="changeRQty(1)">+</button>
+        </div>
+        <div class="bulk-warning" id="r-bulk-warning">⚠️ Bulk request (≥8 coupons). Admin review may be required.</div>
+      </div>
+    </div>
+
+    <!-- Price Summary + BUY NOW -->
+    <div class="price-box">
+      <div class="price-rows">
+        <div class="price-row">
+          <span class="price-row-key">Price per Coupon</span>
+          <span class="price-row-val" id="r-price-per">₹40/-</span>
+        </div>
+        <div class="price-row">
+          <span class="price-row-key">Quantity</span>
+          <span class="price-row-val" id="r-price-qty">1</span>
+        </div>
+        <div class="price-row total">
+          <span class="price-row-key">Total Amount</span>
+          <span class="price-row-val" id="r-price-total">₹40/-</span>
+        </div>
+      </div>
+      <div class="price-timing">
+        <div class="price-timing-row">🕖 Prasadam Timing: <strong>6:30 PM to 9:00 PM</strong></div>
+        <div class="price-note">⚠️ Note: The coupons are not valid on Festival days.</div>
+      </div>
+      <div class="price-terms">
+        <p class="terms-text">
+          By continuing, you are agreeing to our
+          <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>
+        </p>
+        <button class="btn-full" onclick="submitReg()">🛒 BUY NOW</button>
+        <button class="btn-back" onclick="showView('landing')">← Back to Home</button>
+      </div>
+    </div>
+  </div><!-- /reg-form-card -->
+  </div>
+</div><!-- /view-register -->
+
+
+<!-- ══════════════════════════════════
+     VIEW: PAYMENT STEP
+══════════════════════════════════ -->
+<div class="view" id="view-payment">
+  <div id="pay-qr-wrap">
+    <div class="payment-wrap">
+      <div class="payment-card">
+        <div class="payment-card-header">
+          <h3>💳 Complete Your Payment</h3>
+          <p>Scan the QR code and pay via UPI, then submit your transaction details</p>
+        </div>
+        <div class="order-bar">
+          <div>
+            <div class="order-id-tag" id="hp-booking-id">HKM-000000</div>
+            <div class="order-name" id="hp-name">—</div>
+            <div class="order-meta" id="hp-meta">—</div>
+          </div>
+          <div class="order-total" id="hp-total">₹0/-</div>
+        </div>
+        <div class="qr-area">
+          <div class="qr-box" id="hp-qr-frame"></div>
+          <div class="qr-upi-label">📲 Pay to: <strong>hkmchennai@ybl</strong></div>
+          <div class="qr-hint">Open any UPI app · Scan & pay · Come back here to confirm</div>
+        </div>
+        <div class="pay-form-body">
+          <div class="form-group">
+            <label class="form-label">UPI Transaction ID <span class="req">*</span></label>
+            <input class="form-input" id="hp-txid" type="text" placeholder="e.g. UPI-2026-12345678" oninput="this.value=this.value.toUpperCase()">
+            <div style="font-size:0.7rem;color:var(--text-light);margin-top:5px">Copy from your UPI app payment confirmation</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Screenshot <span class="req">*</span></label>
+            <div class="proof-drop" id="hp-proof-drop" onclick="document.getElementById('hp-proof').click()">
+              <input type="file" id="hp-proof" accept="image/*" onchange="handleHPProof(this)">
+              <div class="proof-icon" id="hp-proof-icon">📸</div>
+              <div class="proof-main" id="hp-proof-main">Tap to upload payment screenshot</div>
+              <div class="proof-sub" id="hp-proof-sub">JPG, PNG or PDF · Max 5 MB</div>
+              <div class="proof-name" id="hp-proof-name"></div>
+            </div>
+          </div>
+          <button class="btn-full" onclick="confirmHPPayment()">✅ Confirm Payment Submission</button>
+          <button class="btn-back" onclick="showView('register')">← Back to Registration</button>
+        </div>
+      </div>
+      <div style="background:var(--gold-pale);border:1px solid #f0d870;border-radius:10px;padding:14px 18px;font-size:0.78rem;color:var(--brown-mid);line-height:1.7">
+        <strong>📋 Important:</strong> Keep your UPI transaction ID and screenshot ready. Your booking will be held for <strong>30 minutes</strong> while payment is verified by our admin team.
+      </div>
+    </div>
+  </div>
+</div><!-- /view-payment -->
+
+
+<!-- ══════════════════════════════════
+     VIEW: SUCCESS
+══════════════════════════════════ -->
+<div class="view" id="view-success">
+  <div class="success-wrap">
+    <div class="success-icon">⏳</div>
+    <h2 class="success-title">Payment Submitted!</h2>
+    <p class="success-body">
+      Your payment is under review. Our admin team will verify your UPI transaction and approve it shortly.<br><br>
+      You will receive a <strong>confirmation email</strong> with your digital prasadam coupon once the payment is approved.
+    </p>
+    <div class="success-ref">
+      <div class="success-ref-label">Booking Reference</div>
+      <div class="success-ref-val" id="hp-success-id">HKM-000000</div>
+    </div>
+    <br>
+    <div class="status-pill">
+      <span class="pulse-dot"></span>
+      Payment Approval Pending
+    </div>
+    <div class="next-steps">
+      <div class="next-steps-title">What happens next?</div>
+      <div class="next-step-item"><span class="step-num">1.</span> Admin verifies your UPI transaction ID and screenshot</div>
+      <div class="next-step-item"><span class="step-num">2.</span> Your booking is confirmed in our system</div>
+      <div class="next-step-item"><span class="step-num">3.</span> Digital prasadam coupon is sent to your email address</div>
+    </div>
+    <div class="success-actions">
+      <button class="btn-full" style="width:auto;padding:12px 28px" onclick="showView('register')">🪷 New Booking</button>
+      <button class="btn-back" style="width:auto;padding:12px 28px;margin-top:0" onclick="showView('landing')">← Back to Home</button>
+    </div>
+  </div>
+</div><!-- /view-success -->
+
+
+<!-- ══════════════════════════════════
+     VIEW: MY BOOKINGS
+══════════════════════════════════ -->
+<div class="view" id="view-bookings">
+  <div class="bookings-wrap">
+    <div class="bookings-page-header">
+      <h2>📋 My Bookings</h2>
+      <p>Track the status of your prasadam coupon requests</p>
+    </div>
+    <div class="bookings-card">
+      <div class="bookings-card-header">
+        <h3>Booking History</h3>
+        <button class="btn-full" style="width:auto;padding:9px 20px;font-size:0.8rem;border-radius:8px" onclick="showView('register')">+ New Booking</button>
+      </div>
+      <div id="bk-list">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     COUPON MODAL
+══════════════════════════════════ -->
+<div class="coupon-overlay" id="coupon-overlay">
+  <div class="coupon-modal">
+    <div class="coupon-modal-top">
+      <div class="coupon-modal-lotus">🪷</div>
+      <div class="coupon-modal-org">Hare Krishna Movement Chennai</div>
+      <div class="coupon-modal-title">Prasadam Coupon</div>
+      <div class="coupon-modal-sub" id="cm-subtitle">Sacred meal coupon</div>
+    </div>
+    <div class="coupon-status-banner" id="cm-status-banner">⏳ Pending Approval</div>
+    <div class="coupon-modal-body">
+      <div class="coupon-row">
+        <span class="coupon-key">Pilgrim Name</span>
+        <span class="coupon-val" id="cm-name">—</span>
+      </div>
+      <div class="coupon-row">
+        <span class="coupon-key">Location</span>
+        <span class="coupon-val" id="cm-loc">—</span>
+      </div>
+      <div class="coupon-row">
+        <span class="coupon-key">Meal Type</span>
+        <span class="coupon-val" id="cm-meal">—</span>
+      </div>
+      <div class="coupon-row">
+        <span class="coupon-key">Event Date</span>
+        <span class="coupon-val" id="cm-date">—</span>
+      </div>
+      <div class="coupon-row">
+        <span class="coupon-key">Quantity</span>
+        <span class="coupon-val" id="cm-qty">—</span>
+      </div>
+      <div class="coupon-row">
+        <span class="coupon-key">Amount Paid</span>
+        <span class="coupon-val" id="cm-amount" style="color:var(--saffron)">—</span>
+      </div>
+    </div>
+    <div class="coupon-qr-strip">
+      <div class="coupon-qr-mini" id="cm-qr"></div>
+      <div>
+        <div class="coupon-uid-big" id="cm-uid">HKM-000000</div>
+        <div class="coupon-uid-sub">Show this at the prasadam counter</div>
+      </div>
+    </div>
+    <div class="coupon-modal-footer">
+      <button class="btn-back" style="width:auto;padding:9px 20px;margin:0" onclick="closeCouponModal()">Close</button>
+      <button class="btn-full" style="width:auto;padding:9px 22px;font-size:0.82rem;border-radius:8px" onclick="window.print()">🖨 Print</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="hp-toast">
+  <span>✅</span>
+  <span id="hp-toast-msg">Done</span>
+</div>
+
+<script>
+// ─── RATES (mirrors admin panel) ───
+var defRates = { Breakfast: 20, Lunch: 40, Dinner: 35, SundayKhichdi: 20 };
+var priceOvr = {
+  '2026-04-27': { Breakfast: 30, Lunch: 60, Dinner: 50, SundayKhichdi: 25 },
+  '2026-05-01': { Breakfast: 25, Lunch: 50, Dinner: 45, SundayKhichdi: 20 },
+  '2026-05-04': { Breakfast: 30, Lunch: 55, Dinner: 45, SundayKhichdi: 30 },
+};
+var hpCounter = 5000;
+var hpPending = null;
+
+// ─── MY BOOKINGS store ───
+var myBookings = [
+  { id:'HKM-04901', name:'Gopika Devi',     mobile:'9876543212', loc:'Thiruvanmiyur', meal:'Lunch',          date:'2026-04-27', qty:2,  total:120, status:'approved' },
+  { id:'HKM-04900', name:'Madhava Das',     mobile:'9745123444', loc:'NLBR',          meal:'Breakfast',      date:'2026-04-28', qty:1,  total:20,  status:'pending'  },
+  { id:'HKM-04899', name:'Tulasi Priya',    mobile:'9198765488', loc:'Thiruvanmiyur', meal:'Sunday Khichdi', date:'2026-04-27', qty:4,  total:100, status:'approved' },
+  { id:'HKM-04898', name:'Radha Mohan',     mobile:'8867452301', loc:'NLBR',          meal:'Dinner',         date:'2026-04-29', qty:2,  total:70,  status:'pending'  },
+  { id:'HKM-04897', name:'Hari Priya',      mobile:'7654321098', loc:'Thiruvanmiyur', meal:'Breakfast',      date:'2026-04-30', qty:3,  total:60,  status:'declined' },
+];
+
+// ─── VIEW MANAGER ───
+function showView(name) {
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+  var el = document.getElementById('view-' + name);
+  if (el) el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // update nav active states
+  document.querySelectorAll('.nav-link').forEach(function(b) { b.classList.remove('active'); });
+  var navMap = { register: 'nav-register', payment: 'nav-register', bookings: 'nav-bookings' };
+  var activeNav = navMap[name] ? document.getElementById(navMap[name]) : null;
+  if (activeNav) activeNav.classList.add('active');
+
+  if (name === 'payment' && hpPending) {
+    document.getElementById('hp-qr-frame').innerHTML = generateQR();
+  }
+  if (name === 'register') resetRegForm();
+  if (name === 'bookings') renderBookings();
+}
+
+function scrollToSection(id) {
+  showView('landing');
+  setTimeout(function() {
+    var el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
+}
+
+// ─── NAV ───
+function toggleNav() {
+  document.getElementById('header-nav').classList.toggle('open');
+}
+function closeNav() {
+  document.getElementById('header-nav').classList.remove('open');
+}
+
+// ─── PRICE BOX ───
+function updatePriceBox() {
+  var meal = document.querySelector('input[name=r-meal]:checked');
+  var date = document.getElementById('r-date').value;
+  var qty  = parseInt(document.getElementById('r-qty').value) || 1;
+  var mealVal = meal ? meal.value : '';
+  var mealKey = mealVal === 'Sunday Khichdi' ? 'SundayKhichdi' : mealVal;
+
+  var rate = 0;
+  if (mealKey) {
+    var ov = priceOvr[date];
+    rate = (ov && ov[mealKey] !== undefined) ? ov[mealKey] : (defRates[mealKey] || 0);
+  }
+  var total = rate * qty;
+
+  document.getElementById('r-price-per').textContent   = rate ? '₹' + rate + '/-' : '—';
+  document.getElementById('r-price-qty').textContent   = qty;
+  document.getElementById('r-price-total').textContent = rate ? '₹' + total + '/-' : '—';
+}
+
+function changeRQty(d) {
+  var inp = document.getElementById('r-qty');
+  var v = Math.max(1, Math.min(10, (parseInt(inp.value) || 1) + d));
+  inp.value = v;
+  updatePriceBox(); checkRBulk();
+}
+function checkRBulk() {
+  var v = parseInt(document.getElementById('r-qty').value) || 1;
+  document.getElementById('r-bulk-warning').classList.toggle('show', v >= 8);
+}
+
+// ─── SUBMIT REG ───
+function submitReg() {
+  var name   = document.getElementById('r-name').value.trim();
+  var mobile = document.getElementById('r-mobile').value.trim();
+  var email  = document.getElementById('r-email').value.trim();
+  var loc    = document.querySelector('input[name=r-location]:checked');
+  var cat    = document.querySelector('input[name=r-category]:checked');
+  var meal   = document.querySelector('input[name=r-meal]:checked');
+  var date   = document.getElementById('r-date').value;
+  var qty    = parseInt(document.getElementById('r-qty').value) || 1;
+
+  if (!name || !mobile || !loc || !cat || !meal || !date) {
+    showHPToast('Please fill all required fields ⚠️'); return;
+  }
+  if (mobile.length !== 10 || !/^\d+$/.test(mobile)) {
+    showHPToast('Enter a valid 10-digit mobile number'); return;
+  }
+
+  var mealKey = meal.value === 'Sunday Khichdi' ? 'SundayKhichdi' : meal.value;
+  var ov   = priceOvr[date];
+  var rate = (ov && ov[mealKey] !== undefined) ? ov[mealKey] : (defRates[mealKey] || 0);
+
+  hpPending = {
+    id: 'HKM-0' + hpCounter++,
+    name: name, mobile: mobile, email: email,
+    loc: loc.value, cat: cat.value, meal: meal.value,
+    date: date, qty: qty,
+    rate: rate, total: rate * qty
+  };
+
+  var mealIcon = { 'Breakfast':'🌅','Lunch':'☀️','Dinner':'🌙','Sunday Khichdi':'🥘' };
+  document.getElementById('hp-booking-id').textContent = hpPending.id;
+  document.getElementById('hp-name').textContent       = name;
+  document.getElementById('hp-meta').textContent       = (mealIcon[meal.value] || '🍽') + ' ' + meal.value + ' · ' + date + ' · ' + qty + ' coupon(s)';
+  document.getElementById('hp-total').textContent      = rate ? '₹' + (rate * qty) + '/-' : 'Free';
+
+  document.getElementById('hp-txid').value = '';
+  document.getElementById('hp-proof').value = '';
+  resetHPProofUI();
+
+  showView('payment');
+}
+
+function resetRegForm() {
+  ['r-name','r-mobile','r-email'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  ['r-location','r-category','r-meal'].forEach(function(n) {
+    var el = document.querySelector('input[name=' + n + ']:checked');
+    if (el) el.checked = false;
+  });
+  var qty = document.getElementById('r-qty'); if (qty) qty.value = 1;
+  document.getElementById('r-bulk-warning').classList.remove('show');
+  updatePriceBox();
+}
+
+// ─── QR GENERATOR ───
+function generateQR() {
+  var size = 21;
+  var m = [];
+  for (var r = 0; r < size; r++) { m[r] = []; for (var c = 0; c < size; c++) m[r][c] = 0; }
+
+  function finder(row, col) {
+    for (var r = 0; r < 7; r++) for (var c = 0; c < 7; c++)
+      m[row+r][col+c] = (r===0||r===6||c===0||c===6||(r>=2&&r<=4&&c>=2&&c<=4)) ? 1 : 0;
+  }
+  finder(0,0); finder(0,14); finder(14,0);
+  for (var i = 8; i < 13; i++) { m[6][i] = i%2===0?1:0; m[i][6] = i%2===0?1:0; }
+  m[13][8] = 1;
+
+  var s = 0x5A3F;
+  function rnd() { s = ((s*1664525+1013904223)>>>0); return (s>>>16)&1; }
+  for (var r = 0; r < size; r++) for (var c = 0; c < size; c++) {
+    if (m[r][c] !== 0) continue;
+    if (!(r<8&&c<8) && !(r<8&&c>=13) && !(r>=13&&c<8)) m[r][c] = rnd();
+  }
+
+  var cell=9, q=4, tot=size*cell+q*2;
+  var svg = '<svg width="'+tot+'" height="'+tot+'" viewBox="0 0 '+tot+' '+tot+'" xmlns="http://www.w3.org/2000/svg">'
+    + '<rect width="'+tot+'" height="'+tot+'" fill="white"/>';
+  for (var r = 0; r < size; r++) for (var c = 0; c < size; c++)
+    if (m[r][c]===1) svg += '<rect x="'+(q+c*cell)+'" y="'+(q+r*cell)+'" width="'+cell+'" height="'+cell+'" fill="#3B1F0A"/>';
+  svg += '</svg>';
+  return svg;
+}
+
+// ─── PROOF UPLOAD ───
+function handleHPProof(input) {
+  if (input.files && input.files[0]) {
+    var f = input.files[0];
+    document.getElementById('hp-proof-drop').classList.add('has-file');
+    document.getElementById('hp-proof-icon').textContent = '✅';
+    document.getElementById('hp-proof-main').textContent = 'Screenshot uploaded';
+    document.getElementById('hp-proof-sub').textContent  = '';
+    var nm = document.getElementById('hp-proof-name');
+    nm.style.display = 'block';
+    nm.textContent = f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)';
+  } else { resetHPProofUI(); }
+}
+function resetHPProofUI() {
+  document.getElementById('hp-proof-drop').classList.remove('has-file');
+  document.getElementById('hp-proof-icon').textContent  = '📸';
+  document.getElementById('hp-proof-main').textContent  = 'Tap to upload payment screenshot';
+  document.getElementById('hp-proof-sub').textContent   = 'JPG, PNG or PDF · Max 5 MB';
+  var nm = document.getElementById('hp-proof-name');
+  nm.style.display = 'none'; nm.textContent = '';
+}
+
+// ─── CONFIRM PAYMENT ───
+function confirmHPPayment() {
+  var txid  = document.getElementById('hp-txid').value.trim();
+  var proof = document.getElementById('hp-proof').files;
+  if (!txid)               { showHPToast('Please enter your UPI Transaction ID ⚠️'); return; }
+  if (!proof || !proof.length) { showHPToast('Please upload your payment screenshot ⚠️'); return; }
+  document.getElementById('hp-success-id').textContent = hpPending ? hpPending.id : '—';
+  if (hpPending) {
+    myBookings.unshift({
+      id: hpPending.id, name: hpPending.name, mobile: hpPending.mobile,
+      loc: hpPending.loc, meal: hpPending.meal, date: hpPending.date,
+      qty: hpPending.qty, total: hpPending.total, status: 'pending'
+    });
+  }
+  showView('success');
+}
+
+// ─── TOAST ───
+var hpToastTimer;
+function showHPToast(msg) {
+  var t = document.getElementById('hp-toast');
+  document.getElementById('hp-toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(hpToastTimer);
+  hpToastTimer = setTimeout(function() { t.classList.remove('show'); }, 3200);
+}
+
+// ─── MY BOOKINGS ───
+function renderBookings() {
+  var list = document.getElementById('bk-list');
+  if (!list) return;
+  if (!myBookings.length) {
+    list.innerHTML = '<div class="bk-empty"><div class="bk-empty-icon">🎟</div><p>No bookings yet. Book your first prasadam coupon!</p></div>';
+    return;
+  }
+  var mealIcon = { 'Breakfast':'🌅', 'Lunch':'☀️', 'Dinner':'🌙', 'Sunday Khichdi':'🥘' };
+  var html = '';
+  for (var i = 0; i < myBookings.length; i++) {
+    var b = myBookings[i];
+    var icon = mealIcon[b.meal] || '🍽';
+    var statusLabel = b.status === 'approved' ? '✔ Approved' : b.status === 'declined' ? '✖ Declined' : '⏳ Pending';
+    var canView = (b.status === 'approved');
+    html += '<div class="bk-item">'
+      + '<div class="bk-id">' + b.id + '</div>'
+      + '<div class="bk-info">'
+      +   '<div class="bk-name">' + b.name + '</div>'
+      +   '<div class="bk-meta">' + icon + ' ' + b.meal + ' &nbsp;·&nbsp; ' + b.date + ' &nbsp;·&nbsp; ' + b.qty + ' coupon(s) &nbsp;·&nbsp; HKM ' + b.loc + '</div>'
+      + '</div>'
+      + '<div class="bk-status"><span class="bk-badge ' + b.status + '"><span class="bk-badge-dot"></span>' + statusLabel + '</span></div>'
+      + '<button class="bk-view-btn' + (canView ? '' : ' disabled') + '" title="View Coupon" onclick="openCouponModal(' + i + ')">'
+      +   (canView ? '👁' : '—')
+      + '</button>'
+      + '</div>';
+  }
+  list.innerHTML = html;
+}
+
+function openCouponModal(idx) {
+  var b = myBookings[idx];
+  var mealIcon = { 'Breakfast':'🌅 Breakfast', 'Lunch':'☀️ Lunch', 'Dinner':'🌙 Dinner', 'Sunday Khichdi':'🥘 Sunday Khichdi' };
+  var dateStr = '';
+  try { dateStr = new Date(b.date + 'T12:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
+  catch(e) { dateStr = b.date; }
+
+  document.getElementById('cm-name').textContent    = b.name;
+  document.getElementById('cm-loc').textContent     = 'HKM ' + b.loc;
+  document.getElementById('cm-meal').textContent    = mealIcon[b.meal] || b.meal;
+  document.getElementById('cm-date').textContent    = dateStr;
+  document.getElementById('cm-qty').textContent     = b.qty + (b.qty === 1 ? ' person' : ' persons');
+  document.getElementById('cm-amount').textContent  = '₹' + b.total + '/-';
+  document.getElementById('cm-uid').textContent     = b.id;
+  document.getElementById('cm-subtitle').textContent = b.meal + ' · ' + b.date;
+
+  var banner = document.getElementById('cm-status-banner');
+  if (b.status === 'approved') {
+    banner.textContent = '✔ Payment Verified — Coupon Active';
+    banner.className = 'coupon-status-banner approved';
+  } else {
+    banner.textContent = '⏳ Pending Admin Approval';
+    banner.className = 'coupon-status-banner pending';
+  }
+
+  document.getElementById('cm-qr').innerHTML = generateQR();
+  document.getElementById('coupon-overlay').classList.add('show');
+}
+
+function closeCouponModal() {
+  document.getElementById('coupon-overlay').classList.remove('show');
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target === document.getElementById('coupon-overlay')) closeCouponModal();
+});
+
+// ─── INIT ───
+window.addEventListener('load', function() {
+  updatePriceBox();
+  var d = new Date(2026,3,27);
+  var inp = document.getElementById('r-date');
+  if (inp) inp.value = d.toISOString().slice(0,10);
+  updatePriceBox();
+});
+</script>
+</body>
+</html>

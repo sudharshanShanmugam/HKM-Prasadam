@@ -163,7 +163,7 @@ input, select, textarea { font-family: 'Inter', sans-serif; }
 .page.active { display: block; }
 
 /* ─── STAT CARDS ─── */
-.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 28px; }
 .stat-card {
   background: var(--white);
   border: 1px solid var(--border);
@@ -846,11 +846,6 @@ tr:hover td { background: var(--ivory); }
     <div class="brand-sub">Coupon Management</div>
   </div>
 
-  <div class="sidebar-section-label">Public</div>
-  <button class="nav-item" onclick="showPage('register')">
-    <span class="nav-icon">📝</span> Register & Book
-  </button>
-
   <div class="sidebar-section-label">Admin</div>
   <button class="nav-item active" onclick="showPage('dashboard')">
     <span class="nav-icon">📊</span> Live Dashboard
@@ -878,7 +873,8 @@ tr:hover td { background: var(--ivory); }
 
   <div class="sidebar-footer">
     HKM Chennai · Thiruvanmiyur & NLBR<br>
-    Hare Krishna Movement
+    Hare Krishna Movement<br><br>
+    <button onclick="window.location.href='hkm-home.html'" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);padding:6px 14px;border-radius:6px;font-size:0.7rem;cursor:pointer;width:100%">← Public Site</button>
   </div>
 </nav>
 
@@ -895,7 +891,7 @@ tr:hover td { background: var(--ivory); }
     </div>
     <div class="topbar-right">
       <div class="topbar-date" id="today-date"></div>
-      <button class="btn btn-primary btn-sm" onclick="showPage('register')">+ New Registration</button>
+      <button class="btn btn-primary btn-sm" onclick="window.location.href='hkm-home.html'">🪷 Public Site</button>
       <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -1128,12 +1124,6 @@ tr:hover td { background: var(--ivory); }
         <div class="stat-label">Bulk Requests</div>
         <div class="stat-num red">8</div>
         <div class="stat-delta">≥ 8 coupons pending review</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">✅</div>
-        <div class="stat-label">Slots Open Today</div>
-        <div class="stat-num green">6</div>
-        <div class="stat-delta">2 locations × 3 meals</div>
       </div>
     </div>
 
@@ -1868,7 +1858,7 @@ tr:hover td { background: var(--ivory); }
               <th>Amount Claimed</th>
               <th>UPI TX ID</th>
               <th>Submitted</th>
-              <th>Screenshot</th>
+              <th style="text-align:center">Screenshot</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -2783,14 +2773,11 @@ function renderPaymentsTable() {
     var actions = '';
     if (p.status === 'pending') {
       actions = '<div class="pay-action-group">'
-        + '<button class="pay-action-btn view"    title="View details"   onclick="openPayModal(' + idx + ')">👁</button>'
         + '<button class="pay-action-btn approve" title="Verify payment" onclick="quickPayAction(' + idx + ',\'verified\')">✓</button>'
         + '<button class="pay-action-btn decline" title="Decline"        onclick="quickPayAction(' + idx + ',\'declined\')">✕</button>'
         + '</div>';
     } else {
-      actions = '<div class="pay-action-group">'
-        + '<button class="pay-action-btn view" title="View details" onclick="openPayModal(' + idx + ')">👁</button>'
-        + '</div>';
+      actions = '<span style="font-size:0.75rem;color:var(--text-light)">—</span>';
     }
     html += '<tr>'
       + '<td><strong style="color:var(--saffron)">' + p.id + '</strong></td>'
@@ -2798,7 +2785,7 @@ function renderPaymentsTable() {
       + '<td><strong>₹' + p.amount.toLocaleString('en-IN') + '</strong></td>'
       + '<td style="font-family:monospace;font-size:0.78rem">' + p.txid + '</td>'
       + '<td style="white-space:nowrap">' + p.submitted + '</td>'
-      + '<td><span class="ss-thumb" title="View screenshot" onclick="openPayModal(' + idx + ')">📸</span></td>'
+      + '<td style="text-align:center"><span class="ss-thumb" title="View screenshot" onclick="openPayModal(' + idx + ')">📸</span></td>'
       + '<td>' + (statusBadge[p.status] || p.status) + '</td>'
       + '<td>' + actions + '</td>'
       + '</tr>';
