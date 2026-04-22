@@ -507,6 +507,100 @@ tr:hover td { background: var(--ivory); }
 .report-info p { font-size: 0.78rem; color: var(--text-light); line-height: 1.5; margin-bottom: 12px; }
 .report-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* ─── PAYMENT STEP ─── */
+.payment-step-wrap {
+  max-width: 560px; margin: 0 auto;
+}
+.payment-step-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden; margin-bottom: 20px;
+  box-shadow: 0 4px 24px rgba(60,20,0,0.08);
+}
+.payment-step-header {
+  background: linear-gradient(135deg, var(--brown-dark), var(--brown-mid));
+  padding: 20px 26px; color: #fff;
+}
+.payment-step-header h3 { font-size: 1.3rem; color: #fff; margin-bottom: 3px; }
+.payment-step-header p  { font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+.qr-section {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 28px 24px 20px; border-bottom: 1px solid var(--border-light);
+}
+.qr-frame {
+  width: 200px; height: 200px;
+  border: 3px solid var(--brown-dark);
+  border-radius: 14px; overflow: hidden;
+  background: #fff; padding: 6px;
+  box-shadow: 0 4px 20px rgba(60,20,0,0.15);
+  margin-bottom: 14px;
+}
+.qr-frame svg { width: 100%; height: 100%; }
+.qr-upi-id {
+  font-size: 0.82rem; font-weight: 600; color: var(--text-mid);
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: 50px; padding: 6px 18px; letter-spacing: 0.03em;
+}
+.pay-order-summary {
+  padding: 16px 24px; background: var(--saffron-pale);
+  border-bottom: 1px solid rgba(232,98,26,0.15);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  flex-wrap: wrap;
+}
+.pay-order-id   { font-size: 0.72rem; color: var(--saffron-dark); font-weight: 700; letter-spacing:0.04em; }
+.pay-order-name { font-size: 0.88rem; font-weight: 600; color: var(--brown-dark); }
+.pay-order-amt  { font-size: 1.3rem; font-weight: 700; color: var(--saffron); font-family:'Cormorant Garamond',serif; }
+.pay-form-section { padding: 22px 24px; }
+.pay-form-section .form-group { margin-bottom: 18px; }
+.pay-proof-upload {
+  border: 2px dashed var(--border);
+  border-radius: 10px; padding: 24px; text-align: center;
+  cursor: pointer; transition: all 0.2s; background: var(--cream);
+  position: relative;
+}
+.pay-proof-upload:hover, .pay-proof-upload.has-file {
+  border-color: var(--saffron); background: var(--saffron-pale);
+}
+.pay-proof-upload input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.pay-proof-icon  { font-size: 2rem; margin-bottom: 8px; }
+.pay-proof-label { font-size: 0.82rem; font-weight: 600; color: var(--text-mid); }
+.pay-proof-sub   { font-size: 0.72rem; color: var(--text-light); margin-top: 3px; }
+.pay-proof-name  { font-size: 0.78rem; color: var(--saffron); font-weight: 600; margin-top: 6px; display:none; }
+
+/* Success state */
+.pay-success-wrap {
+  max-width: 480px; margin: 60px auto 0;
+  text-align: center; padding: 0 16px;
+}
+.pay-success-icon {
+  width: 90px; height: 90px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-pale), #d4edda);
+  border: 3px solid #b2dfbc;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem; margin: 0 auto 24px;
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { from { transform: scale(0); opacity:0; } to { transform: scale(1); opacity:1; } }
+.pay-success-title { font-size: 1.9rem; color: var(--brown-dark); margin-bottom: 10px; }
+.pay-success-sub   { font-size: 0.88rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 28px; }
+.pay-success-ref   {
+  display: inline-block;
+  background: var(--cream); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 12px 24px; margin-bottom: 28px;
+}
+.pay-success-ref-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-light); margin-bottom: 4px; }
+.pay-success-ref-val   { font-size: 1rem; font-weight: 700; color: var(--saffron); letter-spacing: 0.06em; }
+.pay-status-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--gold-pale); border: 1.5px solid #f0d870;
+  border-radius: 50px; padding: 8px 20px;
+  font-size: 0.82rem; font-weight: 600; color: var(--gold);
+  margin-bottom: 28px;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.pay-status-dot { width:8px;height:8px;border-radius:50%;background:var(--gold);animation:pulse 1.5s infinite; }
+
 /* ─── PAYMENTS ─── */
 .pay-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
 .badge-pending  { background: var(--gold-pale);  color: var(--gold);  border: 1px solid #f0d870; }
@@ -924,10 +1018,46 @@ tr:hover td { background: var(--ivory); }
             </div>
           </div>
 
-          <div style="margin-top:24px">
-            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="submitRegistration()">
-              🪷 Confirm Registration & Generate Coupon
-            </button>
+          <!-- ── PRICE SUMMARY + TERMS ── -->
+          <div style="margin-top:24px;border:1.5px solid var(--border);border-radius:12px;overflow:hidden">
+            <!-- Price breakdown -->
+            <div style="background:var(--cream);padding:16px 18px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light)">
+                <span style="font-size:0.78rem;color:var(--text-mid);font-weight:500">Price per Coupon</span>
+                <span style="font-size:0.88rem;font-weight:700;color:var(--text-dark)" id="price-per-coupon">₹40/-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light)">
+                <span style="font-size:0.78rem;color:var(--text-mid);font-weight:500">Quantity</span>
+                <span style="font-size:0.88rem;font-weight:700;color:var(--text-dark)" id="price-qty-display">1</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0 4px">
+                <span style="font-size:0.82rem;font-weight:700;color:var(--brown-dark)">Total Amount</span>
+                <span style="font-size:1.08rem;font-weight:700;color:var(--saffron)" id="price-total">₹40/-</span>
+              </div>
+            </div>
+
+            <!-- Timing + note -->
+            <div style="background:var(--gold-pale);border-top:1px solid #f0d870;padding:10px 18px;display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:center;gap:7px;font-size:0.78rem;color:var(--brown-mid);font-weight:600">
+                <span>🕖</span> Prasadam Timing: <strong>6:30 PM to 9:00 PM</strong>
+              </div>
+              <div style="font-size:0.74rem;color:var(--maroon);font-weight:500">
+                ⚠️ Note: The coupons are not valid on Festival days.
+              </div>
+            </div>
+
+            <!-- Terms + BUY NOW -->
+            <div style="background:#fff;padding:14px 18px">
+              <p style="font-size:0.72rem;color:var(--text-light);margin-bottom:14px;line-height:1.6;text-align:center">
+                By continuing, you are agreeing to our
+                <a href="#" style="color:var(--saffron);text-decoration:none;font-weight:600">Terms of Use</a>
+                and
+                <a href="#" style="color:var(--saffron);text-decoration:none;font-weight:600">Privacy Policy</a>
+              </p>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:0.95rem;letter-spacing:0.05em" onclick="submitRegistration()">
+                🛒 BUY NOW
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1573,6 +1703,113 @@ tr:hover td { background: var(--ivory); }
   </div>
 
 
+  <!-- ═══ PAGE: PAYMENT STEP ═══ -->
+  <div class="page" id="page-payment">
+
+    <!-- ── QR + Form state ── -->
+    <div id="pay-step-qr">
+      <div class="payment-step-wrap">
+
+        <!-- Order summary bar -->
+        <div class="payment-step-card">
+          <div class="payment-step-header">
+            <h3>💳 Complete Your Payment</h3>
+            <p>Scan the QR code and pay via UPI, then submit your transaction details below</p>
+          </div>
+          <div class="pay-order-summary">
+            <div>
+              <div class="pay-order-id" id="ps-booking-id">HKM-000000</div>
+              <div class="pay-order-name" id="ps-name">Devotee Name</div>
+              <div style="font-size:0.75rem;color:var(--text-light);margin-top:2px" id="ps-meal-info">—</div>
+            </div>
+            <div class="pay-order-amt" id="ps-total">₹0/-</div>
+          </div>
+
+          <!-- QR Code -->
+          <div class="qr-section">
+            <div class="qr-frame" id="qr-frame"></div>
+            <div class="qr-upi-id">📲 Pay to: <strong>hkmchennai@ybl</strong></div>
+            <div style="font-size:0.72rem;color:var(--text-light);margin-top:8px;text-align:center">
+              Open any UPI app · Scan & pay · Come back here to confirm
+            </div>
+          </div>
+
+          <!-- TX ID + Upload form -->
+          <div class="pay-form-section">
+            <div class="form-group">
+              <label class="form-label">UPI Transaction ID <span class="req">*</span></label>
+              <input class="form-input" id="ps-txid" type="text" placeholder="e.g. UPI-2026-12345678" oninput="this.value=this.value.toUpperCase()">
+              <div style="font-size:0.7rem;color:var(--text-light);margin-top:5px">Copy from your UPI app payment confirmation screen</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Payment Screenshot <span class="req">*</span></label>
+              <div class="pay-proof-upload" id="proof-drop" onclick="document.getElementById('ps-proof').click()">
+                <input type="file" id="ps-proof" accept="image/*" onchange="handleProofUpload(this)">
+                <div class="pay-proof-icon" id="proof-icon">📸</div>
+                <div class="pay-proof-label" id="proof-label">Tap to upload payment screenshot</div>
+                <div class="pay-proof-sub" id="proof-sub">JPG, PNG or PDF · Max 5 MB</div>
+                <div class="pay-proof-name" id="proof-name"></div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:0.95rem" onclick="confirmPayment()">
+              ✅ Confirm Payment Submission
+            </button>
+            <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:10px" onclick="showPage('register')">
+              ← Back to Registration
+            </button>
+          </div>
+        </div>
+
+        <!-- Info note -->
+        <div style="background:var(--gold-pale);border:1px solid #f0d870;border-radius:10px;padding:14px 18px;font-size:0.78rem;color:var(--brown-mid);line-height:1.7">
+          <strong>📋 Important:</strong> Keep your UPI transaction ID and screenshot ready. Your booking will be held for <strong>30 minutes</strong> while payment is verified by our admin team.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Success / Pending state ── -->
+    <div id="pay-step-success" style="display:none">
+      <div class="pay-success-wrap">
+        <div class="pay-success-icon">⏳</div>
+        <h2 class="pay-success-title">Payment Submitted!</h2>
+        <p class="pay-success-sub">
+          Your payment is under review. Our admin team will verify your UPI transaction and approve it shortly.<br><br>
+          You will receive a <strong>confirmation email</strong> with your digital prasadam coupon once the payment is approved.
+        </p>
+        <div class="pay-success-ref">
+          <div class="pay-success-ref-label">Booking Reference</div>
+          <div class="pay-success-ref-val" id="ps-success-id">HKM-000000</div>
+        </div>
+        <br>
+        <div class="pay-status-pill">
+          <span class="pay-status-dot"></span>
+          Payment Approval Pending
+        </div>
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:16px 20px;text-align:left;margin-bottom:28px">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-light);margin-bottom:10px">What happens next?</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.8rem;color:var(--text-mid)">
+              <span style="color:var(--saffron);font-weight:700;flex-shrink:0">1.</span> Admin verifies your UPI transaction ID and screenshot
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.8rem;color:var(--text-mid)">
+              <span style="color:var(--saffron);font-weight:700;flex-shrink:0">2.</span> Your booking is confirmed in our system
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.8rem;color:var(--text-mid)">
+              <span style="color:var(--saffron);font-weight:700;flex-shrink:0">3.</span> Digital prasadam coupon is sent to your email address
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="showPage('register')">🪷 New Registration</button>
+          <button class="btn btn-ghost" onclick="showPage('dashboard')">📊 Dashboard</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
   <!-- ═══ PAGE: PAYMENTS ═══ -->
   <div class="page" id="page-payments">
     <!-- Stats row -->
@@ -1784,6 +2021,7 @@ var payments = [
 var payPage = 0;
 var payPerPage = 8;
 var currentPayModalIdx = -1;
+var pendingEntry = null;
 
 // fill-rate data per date key "YYYY-MM-DD"
 const fillData = {
@@ -1829,6 +2067,7 @@ const pageTitles = {
   pricing:       ['Pricing Calendar',          'Set special-day food rates by date'],
   reports:       ['Reports & Exports',        'PDF & Excel data exports'],
   payments:      ['Payments',                 'Review and verify UPI payment submissions'],
+  payment:       ['Complete Payment',         'Scan QR & submit your UPI transaction details'],
 };
 
 function showPage(id) {
@@ -1845,6 +2084,8 @@ function showPage(id) {
   if (id === 'coupon') renderCoupon();
   if (id === 'dashboard') updateDashboardStats();
   if (id === 'pricing') renderCalendar();
+  if (id === 'payments') renderPaymentsTable();
+  if (id === 'payment' && !pendingEntry) showPage('register'); // guard: no direct nav
   // close mobile sidebar
   document.getElementById('main-sidebar').classList.remove('open');
   document.getElementById('sidebar-overlay').classList.remove('open');
@@ -1889,6 +2130,26 @@ function updateSummary() {
   document.getElementById('sum-date').textContent   = date ? new Date(date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
   document.getElementById('sum-qty').textContent    = qty + (parseInt(qty) >= 8 ? ' ⚠️ Bulk' : '');
   document.getElementById('sum-uid').textContent    = 'HKM-00' + couponCounter;
+
+  // ── price breakdown panel ──
+  var mealKey = meal === 'Sunday Khichdi' ? 'SundayKhichdi' : meal;
+  var dateOverride = (typeof pricingOverrides !== 'undefined' && date) ? pricingOverrides[date] : null;
+  var rate = 0;
+  if (mealKey && mealKey !== '—') {
+    if (dateOverride && dateOverride[mealKey] !== undefined) {
+      rate = dateOverride[mealKey];
+    } else if (typeof defaultRates !== 'undefined' && defaultRates[mealKey] !== undefined) {
+      rate = defaultRates[mealKey];
+    }
+  }
+  var qtyNum = parseInt(qty) || 1;
+  var total  = rate * qtyNum;
+  var ppcEl  = document.getElementById('price-per-coupon');
+  var pqdEl  = document.getElementById('price-qty-display');
+  var ptlEl  = document.getElementById('price-total');
+  if (ppcEl) ppcEl.textContent = rate ? '₹' + rate + '/-' : '—';
+  if (pqdEl) pqdEl.textContent = qtyNum;
+  if (ptlEl) ptlEl.textContent = rate ? '₹' + total + '/-' : '—';
 }
 
 function changeQty(delta) {
@@ -1946,20 +2207,11 @@ function submitRegistration() {
   const entry = { id: uid, name, mobile, email, loc, cat, meal, date, qty };
   registrations.unshift(entry);
   lastConfirmed = entry;
-
   document.getElementById('reg-count-badge').textContent = registrations.length;
-  document.getElementById('modal-uid').textContent = uid;
-  document.getElementById('success-modal').classList.add('show');
 
-  // reset form
-  ['f-name','f-mobile','f-email'].forEach(id => { document.getElementById(id).value = ''; });
-  ['location','category','meal'].forEach(name => {
-    const el = document.querySelector(`input[name=${name}]:checked`);
-    if (el) el.checked = false;
-  });
-  document.getElementById('f-qty').value = 1;
-  document.getElementById('bulk-warning').classList.remove('show');
-  updateSummary();
+  // navigate to payment step
+  showPage('payment');
+  loadPaymentStep(entry);
 }
 
 function closeModal() {
@@ -2474,6 +2726,320 @@ window.addEventListener('load', function() {
   renderAllTable();
   updateDashboardStats();
 });
+
+// ════════════════════════════════════════
+// PAYMENTS
+// ════════════════════════════════════════
+function updatePayStats() {
+  var pending  = payments.filter(function(p){ return p.status === 'pending';  }).length;
+  var verified = payments.filter(function(p){ return p.status === 'verified'; }).length;
+  var declined = payments.filter(function(p){ return p.status === 'declined'; }).length;
+  var totalEl   = document.getElementById('pay-stat-total');
+  var pendingEl = document.getElementById('pay-stat-pending');
+  var verEl     = document.getElementById('pay-stat-verified');
+  var decEl     = document.getElementById('pay-stat-declined');
+  var badgeEl   = document.getElementById('pay-pending-badge');
+  if (totalEl)   totalEl.textContent   = payments.length;
+  if (pendingEl) pendingEl.textContent = pending;
+  if (verEl)     verEl.textContent     = verified;
+  if (decEl)     decEl.textContent     = declined;
+  if (badgeEl) {
+    badgeEl.textContent = pending;
+    badgeEl.style.display = pending > 0 ? '' : 'none';
+  }
+}
+
+function renderPaymentsTable() {
+  var tbody = document.getElementById('pay-tbody');
+  var pager = document.getElementById('pay-pager');
+  if (!tbody) return;
+
+  var search    = (document.getElementById('pay-search')        ? document.getElementById('pay-search').value        : '').toLowerCase();
+  var statusF   = (document.getElementById('pay-filter-status') ? document.getElementById('pay-filter-status').value : '');
+  var locF      = (document.getElementById('pay-filter-loc')    ? document.getElementById('pay-filter-loc').value    : '');
+
+  var rows = payments.filter(function(p) {
+    if (search  && (p.name.toLowerCase().indexOf(search) === -1 && p.txid.toLowerCase().indexOf(search) === -1 && p.id.toLowerCase().indexOf(search) === -1)) return false;
+    if (statusF && p.status !== statusF) return false;
+    if (locF    && p.loc    !== locF)    return false;
+    return true;
+  });
+
+  var total = rows.length;
+  var start = payPage * payPerPage;
+  var end   = Math.min(start + payPerPage, total);
+  var pageRows = rows.slice(start, end);
+
+  var statusBadge = {
+    pending:  '<span class="badge badge-gold" style="gap:5px">◆ PENDING</span>',
+    verified: '<span class="badge badge-green" style="gap:5px">✔ VERIFIED</span>',
+    declined: '<span class="badge badge-maroon" style="gap:5px">✖ DECLINED</span>'
+  };
+
+  var html = '';
+  for (var i = 0; i < pageRows.length; i++) {
+    var p = pageRows[i];
+    var idx = payments.indexOf(p);
+    var actions = '';
+    if (p.status === 'pending') {
+      actions = '<div class="pay-action-group">'
+        + '<button class="pay-action-btn view"    title="View details"   onclick="openPayModal(' + idx + ')">👁</button>'
+        + '<button class="pay-action-btn approve" title="Verify payment" onclick="quickPayAction(' + idx + ',\'verified\')">✓</button>'
+        + '<button class="pay-action-btn decline" title="Decline"        onclick="quickPayAction(' + idx + ',\'declined\')">✕</button>'
+        + '</div>';
+    } else {
+      actions = '<div class="pay-action-group">'
+        + '<button class="pay-action-btn view" title="View details" onclick="openPayModal(' + idx + ')">👁</button>'
+        + '</div>';
+    }
+    html += '<tr>'
+      + '<td><strong style="color:var(--saffron)">' + p.id + '</strong></td>'
+      + '<td>' + p.name + '</td>'
+      + '<td><strong>₹' + p.amount.toLocaleString('en-IN') + '</strong></td>'
+      + '<td style="font-family:monospace;font-size:0.78rem">' + p.txid + '</td>'
+      + '<td style="white-space:nowrap">' + p.submitted + '</td>'
+      + '<td><span class="ss-thumb" title="View screenshot" onclick="openPayModal(' + idx + ')">📸</span></td>'
+      + '<td>' + (statusBadge[p.status] || p.status) + '</td>'
+      + '<td>' + actions + '</td>'
+      + '</tr>';
+  }
+  tbody.innerHTML = html || '<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-light)">No payments found.</td></tr>';
+
+  if (pager) {
+    var totalPages = Math.ceil(total / payPerPage) || 1;
+    var info = 'Showing ' + (total === 0 ? 0 : start + 1) + '–' + end + ' of ' + total + ' payments';
+    var prev = '<button class="btn btn-ghost btn-sm" onclick="changePayPage(-1)" ' + (payPage === 0 ? 'disabled' : '') + '>← Prev</button>';
+    var next = '<button class="btn btn-ghost btn-sm" onclick="changePayPage(1)" '  + (payPage >= totalPages - 1 ? 'disabled' : '') + '>Next →</button>';
+    pager.innerHTML = '<span>' + info + '</span><div style="display:flex;gap:8px">' + prev + next + '</div>';
+  }
+
+  updatePayStats();
+}
+
+function changePayPage(d) { payPage += d; renderPaymentsTable(); }
+
+function quickPayAction(idx, newStatus) {
+  payments[idx].status = newStatus;
+  renderPaymentsTable();
+  showToast(newStatus === 'verified' ? '✅ Payment verified: ' + payments[idx].id : '❌ Payment declined: ' + payments[idx].id);
+}
+
+function openPayModal(idx) {
+  var p = payments[idx];
+  currentPayModalIdx = idx;
+
+  var statusBadge = {
+    pending:  '<span class="badge badge-gold">◆ PENDING</span>',
+    verified: '<span class="badge badge-green">✔ VERIFIED</span>',
+    declined: '<span class="badge badge-maroon">✖ DECLINED</span>'
+  };
+
+  var mealIcon = { 'Breakfast':'🌅', 'Lunch':'☀️', 'Dinner':'🌙', 'Sunday Khichdi':'🥘' };
+
+  document.getElementById('pmd-title').textContent     = p.name;
+  document.getElementById('pmd-booking-id').textContent = p.id;
+  document.getElementById('pmd-name').textContent      = p.name;
+  document.getElementById('pmd-mobile').textContent    = p.mobile;
+  document.getElementById('pmd-meal-date').textContent = (mealIcon[p.meal] || '🍽') + ' ' + p.meal + ' · ' + p.date;
+  document.getElementById('pmd-loc').textContent       = 'HKM ' + p.loc;
+  document.getElementById('pmd-amount').textContent    = '₹' + p.amount.toLocaleString('en-IN');
+  document.getElementById('pmd-txid').textContent      = p.txid;
+  document.getElementById('pmd-submitted').textContent = p.submitted;
+  document.getElementById('pmd-status-badge').innerHTML = statusBadge[p.status] || p.status;
+
+  // Show/hide action buttons based on current status
+  var approveBtn = document.getElementById('pmd-approve-btn');
+  var declineBtn = document.getElementById('pmd-decline-btn');
+  if (p.status === 'pending') {
+    approveBtn.style.display = '';
+    declineBtn.style.display = '';
+  } else if (p.status === 'verified') {
+    approveBtn.style.display = 'none';
+    declineBtn.style.display = '';
+    declineBtn.textContent   = '✕ Revoke';
+  } else {
+    approveBtn.style.display = '';
+    approveBtn.textContent   = '✓ Re-verify';
+    declineBtn.style.display = 'none';
+  }
+
+  document.getElementById('pay-modal-overlay').classList.add('show');
+}
+
+function closePayModal() {
+  document.getElementById('pay-modal-overlay').classList.remove('show');
+  currentPayModalIdx = -1;
+  // Reset button labels
+  document.getElementById('pmd-approve-btn').textContent = '✓ Verify Payment';
+  document.getElementById('pmd-decline-btn').textContent = '✕ Decline';
+}
+
+function payModalAction(newStatus) {
+  if (currentPayModalIdx === -1) return;
+  payments[currentPayModalIdx].status = newStatus;
+  var p = payments[currentPayModalIdx];
+  closePayModal();
+  renderPaymentsTable();
+  showToast(newStatus === 'verified' ? '✅ Payment verified: ' + p.id : '❌ Payment declined: ' + p.id);
+}
+
+// Close modal on overlay click
+document.addEventListener('click', function(e) {
+  var overlay = document.getElementById('pay-modal-overlay');
+  if (e.target === overlay) closePayModal();
+});
+
+// ════════════════════════════════════════
+// PAYMENT STEP (QR + TX ID + Proof)
+// ════════════════════════════════════════
+function generateQRSvg() {
+  var size = 21;
+  var modules = [];
+  for (var r = 0; r < size; r++) {
+    modules[r] = [];
+    for (var c = 0; c < size; c++) modules[r][c] = 0;
+  }
+
+  function addFinder(row, col) {
+    for (var r = 0; r < 7; r++) {
+      for (var c = 0; c < 7; c++) {
+        modules[row+r][col+c] =
+          (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) ? 1 : 0;
+      }
+    }
+  }
+  addFinder(0, 0); addFinder(0, 14); addFinder(14, 0);
+
+  // separator rows/cols (leave 0)
+  // timing patterns
+  for (var i = 8; i < 13; i++) { modules[6][i] = (i % 2 === 0) ? 1 : 0; modules[i][6] = (i % 2 === 0) ? 1 : 0; }
+  modules[13][8] = 1; // dark module
+
+  // pseudo-random data
+  var seed = 0x5A3F;
+  function rand() { seed = ((seed * 1664525 + 1013904223) >>> 0); return (seed >>> 16) & 1; }
+
+  for (var r = 0; r < size; r++) {
+    for (var c = 0; c < size; c++) {
+      if (modules[r][c] !== 0) continue;
+      var inTL = (r < 8 && c < 8), inTR = (r < 8 && c >= 13), inBL = (r >= 13 && c < 8);
+      if (!inTL && !inTR && !inBL) modules[r][c] = rand();
+    }
+  }
+
+  var cell = 9, quiet = 4, total = size * cell + quiet * 2;
+  var svg = '<svg width="' + total + '" height="' + total + '" viewBox="0 0 ' + total + ' ' + total + '" xmlns="http://www.w3.org/2000/svg">'
+    + '<rect width="' + total + '" height="' + total + '" fill="white"/>';
+  for (var r = 0; r < size; r++) {
+    for (var c = 0; c < size; c++) {
+      if (modules[r][c] === 1) {
+        svg += '<rect x="' + (quiet + c*cell) + '" y="' + (quiet + r*cell) + '" width="' + cell + '" height="' + cell + '" fill="#3B1F0A"/>';
+      }
+    }
+  }
+  svg += '</svg>';
+  return svg;
+}
+
+function loadPaymentStep(entry) {
+  pendingEntry = entry;
+
+  // reset states
+  document.getElementById('pay-step-qr').style.display = '';
+  document.getElementById('pay-step-success').style.display = 'none';
+  document.getElementById('ps-txid').value = '';
+  document.getElementById('ps-proof').value = '';
+  resetProofUI();
+
+  // fill order summary
+  var mealIcon = { 'Breakfast':'🌅','Lunch':'☀️','Dinner':'🌙','Sunday Khichdi':'🥘' };
+  var mealKey  = entry.meal === 'Sunday Khichdi' ? 'SundayKhichdi' : entry.meal;
+  var override = (typeof pricingOverrides !== 'undefined') ? pricingOverrides[entry.date] : null;
+  var rate = (override && override[mealKey] !== undefined) ? override[mealKey]
+             : (typeof defaultRates !== 'undefined' ? (defaultRates[mealKey] || 0) : 0);
+  var total = rate * entry.qty;
+
+  document.getElementById('ps-booking-id').textContent = entry.id;
+  document.getElementById('ps-name').textContent       = entry.name;
+  document.getElementById('ps-meal-info').textContent  =
+    (mealIcon[entry.meal] || '🍽') + ' ' + entry.meal + ' · ' + entry.date + ' · ' + entry.qty + ' coupon(s)';
+  document.getElementById('ps-total').textContent = rate ? '₹' + total + '/-' : 'Free';
+
+  // render QR
+  document.getElementById('qr-frame').innerHTML = generateQRSvg();
+
+  // reset the registration form silently
+  ['f-name','f-mobile','f-email'].forEach(function(id) { document.getElementById(id).value = ''; });
+  ['location','category','meal'].forEach(function(n) {
+    var el = document.querySelector('input[name=' + n + ']:checked');
+    if (el) el.checked = false;
+  });
+  document.getElementById('f-qty').value = 1;
+  document.getElementById('bulk-warning').classList.remove('show');
+  updateSummary();
+}
+
+function handleProofUpload(input) {
+  var drop = document.getElementById('proof-drop');
+  var nameEl = document.getElementById('proof-name');
+  var iconEl = document.getElementById('proof-icon');
+  var labelEl = document.getElementById('proof-label');
+  var subEl = document.getElementById('proof-sub');
+  if (input.files && input.files[0]) {
+    var file = input.files[0];
+    drop.classList.add('has-file');
+    iconEl.textContent = '✅';
+    labelEl.textContent = 'Screenshot uploaded';
+    subEl.textContent = '';
+    nameEl.style.display = 'block';
+    nameEl.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+  } else {
+    resetProofUI();
+  }
+}
+
+function resetProofUI() {
+  var drop = document.getElementById('proof-drop');
+  if (drop) drop.classList.remove('has-file');
+  var iconEl  = document.getElementById('proof-icon');
+  var labelEl = document.getElementById('proof-label');
+  var subEl   = document.getElementById('proof-sub');
+  var nameEl  = document.getElementById('proof-name');
+  if (iconEl)  iconEl.textContent  = '📸';
+  if (labelEl) labelEl.textContent = 'Tap to upload payment screenshot';
+  if (subEl)   subEl.textContent   = 'JPG, PNG or PDF · Max 5 MB';
+  if (nameEl)  { nameEl.style.display = 'none'; nameEl.textContent = ''; }
+}
+
+function confirmPayment() {
+  var txid  = document.getElementById('ps-txid').value.trim();
+  var proof = document.getElementById('ps-proof').files;
+
+  if (!txid) { showToast('Please enter your UPI Transaction ID ⚠️'); return; }
+  if (!proof || !proof.length) { showToast('Please upload your payment screenshot ⚠️'); return; }
+
+  // Add to payments list as pending
+  if (pendingEntry) {
+    var mealKey  = pendingEntry.meal === 'Sunday Khichdi' ? 'SundayKhichdi' : pendingEntry.meal;
+    var override = (typeof pricingOverrides !== 'undefined') ? pricingOverrides[pendingEntry.date] : null;
+    var rate = (override && override[mealKey] !== undefined) ? override[mealKey]
+               : (typeof defaultRates !== 'undefined' ? (defaultRates[mealKey] || 0) : 0);
+    payments.unshift({
+      id: pendingEntry.id, name: pendingEntry.name,
+      mobile: pendingEntry.mobile, loc: pendingEntry.loc,
+      meal: pendingEntry.meal, date: pendingEntry.date, qty: pendingEntry.qty,
+      amount: rate * pendingEntry.qty, txid: txid,
+      submitted: new Date().toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}),
+      status: 'pending'
+    });
+  }
+
+  // show success state
+  document.getElementById('pay-step-qr').style.display = 'none';
+  document.getElementById('pay-step-success').style.display = '';
+  document.getElementById('ps-success-id').textContent = pendingEntry ? pendingEntry.id : '—';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 </script>
 </body>
 </html>
