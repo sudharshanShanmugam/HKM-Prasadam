@@ -54,7 +54,7 @@ input, select, textarea { font-family: 'Inter', sans-serif; }
 .sidebar {
   width: var(--sidebar-w);
   min-height: 100vh;
-  background: #BA5726;
+  background: #D86A32;
   position: fixed;
   left: 0; top: 0; bottom: 0;
   display: flex; flex-direction: column;
@@ -1654,7 +1654,7 @@ tr:hover td { background: var(--ivory); }
             </select>
           </div>
           <div class="report-actions">
-            <button class="btn btn-primary btn-sm" onclick="printDistributionList()">⬇️ Print / Save PDF</button>
+            <button class="btn btn-primary btn-sm" onclick="exportPDF()">⬇️ Print / Save PDF</button>
           </div>
         </div>
       </div>
@@ -2356,126 +2356,6 @@ function exportCSV(scope) {
 
 function exportPDF() {
   window.print();
-}
-
-function printDistributionList() {
-  var dateVal  = document.getElementById('report-dist-date').value;
-  var locVal   = document.getElementById('report-dist-loc').value;
-
-  var dateLabel = dateVal
-    ? new Date(dateVal + 'T12:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
-    : 'All Dates';
-  var locLabel = locVal || 'All Locations';
-
-  var meals = [
-    { key: 'Breakfast',      label: 'Breakfast' },
-    { key: 'Lunch',          label: 'Lunch' },
-    { key: 'Dinner',         label: 'Dinner' },
-    { key: 'Sunday Khichdi', label: 'Sunday Khichdi' }
-  ];
-
-  function buildMealSection(meal) {
-    var filtered = registrations.filter(function(r) {
-      return (!dateVal || r.date === dateVal) && (!locVal || r.loc === locVal) && r.meal === meal.key;
-    });
-    var total = filtered.reduce(function(s, r) { return s + r.qty; }, 0);
-    var rows = filtered.length
-      ? filtered.map(function(r, i) {
-          return '<tr>'
-            + '<td>' + (i + 1) + '</td>'
-            + '<td>' + r.id + '</td>'
-            + '<td><strong>' + r.name + '</strong></td>'
-            + '<td>' + r.mobile + '</td>'
-            + '<td>' + r.loc + '</td>'
-            + '<td>' + r.cat + '</td>'
-            + '<td style="text-align:center;font-weight:700">' + r.qty + '</td>'
-            + '</tr>';
-        }).join('')
-      : '<tr><td colspan="7" style="text-align:center;padding:14px;color:#aaa;font-style:italic">No registrations for this meal</td></tr>';
-
-    return '<div class="meal-section">'
-      + '<div class="meal-heading">'
-      + meal.label
-      + (filtered.length ? '<span class="meal-count">' + filtered.length + ' bookings &nbsp;&bull;&nbsp; ' + total + ' coupons total</span>' : '')
-      + '</div>'
-      + '<table><thead><tr>'
-      + '<th>#</th><th>Coupon ID</th><th>Name</th><th>Mobile</th><th>Location</th><th>Category</th><th>Qty</th>'
-      + '</tr></thead><tbody>' + rows + '</tbody></table>'
-      + '</div>';
-  }
-
-  var html = [
-    '<!DOCTYPE html><html><head><meta charset="UTF-8">',
-    '<title>Distribution List</title>',
-    '<style>',
-    '* { box-sizing: border-box; margin: 0; padding: 0; }',
-    'body { font-family: Arial, sans-serif; padding: 28px 32px; color: #1a0a00; font-size: 12px; background: #fff; }',
-    '.header { display: flex; align-items: center; gap: 18px; padding-bottom: 16px; border-bottom: 3px solid #D86A32; margin-bottom: 24px; }',
-    '.logo-circle { width: 52px; height: 52px; background: #D86A32; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }',
-    '.logo-circle svg { width: 28px; height: 28px; fill: #fff; }',
-    '.org-name { font-size: 18px; font-weight: 700; color: #D86A32; line-height: 1.2; }',
-    '.org-sub { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #888; margin-top: 3px; }',
-    '.header-right { margin-left: auto; text-align: right; }',
-    '.doc-title { font-size: 13px; font-weight: 700; color: #333; }',
-    '.meta { margin-top: 5px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }',
-    '.meta-pill { background: #fff3ec; border: 1px solid #f0c8a0; border-radius: 4px; padding: 3px 9px; font-size: 10px; color: #8a4010; }',
-    '.meal-section { margin-bottom: 24px; }',
-    '.meal-heading { background: #D86A32; color: #fff; padding: 8px 14px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }',
-    '.meal-count { font-size: 10px; font-weight: 400; opacity: 0.88; }',
-    'table { width: 100%; border-collapse: collapse; }',
-    'thead { background: #fff3ec; }',
-    'th { padding: 6px 10px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: #D86A32; border-bottom: 1.5px solid #f0c8a0; }',
-    'td { padding: 6px 10px; border-bottom: 1px solid #f0e8dc; font-size: 11px; }',
-    'tr:last-child td { border-bottom: 2px solid #f0c8a0; }',
-    'tr:nth-child(even) td { background: #fffaf6; }',
-    '.footer { text-align: center; margin-top: 28px; font-size: 9px; color: #bbb; border-top: 1px solid #eee; padding-top: 10px; }',
-    '@media print {',
-    '  body { padding: 16px; }',
-    '  .meal-section { page-break-inside: avoid; }',
-    '  .meal-heading { -webkit-print-color-adjust: exact; print-color-adjust: exact; }',
-    '  thead { -webkit-print-color-adjust: exact; print-color-adjust: exact; }',
-    '}',
-    '</style></head><body>',
-    '<div class="header">',
-    '  <div class="logo-circle">',
-    '    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
-    '      <path d="M12 2C9.5 5 7 7.5 7 10.5a5 5 0 0010 0C17 7.5 14.5 5 12 2z"/>',
-    '      <path d="M12 13c-2.5 3-5 5.5-5 8.5h10c0-3-2.5-5.5-5-8.5z" opacity=".6"/>',
-    '    </svg>',
-    '  </div>',
-    '  <div>',
-    '    <div class="org-name">Hare Krishna Movement</div>',
-    '    <div class="org-sub">Chennai &middot; Prasadam Seva</div>',
-    '  </div>',
-    '  <div class="header-right">',
-    '    <div class="doc-title">Daily Distribution List</div>',
-    '    <div class="meta">',
-    '      <span class="meta-pill">Date: ' + dateLabel + '</span>',
-    '      <span class="meta-pill">Location: ' + locLabel + '</span>',
-    '    </div>',
-    '  </div>',
-    '</div>',
-    meals.map(buildMealSection).join(''),
-    '<div class="footer">Generated on ' + new Date().toLocaleString('en-IN') + ' &nbsp;&bull;&nbsp; HKM Prasadam Management &nbsp;&bull;&nbsp; Hare Krishna!</div>',
-    '</body></html>'
-  ].join('\n');
-
-  /* use hidden iframe — works without popup blocker issues */
-  var old = document.getElementById('dist-print-frame');
-  if (old) old.parentNode.removeChild(old);
-
-  var iframe = document.createElement('iframe');
-  iframe.id = 'dist-print-frame';
-  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
-  document.body.appendChild(iframe);
-
-  var doc = iframe.contentDocument || iframe.contentWindow.document;
-  doc.open(); doc.write(html); doc.close();
-
-  setTimeout(function() {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-  }, 350);
 }
 
 // ─── SLOT OVERRIDES ───
