@@ -438,6 +438,18 @@ tr:hover td { background: var(--ivory); }
 .slot-status-pill.closed { background: var(--red-pale);   color: var(--red);   }
 .slot-action-btn { flex-shrink: 0; min-width: 96px; justify-content: center; }
 
+/* slot add-form tabs */
+.slot-tab-bar { display: flex; gap: 0; border-bottom: 2px solid var(--saffron-pale); margin-bottom: 16px; }
+.slot-tab-btn { padding: 8px 18px; font-size: 0.8rem; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--text-light); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+.slot-tab-btn.active { color: var(--saffron); border-bottom-color: var(--saffron); }
+.slot-tab-pane { display: none; }
+.slot-tab-pane.active { display: flex; flex-direction: column; gap: 12px; }
+.slot-form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.slot-form-field { display: flex; flex-direction: column; gap: 5px; }
+.slot-form-field label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-mid); }
+.slot-form-select { padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.85rem; color: var(--text-dark); background: #fff; font-family: 'Inter', sans-serif; outline: none; min-width: 180px; }
+.slot-form-select:focus { border-color: var(--saffron); }
+
 /* ─── EMAIL COUPON PREVIEW ─── */
 .coupon-preview-wrapper {
   background: var(--white);
@@ -1401,19 +1413,64 @@ tr:hover td { background: var(--ivory); }
       <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:16px">Close a specific slot early if the kitchen is at capacity before the auto-close deadline.</p>
 
       <!-- Add slot form -->
-      <div id="add-slot-form" style="display:none;background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:16px">
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-          <div>
-            <label class="form-label" style="margin-bottom:5px">Slot Label</label>
-            <input class="form-input" id="new-slot-label" placeholder="e.g. Lunch · Thiruvanmiyur" style="width:220px">
-          </div>
-          <div>
-            <label class="form-label" style="margin-bottom:5px">Date</label>
-            <input class="form-input" id="new-slot-date" type="date" style="width:160px">
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="addSlotOverride()" style="margin-bottom:2px">Add</button>
-          <button class="btn btn-ghost btn-sm" onclick="toggleAddSlotForm()" style="margin-bottom:2px">Cancel</button>
+      <div id="add-slot-form" style="display:none;background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px">
+
+        <!-- Tab bar -->
+        <div class="slot-tab-bar">
+          <button class="slot-tab-btn active" onclick="switchSlotTab('general')">General</button>
+          <button class="slot-tab-btn" onclick="switchSlotTab('festival')">Festival</button>
         </div>
+
+        <!-- General tab -->
+        <div class="slot-tab-pane active" id="slot-tab-general">
+          <div class="slot-form-row">
+            <div class="slot-form-field">
+              <label>Date</label>
+              <input class="form-input" id="new-slot-date" type="date" style="width:160px">
+            </div>
+            <div class="slot-form-field">
+              <label>Meal Type</label>
+              <select class="slot-form-select" id="new-slot-meal-gen">
+                <option value="">— Select Meal —</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Special Khichdi">Special Khichdi</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-end">
+              <button class="btn btn-primary btn-sm" onclick="addSlotGeneral()">Add Slot</button>
+              <button class="btn btn-ghost btn-sm" onclick="toggleAddSlotForm()">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Festival tab -->
+        <div class="slot-tab-pane" id="slot-tab-festival">
+          <div class="slot-form-row">
+            <div class="slot-form-field">
+              <label>Festival</label>
+              <select class="slot-form-select" id="new-slot-festival" style="min-width:220px">
+                <option value="">— Select Festival —</option>
+              </select>
+            </div>
+            <div class="slot-form-field">
+              <label>Meal Type</label>
+              <select class="slot-form-select" id="new-slot-meal-fest">
+                <option value="">— Select Meal —</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Special Khichdi">Special Khichdi</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-end">
+              <button class="btn btn-primary btn-sm" onclick="addSlotFestival()">Add Slot</button>
+              <button class="btn btn-ghost btn-sm" onclick="toggleAddSlotForm()">Cancel</button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <div class="slot-override-grid" id="slot-overrides">
@@ -2396,23 +2453,68 @@ function removeSlot(i) {
   showToast('Override removed: ' + label);
 }
 
+var adminFestivals = [
+  { date: '2026-04-30', name: 'Sri Rama Navami' },
+  { date: '2026-05-03', name: 'Hanuman Jayanti' },
+  { date: '2026-05-04', name: 'Sunday Feast (Khichdi)' },
+  { date: '2026-05-10', name: 'Mohini Ekadashi' },
+  { date: '2026-05-11', name: 'Parashurama Jayanti' },
+  { date: '2026-05-24', name: 'Narasimha Chaturdashi' },
+  { date: '2026-05-25', name: 'Srila Prabhupada Vyasa Puja' },
+  { date: '2026-06-01', name: 'Pandava Nirjala Ekadashi' },
+  { date: '2026-06-14', name: 'Snana Yatra' },
+  { date: '2026-06-27', name: 'Rath Yatra' }
+];
+
 function toggleAddSlotForm() {
-  const f = document.getElementById('add-slot-form');
-  f.style.display = f.style.display === 'none' ? 'flex' : 'none';
-  if (f.style.display !== 'none') document.getElementById('new-slot-label').focus();
+  var f = document.getElementById('add-slot-form');
+  var open = f.style.display === 'none' || f.style.display === '';
+  f.style.display = open ? 'block' : 'none';
+  if (open) populateFestivalSlotDropdown();
 }
 
-function addSlotOverride() {
-  const label = document.getElementById('new-slot-label').value.trim();
-  const raw   = document.getElementById('new-slot-date').value;
-  if (!label || !raw) { showToast('Please enter a label and date'); return; }
-  const dateStr = new Date(raw + 'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-  slots.push({ label, date: dateStr, status: 'open' });
+function switchSlotTab(tab) {
+  document.querySelectorAll('.slot-tab-btn').forEach(function(b, i) {
+    b.classList.toggle('active', (i === 0 && tab === 'general') || (i === 1 && tab === 'festival'));
+  });
+  document.getElementById('slot-tab-general').classList.toggle('active', tab === 'general');
+  document.getElementById('slot-tab-festival').classList.toggle('active', tab === 'festival');
+}
+
+function populateFestivalSlotDropdown() {
+  var today = new Date().toISOString().slice(0, 10);
+  var sel = document.getElementById('new-slot-festival');
+  sel.innerHTML = '<option value="">— Select Festival —</option>'
+    + adminFestivals.filter(function(f) { return f.date >= today; }).map(function(f) {
+        var d = new Date(f.date + 'T12:00:00');
+        var ds = d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+        return '<option value="' + f.date + '|' + f.name + '">' + f.name + '  ·  ' + ds + '</option>';
+      }).join('');
+}
+
+function addSlotGeneral() {
+  var raw  = document.getElementById('new-slot-date').value;
+  var meal = document.getElementById('new-slot-meal-gen').value;
+  if (!raw || !meal) { alert('Please select a date and meal type.'); return; }
+  var dateStr = new Date(raw + 'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+  slots.push({ label: meal + '  ·  ' + dateStr, date: dateStr, status: 'open' });
   renderSlotOverrides();
-  document.getElementById('new-slot-label').value = '';
-  document.getElementById('new-slot-date').value  = '';
+  document.getElementById('new-slot-date').value = '';
+  document.getElementById('new-slot-meal-gen').value = '';
   document.getElementById('add-slot-form').style.display = 'none';
-  showToast('Slot added: ' + label);
+}
+
+function addSlotFestival() {
+  var val  = document.getElementById('new-slot-festival').value;
+  var meal = document.getElementById('new-slot-meal-fest').value;
+  if (!val || !meal) { alert('Please select a festival and meal type.'); return; }
+  var parts = val.split('|');
+  var dateStr = new Date(parts[0] + 'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+  slots.push({ label: meal + '  ·  ' + parts[1], date: dateStr, status: 'open' });
+  renderSlotOverrides();
+  document.getElementById('new-slot-festival').value = '';
+  document.getElementById('new-slot-meal-fest').value = '';
+  document.getElementById('add-slot-form').style.display = 'none';
 }
 
 // ─── TOGGLE SWITCH ───

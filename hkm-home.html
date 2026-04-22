@@ -505,6 +505,22 @@ section { padding: 88px 40px; }
 .bulk-warning { display: none; background: var(--saffron-pale); border: 1px solid rgba(232,98,26,0.25); border-radius: 8px; padding: 10px 14px; font-size: 0.78rem; color: var(--saffron-dark); margin-top: 8px; }
 .bulk-warning.show { display: block; }
 
+/* festival picker */
+.fest-picker { display: none; margin-top: 12px; }
+.fest-picker.show { display: block; }
+.fest-select {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  font-family: 'Inter', sans-serif; font-size: 0.88rem;
+  color: var(--text-dark); background: #fff;
+  cursor: pointer; outline: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23E8621A' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  padding-right: 36px;
+}
+.fest-select:focus { border-color: var(--saffron); box-shadow: 0 0 0 3px rgba(232,98,26,0.1); }
+.fest-select option { padding: 8px; }
+
 /* price box */
 .price-box { border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 24px; }
 .price-rows { background: var(--cream); padding: 14px 18px; }
@@ -916,13 +932,20 @@ section { padding: 88px 40px; }
       <label class="form-label">Prasadam Category <span class="req">*</span></label>
       <div class="pill-group">
         <div class="pill-opt">
-          <input type="radio" name="r-category" id="r-cat-gen" value="General">
+          <input type="radio" name="r-category" id="r-cat-gen" value="General" onchange="onCategoryChange()">
           <label for="r-cat-gen">🍱 General</label>
         </div>
         <div class="pill-opt">
-          <input type="radio" name="r-category" id="r-cat-fest" value="Festival">
+          <input type="radio" name="r-category" id="r-cat-fest" value="Festival" onchange="onCategoryChange()">
           <label for="r-cat-fest">🎉 Festival</label>
         </div>
+      </div>
+
+      <!-- Festival picker (shown only when Festival selected) -->
+      <div class="fest-picker" id="fest-picker">
+        <select class="fest-select" id="fest-select" onchange="selectFestival(this.value)">
+          <option value="">— Select a Festival —</option>
+        </select>
       </div>
     </div>
     <div class="form-group">
@@ -1218,6 +1241,49 @@ function toggleNav() {
 }
 function closeNav() {
   document.getElementById('header-nav').classList.remove('open');
+}
+
+// ─── FESTIVAL PICKER ───
+var festivalData = [
+  { date: '2026-04-30', name: 'Sri Rama Navami',       desc: 'Appearance of Lord Sri Ramachandra' },
+  { date: '2026-05-03', name: 'Hanuman Jayanti',        desc: 'Appearance of Lord Hanuman' },
+  { date: '2026-05-04', name: 'Sunday Feast (Khichdi)', desc: 'Weekly Sunday prasadam feast' },
+  { date: '2026-05-10', name: 'Mohini Ekadashi',        desc: 'Auspicious Ekadashi fasting day' },
+  { date: '2026-05-11', name: 'Parashurama Jayanti',    desc: 'Appearance of Lord Parashurama' },
+  { date: '2026-05-24', name: 'Narasimha Chaturdashi',  desc: 'Appearance of Lord Narasimhadeva' },
+  { date: '2026-05-25', name: 'Srila Prabhupada Vyasa Puja', desc: 'Celebration of Founder-Acharya' },
+  { date: '2026-06-01', name: 'Pandava Nirjala Ekadashi', desc: 'Most auspicious Ekadashi of year' },
+  { date: '2026-06-14', name: 'Snana Yatra',            desc: 'Bathing ceremony of Lord Jagannath' },
+  { date: '2026-06-27', name: 'Rath Yatra',             desc: 'Grand Chariot Festival of Lord Jagannath' }
+];
+
+function onCategoryChange() {
+  var isFest = document.querySelector('input[name=r-category]:checked')?.value === 'Festival';
+  var picker = document.getElementById('fest-picker');
+  picker.classList.toggle('show', isFest);
+  if (isFest) renderFestList();
+  updatePriceBox();
+}
+
+function renderFestList() {
+  var today  = new Date().toISOString().slice(0, 10);
+  var list   = festivalData.filter(function(f) { return f.date >= today; });
+  var sel    = document.getElementById('fest-select');
+  var curVal = document.getElementById('r-date').value;
+
+  sel.innerHTML = '<option value="">— Select a Festival —</option>'
+    + list.map(function(f) {
+        var d = new Date(f.date + 'T12:00:00');
+        var dateStr = d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+        var selected = f.date === curVal ? ' selected' : '';
+        return '<option value="' + f.date + '"' + selected + '>' + f.name + '  ·  ' + dateStr + '</option>';
+      }).join('');
+}
+
+function selectFestival(dateVal) {
+  if (!dateVal) return;
+  document.getElementById('r-date').value = dateVal;
+  updatePriceBox();
 }
 
 // ─── PRICE BOX ───
