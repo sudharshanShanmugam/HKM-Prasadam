@@ -102,8 +102,8 @@ input, select, textarea { font-family: 'Inter', sans-serif; }
   border-left: 3px solid transparent;
   cursor: pointer;
 }
-.nav-item:hover { color: #fff; background: rgba(255,255,255,0.12); }
-.nav-item.active { color: #fff; background: rgba(255,255,255,0.2); border-left-color: #fff; font-weight: 600; }
+.nav-item:hover { color: #fff; background: rgba(255,255,255,0.14); border-left-color: rgba(255,255,255,0.4); }
+.nav-item.active { color: #fff; background: rgba(255,255,255,0.22); border-left-color: #fff; font-weight: 600; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
 .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
 .nav-badge {
   margin-left: auto; font-size: 0.65rem; font-weight: 700;
@@ -165,31 +165,34 @@ input, select, textarea { font-family: 'Inter', sans-serif; }
 
 /* ─── PAGES ─── */
 .page { display: none; flex: 1; padding: 28px 32px; }
-.page.active { display: block; }
+.page.active { display: block; animation: pageIn 0.22s ease; }
+@keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ─── STAT CARDS ─── */
 .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 28px; }
 .stat-card {
   background: #fff;
   border: 1.5px solid var(--saffron-pale);
-  border-radius: 14px;
-  padding: 22px 24px;
+  border-radius: 16px;
+  padding: 24px 24px 20px;
   position: relative; overflow: hidden;
-  box-shadow: 0 2px 12px rgba(232,98,26,0.07);
+  box-shadow: 0 4px 18px rgba(232,98,26,0.09);
+  transition: transform 0.18s, box-shadow 0.18s;
 }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,98,26,0.14); }
 .stat-card::before {
   content: '';
   position: absolute; top: 0; left: 0;
-  width: 100%; height: 3px;
+  width: 100%; height: 4px;
   background: linear-gradient(to right, var(--saffron), var(--gold));
 }
-.stat-label { font-size: 0.71rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; }
-.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700; color: var(--saffron-dark); line-height: 1; }
+.stat-label { font-size: 0.71rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); margin-bottom: 10px; }
+.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 700; color: var(--saffron-dark); line-height: 1; }
 .stat-num.green { color: var(--green); }
 .stat-num.red { color: var(--red); }
 .stat-num.gold { color: var(--gold); }
-.stat-delta { font-size: 0.72rem; color: var(--text-light); margin-top: 5px; }
-.stat-icon { position: absolute; right: 18px; top: 18px; font-size: 1.6rem; opacity: 0.12; }
+.stat-delta { font-size: 0.72rem; color: var(--text-light); margin-top: 6px; }
+.stat-icon { position: absolute; right: 18px; top: 20px; font-size: 1.7rem; width: 44px; height: 44px; background: var(--saffron-pale); border-radius: 12px; display: flex; align-items: center; justify-content: center; opacity: 0.85; }
 
 /* ─── FILL RATE BAR ─── */
 .fill-rate-section {
@@ -203,7 +206,8 @@ input, select, textarea { font-family: 'Inter', sans-serif; }
 .fill-rate-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .fill-rate-header h3 { font-size: 1.05rem; color: var(--saffron-dark); }
 .fill-bars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.fill-bar-item { background: var(--saffron-pale); border-radius: 10px; padding: 14px 16px; }
+.fill-bar-item { background: linear-gradient(135deg, var(--saffron-pale), var(--gold-pale)); border-radius: 10px; padding: 14px 16px; border: 1px solid rgba(232,98,26,0.12); transition: box-shadow 0.18s; }
+.fill-bar-item:hover { box-shadow: 0 4px 14px rgba(232,98,26,0.12); }
 .fill-bar-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .fill-bar-name { font-size: 0.78rem; font-weight: 600; color: var(--text-mid); }
 .fill-bar-count { font-size: 0.78rem; font-weight: 700; color: var(--brown-dark); }
@@ -289,11 +293,17 @@ tr:hover td { background: var(--ivory); }
 }
 .form-card-header {
   padding: 22px 28px 18px;
-  background: linear-gradient(135deg, var(--brown-dark), var(--brown-mid));
-  color: #fff;
+  background: linear-gradient(135deg, var(--saffron-dark) 0%, var(--saffron) 60%, var(--saffron-light) 100%);
+  color: #fff; position: relative; overflow: hidden;
 }
-.form-card-header h2 { font-size: 1.6rem; color: #fff; margin-bottom: 4px; }
-.form-card-header p { font-size: 0.8rem; color: rgba(255,255,255,0.6); }
+.form-card-header::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 30%, rgba(255,255,255,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+.form-card-header h2 { font-size: 1.6rem; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+.form-card-header p { font-size: 0.8rem; color: rgba(255,255,255,0.75); }
 .form-card-body { padding: 28px; }
 
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -354,10 +364,10 @@ tr:hover td { background: var(--ivory); }
 }
 .summary-card-header {
   padding: 18px 20px;
-  background: linear-gradient(135deg, var(--saffron-pale), var(--gold-pale));
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--saffron-dark), var(--saffron));
+  border-bottom: none;
 }
-.summary-card-header h4 { font-size: 1.1rem; color: var(--brown-dark); }
+.summary-card-header h4 { font-size: 1.1rem; color: #fff; }
 .summary-card-body { padding: 20px; }
 .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border-light); }
 .summary-row:last-child { border-bottom: none; }
@@ -397,7 +407,7 @@ tr:hover td { background: var(--ivory); }
   margin-bottom: 24px;
   box-shadow: 0 2px 12px rgba(232,98,26,0.07);
 }
-.window-section h3 { font-size: 1.05rem; color: var(--brown-dark); margin-bottom: 18px; }
+.window-section h3 { font-size: 1.05rem; color: var(--saffron-dark); margin-bottom: 18px; padding-left: 10px; border-left: 3px solid var(--saffron); }
 .window-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .window-rule {
   display: flex; align-items: center; gap: 12px;
@@ -894,10 +904,10 @@ tr:hover td { background: var(--ivory); }
     <span class="nav-badge" id="reg-count-badge">40</span>
   </button>
   <button class="nav-item" onclick="showPage('capacity')">
-    <span class="nav-icon">⚙️</span> Capacity & Slots
+    <span class="nav-icon">⚙️</span> Default Setting
   </button>
   <button class="nav-item" onclick="showPage('pricing')">
-    <span class="nav-icon">💰</span> Pricing Calendar
+    <span class="nav-icon">💰</span> Slot Management
   </button>
   <button class="nav-item" onclick="showPage('payments')">
     <span class="nav-icon">💳</span> Payments
@@ -1179,46 +1189,17 @@ tr:hover td { background: var(--ivory); }
     <div class="fill-rate-section">
       <div class="fill-rate-header">
         <h3>📊 Live Fill Rate — Today's Slots</h3>
-        <select class="filter-select" id="dashboard-date-filter" onchange="refreshFillBars()">
-          <option>Today (Apr 21)</option>
-          <option>Tomorrow (Apr 22)</option>
-          <option>Apr 27 (Sunday)</option>
-        </select>
-      </div>
-      <div class="fill-bars">
-        <div class="fill-bar-item">
-          <div class="fill-bar-top">
-            <span class="fill-bar-name">🌅 Breakfast · Thiruvanmiyur</span>
-            <span class="fill-bar-count">64 / 100</span>
-          </div>
-          <div class="fill-track"><div class="fill-fill" style="width:64%"></div></div>
-          <div class="fill-pct">64% — 36 remaining</div>
-        </div>
-        <div class="fill-bar-item">
-          <div class="fill-bar-top">
-            <span class="fill-bar-name">☀️ Lunch · Thiruvanmiyur</span>
-            <span class="fill-bar-count">88 / 100</span>
-          </div>
-          <div class="fill-track"><div class="fill-fill warning" style="width:88%"></div></div>
-          <div class="fill-pct">88% — 12 remaining</div>
-        </div>
-        <div class="fill-bar-item">
-          <div class="fill-bar-top">
-            <span class="fill-bar-name">🌙 Dinner · Thiruvanmiyur</span>
-            <span class="fill-bar-count">41 / 100</span>
-          </div>
-          <div class="fill-track"><div class="fill-fill" style="width:41%"></div></div>
-          <div class="fill-pct">41% — 59 remaining</div>
-        </div>
-        <div class="fill-bar-item">
-          <div class="fill-bar-top">
-            <span class="fill-bar-name">☀️ Lunch · NLBR</span>
-            <span class="fill-bar-count">97 / 100</span>
-          </div>
-          <div class="fill-track"><div class="fill-fill danger" style="width:97%"></div></div>
-          <div class="fill-pct" style="color:var(--red);font-weight:600">97% — Almost Full!</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="filter-select" id="dashboard-date-filter" onchange="refreshFillBars()">
+            <!-- populated by JS -->
+          </select>
+          <select class="filter-select" id="dashboard-loc-filter" onchange="refreshFillBars()">
+            <option value="Thiruvanmiyur">📍 Thiruvanmiyur</option>
+            <option value="NLBR">📍 NLBR</option>
+          </select>
         </div>
       </div>
+      <div class="fill-bars" id="fill-bars-container"></div>
     </div>
 
     <!-- Recent registrations mini -->
@@ -1711,7 +1692,7 @@ tr:hover td { background: var(--ivory); }
             </select>
           </div>
           <div class="report-actions">
-            <button class="btn btn-primary btn-sm" onclick="exportPDF()">⬇️ Print / Save PDF</button>
+            <button class="btn btn-primary btn-sm" onclick="printDistributionList()">⬇️ Print / Save PDF</button>
           </div>
         </div>
       </div>
@@ -2046,27 +2027,19 @@ var payPerPage = 8;
 var currentPayModalIdx = -1;
 var pendingEntry = null;
 
-// fill-rate data per date key "YYYY-MM-DD"
+// fill-rate data by location → meal
 const fillData = {
-  'today': [
-    { name: '🌅 Breakfast · Thiruvanmiyur', used: 64,  limit: 100 },
-    { name: '☀️ Lunch · Thiruvanmiyur',     used: 88,  limit: 100 },
-    { name: '🌙 Dinner · Thiruvanmiyur',    used: 41,  limit: 100 },
-    { name: '🌅 Breakfast · NLBR',          used: 44,  limit: 80  },
-    { name: '☀️ Lunch · NLBR',              used: 78,  limit: 80  },
-    { name: '🌙 Dinner · NLBR',             used: 16,  limit: 80  },
+  'Thiruvanmiyur': [
+    { icon: '🌅', meal: 'Breakfast',      used: 64,  limit: 100 },
+    { icon: '☀️', meal: 'Lunch',          used: 88,  limit: 100 },
+    { icon: '🌙', meal: 'Dinner',         used: 41,  limit: 100 },
+    { icon: '🥘', meal: 'Sunday Khichdi', used: 35,  limit: 200 },
   ],
-  'tomorrow': [
-    { name: '🌅 Breakfast · Thiruvanmiyur', used: 22,  limit: 100 },
-    { name: '☀️ Lunch · Thiruvanmiyur',     used: 55,  limit: 100 },
-    { name: '🌙 Dinner · Thiruvanmiyur',    used: 18,  limit: 100 },
-    { name: '🌅 Breakfast · NLBR',          used: 12,  limit: 80  },
-    { name: '☀️ Lunch · NLBR',              used: 30,  limit: 80  },
-    { name: '🌙 Dinner · NLBR',             used: 9,   limit: 80  },
-  ],
-  'sunday': [
-    { name: '🥘 Sunday Khichdi · Thiruvanmiyur', used: 64,  limit: 200 },
-    { name: '🥘 Sunday Khichdi · NLBR',          used: 33,  limit: 150 },
+  'NLBR': [
+    { icon: '🌅', meal: 'Breakfast',      used: 44,  limit: 80  },
+    { icon: '☀️', meal: 'Lunch',          used: 78,  limit: 80  },
+    { icon: '🌙', meal: 'Dinner',         used: 16,  limit: 80  },
+    { icon: '🥘', meal: 'Sunday Khichdi', used: 33,  limit: 150 },
   ],
 };
 
@@ -2085,9 +2058,9 @@ const pageTitles = {
   register:      ['Register for Prasadam',   'Book your sacred meal coupon'],
   dashboard:     ['Live Dashboard',           'Real-time fill rates & alerts'],
   registrations: ['All Registrations',        'Search, filter and manage bookings'],
-  capacity:      ['Capacity & Slot Manager',  'Set limits and booking windows'],
+  capacity:      ['Default Setting', 'Set limits and booking windows'],
   coupon:        ['Email Coupon Preview',     'Digital ticket sent to devotees'],
-  pricing:       ['Pricing Calendar',          'Set special-day food rates by date'],
+  pricing:       ['Slot Management', 'Set special-day food rates by date'],
   reports:       ['Reports & Exports',        'PDF & Excel data exports'],
   payments:      ['Payments',                 'Review and verify UPI payment submissions'],
   payment:       ['Complete Payment',         'Scan QR & submit your UPI transaction details'],
@@ -2105,7 +2078,7 @@ function showPage(id) {
   if (id === 'registrations') renderAllTable();
   if (id === 'capacity') { renderSlotOverrides(); renderDefaultRateInputs(); renderDefaultLimitInputs(); }
   if (id === 'coupon') renderCoupon();
-  if (id === 'dashboard') updateDashboardStats();
+  if (id === 'dashboard') { updateDashboardStats(); populateDateFilter(); refreshFillBars(); }
   if (id === 'pricing') renderCalendar();
   if (id === 'payments') renderPaymentsTable();
   if (id === 'payment' && !pendingEntry) showPage('register'); // guard: no direct nav
@@ -2270,28 +2243,56 @@ function updateDashboardStats() {
 }
 
 // ─── FILL-RATE TICKER ───
+function populateDateFilter() {
+  var sel = document.getElementById('dashboard-date-filter');
+  if (!sel) return;
+  var today    = new Date();
+  var tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+  var pad = function(n) { return String(n).padStart(2,'0'); };
+  var fmt = function(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); };
+  var todayKey    = fmt(today);
+  var tomorrowKey = fmt(tomorrow);
+
+  var opts = [
+    { value: todayKey,    label: 'Today (' + today.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + ')' },
+    { value: tomorrowKey, label: 'Tomorrow (' + tomorrow.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + ')' },
+  ];
+
+  // add this month's special days from pricingOverrides
+  var mm = pad(today.getMonth() + 1);
+  var prefix = today.getFullYear() + '-' + mm;
+  Object.keys(pricingOverrides).sort().forEach(function(k) {
+    if (k.startsWith(prefix) && k !== todayKey && k !== tomorrowKey) {
+      var d = new Date(k + 'T12:00:00');
+      var label = pricingOverrides[k].label || '';
+      opts.push({ value: k, label: d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + (label ? ' — ' + label : '') });
+    }
+  });
+
+  sel.innerHTML = opts.map(function(o) {
+    return '<option value="' + o.value + '">' + o.label + '</option>';
+  }).join('');
+}
+
 function refreshFillBars() {
-  const sel = document.getElementById('dashboard-date-filter');
-  const keys = ['today', 'tomorrow', 'sunday'];
-  const key  = keys[sel.selectedIndex] || 'today';
-  const data = fillData[key] || [];
-  const container = document.querySelector('.fill-bars');
-  container.innerHTML = data.map(item => {
-    const pct = Math.round((item.used / item.limit) * 100);
-    const cls = pct >= 90 ? 'danger' : pct >= 75 ? 'warning' : '';
-    const rem = item.limit - item.used;
-    const remText = pct >= 90
-      ? `<span style="color:var(--red);font-weight:600">${pct}% — ${rem <= 0 ? 'Full!' : rem + ' remaining'}</span>`
-      : `${pct}% — ${rem} remaining`;
-    return `
-      <div class="fill-bar-item">
-        <div class="fill-bar-top">
-          <span class="fill-bar-name">${item.name}</span>
-          <span class="fill-bar-count">${item.used} / ${item.limit}</span>
-        </div>
-        <div class="fill-track"><div class="fill-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div>
-        <div class="fill-pct">${remText}</div>
-      </div>`;
+  var loc = (document.getElementById('dashboard-loc-filter') || {}).value || 'Thiruvanmiyur';
+  var data = fillData[loc] || [];
+  var container = document.getElementById('fill-bars-container');
+  container.innerHTML = data.map(function(item) {
+    var pct    = Math.round((item.used / item.limit) * 100);
+    var cls    = pct >= 90 ? 'danger' : pct >= 75 ? 'warning' : '';
+    var rem    = item.limit - item.used;
+    var remText = pct >= 90
+      ? '<span style="color:var(--red);font-weight:600">' + pct + '% — ' + (rem <= 0 ? 'Full!' : rem + ' remaining') + '</span>'
+      : pct + '% — ' + rem + ' remaining';
+    return '<div class="fill-bar-item">'
+      + '<div class="fill-bar-top">'
+      + '<span class="fill-bar-name">' + item.icon + ' ' + item.meal + '</span>'
+      + '<span class="fill-bar-count">' + item.used + ' / ' + item.limit + '</span>'
+      + '</div>'
+      + '<div class="fill-track"><div class="fill-fill ' + cls + '" style="width:' + Math.min(pct,100) + '%"></div></div>'
+      + '<div class="fill-pct">' + remText + '</div>'
+      + '</div>';
   }).join('');
 }
 
@@ -2413,6 +2414,109 @@ function exportCSV(scope) {
 
 function exportPDF() {
   window.print();
+}
+
+function printDistributionList() {
+  var dateVal = document.getElementById('report-dist-date').value;
+  var locVal  = document.getElementById('report-dist-loc').value;
+
+  var dateLabel = dateVal
+    ? new Date(dateVal + 'T12:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+    : 'All Dates';
+  var locLabel = locVal || 'All Locations';
+
+  var meals = [
+    { key: 'Breakfast',      label: 'Breakfast',      icon: '&#127749;' },
+    { key: 'Lunch',          label: 'Lunch',          icon: '&#9728;&#65039;' },
+    { key: 'Dinner',         label: 'Dinner',         icon: '&#127769;' },
+    { key: 'Sunday Khichdi', label: 'Sunday Khichdi', icon: '&#129368;' }
+  ];
+
+  function buildSection(meal) {
+    var list = registrations.filter(function(r) {
+      return (!dateVal || r.date === dateVal) && (!locVal || r.loc === locVal) && r.meal === meal.key;
+    });
+    var total = list.reduce(function(s, r) { return s + r.qty; }, 0);
+    var rows = list.length
+      ? list.map(function(r, i) {
+          return '<tr>'
+            + '<td class="sn">' + (i + 1) + '</td>'
+            + '<td class="cid">' + r.id + '</td>'
+            + '<td class="nm">' + r.name + '</td>'
+            + '<td>' + r.mobile + '</td>'
+            + '<td>' + r.loc + '</td>'
+            + '<td>' + r.cat + '</td>'
+            + '<td class="qty">' + r.qty + '</td>'
+            + '</tr>';
+        }).join('')
+      : '<tr><td colspan="7" class="empty">No bookings for this meal</td></tr>';
+
+    return '<div class="section">'
+      + '<div class="meal-head">'
+      + '<span>' + meal.label + '</span>'
+      + (list.length ? '<span class="meal-meta">' + list.length + ' bookings &bull; ' + total + ' coupons</span>' : '')
+      + '</div>'
+      + '<table><thead><tr>'
+      + '<th>#</th><th>Coupon ID</th><th>Name</th><th>Mobile</th><th>Location</th><th>Category</th><th>Qty</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table>'
+      + '</div>';
+  }
+
+  var genDate = new Date().toLocaleString('en-IN');
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Distribution List</title><style>'
+    + '* { box-sizing:border-box; margin:0; padding:0; }'
+    + 'body { font-family:Arial,sans-serif; color:#1a0a00; background:#fff; padding:28px 32px; font-size:12px; }'
+    + '/* header */'
+    + '.hdr { display:flex; align-items:center; gap:18px; border-bottom:3px solid #D86A32; padding-bottom:14px; margin-bottom:22px; }'
+    + '.logo { width:52px; height:52px; background:#D86A32; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }'
+    + '.logo svg { width:26px; height:26px; fill:#fff; }'
+    + '.org { line-height:1.3; }'
+    + '.org-name { font-size:17px; font-weight:700; color:#D86A32; }'
+    + '.org-sub  { font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#999; margin-top:2px; }'
+    + '.hdr-right { margin-left:auto; text-align:right; }'
+    + '.doc-title { font-size:13px; font-weight:700; color:#333; }'
+    + '.pills { display:flex; gap:8px; justify-content:flex-end; margin-top:6px; flex-wrap:wrap; }'
+    + '.pill { background:#fff3ec; border:1px solid #f0c8a0; border-radius:4px; padding:3px 10px; font-size:10px; color:#8a4010; }'
+    + '/* meal sections */'
+    + '.section { margin-bottom:22px; page-break-inside:avoid; }'
+    + '.meal-head { background:#D86A32; color:#fff; padding:8px 14px; display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:700; border-radius:6px 6px 0 0; }'
+    + '.meal-meta { font-size:10px; font-weight:400; opacity:.85; }'
+    + 'table { width:100%; border-collapse:collapse; }'
+    + 'thead { background:#fff3ec; }'
+    + 'th { padding:6px 10px; font-size:9px; text-transform:uppercase; letter-spacing:.07em; color:#D86A32; border-bottom:1.5px solid #f0c8a0; text-align:left; }'
+    + 'td { padding:6px 10px; border-bottom:1px solid #f5ede4; font-size:11px; }'
+    + 'tr:nth-child(even) td { background:#fffaf6; }'
+    + 'tr:last-child td { border-bottom:2px solid #f0c8a0; }'
+    + 'td.sn { color:#aaa; width:28px; }'
+    + 'td.cid { font-family:monospace; font-size:10px; color:#666; }'
+    + 'td.nm { font-weight:600; }'
+    + 'td.qty { text-align:center; font-weight:700; }'
+    + 'td.empty { text-align:center; padding:14px; color:#bbb; font-style:italic; }'
+    + '.footer { text-align:center; margin-top:28px; font-size:9px; color:#ccc; border-top:1px solid #eee; padding-top:10px; }'
+    + '@media print { body{padding:16px;} .meal-head{-webkit-print-color-adjust:exact;print-color-adjust:exact;} thead{-webkit-print-color-adjust:exact;print-color-adjust:exact;} }'
+    + '<\/style><\/head><body>'
+    + '<div class="hdr">'
+    +   '<div class="logo"><svg viewBox="0 0 24 24"><path d="M12 2C9.5 5 7 7.5 7 10.5a5 5 0 0010 0C17 7.5 14.5 5 12 2z"/><path d="M12 13c-2.5 3-5 5.5-5 8.5h10c0-3-2.5-5.5-5-8.5z" opacity=".55"/></svg></div>'
+    +   '<div class="org"><div class="org-name">Hare Krishna Movement</div><div class="org-sub">Chennai &middot; Prasadam Seva</div></div>'
+    +   '<div class="hdr-right">'
+    +     '<div class="doc-title">Daily Distribution List</div>'
+    +     '<div class="pills"><span class="pill">&#128197; ' + dateLabel + '</span><span class="pill">&#128205; ' + locLabel + '</span></div>'
+    +   '</div>'
+    + '</div>'
+    + meals.map(buildSection).join('')
+    + '<div class="footer">Generated ' + genDate + ' &bull; HKM Prasadam Management &bull; Hare Krishna!</div>'
+    + '<\/body><\/html>';
+
+  /* hidden iframe — no popup blocker issues */
+  var old = document.getElementById('dist-print-frame');
+  if (old) old.parentNode.removeChild(old);
+  var iframe = document.createElement('iframe');
+  iframe.id = 'dist-print-frame';
+  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
+  document.body.appendChild(iframe);
+  var doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+  setTimeout(function() { iframe.contentWindow.focus(); iframe.contentWindow.print(); }, 400);
 }
 
 // ─── SLOT OVERRIDES ───
@@ -2786,6 +2890,8 @@ window.addEventListener('load', function() {
   initDateDisplay();
   renderAllTable();
   updateDashboardStats();
+  populateDateFilter();
+  refreshFillBars();
   var today = new Date();
   var yyyy = today.getFullYear();
   var mm = String(today.getMonth() + 1).padStart(2, '0');
