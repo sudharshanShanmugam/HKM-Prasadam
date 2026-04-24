@@ -826,6 +826,21 @@ tr:hover td { background: var(--ivory); }
 .price-input:focus { border-color: var(--saffron); background: #fff; box-shadow: 0 0 0 2px rgba(232,98,26,0.1); }
 .price-input.changed { border-color: var(--saffron); background: var(--saffron-pale); }
 
+/* meal remove / add-back toggle */
+.meal-remove-btn {
+  flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: var(--cream);
+  color: var(--text-light); font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; line-height: 1;
+}
+.meal-remove-btn:hover         { border-color: var(--red); color: var(--red); background: var(--red-pale); }
+.meal-remove-btn.is-removed    { border-color: var(--green); color: var(--green); background: #e8f5e9; }
+.meal-remove-btn.is-removed:hover { background: #c8e6c9; }
+.meal-price-row.removed        { opacity: 0.42; }
+.meal-price-row.removed .price-input { pointer-events: none; }
+.meal-price-row.removed .meal-price-name::after { content: ' — not available'; font-size: 0.68rem; color: var(--red); font-weight: 400; }
+
 .price-panel-footer { padding: 16px 20px; border-top: 1.5px solid var(--saffron-pale); display: flex; gap: 8px; background: var(--saffron-pale); }
 
 /* special days list */
@@ -870,6 +885,122 @@ tr:hover td { background: var(--ivory); }
 .limit-loc-input.changed { border-color: var(--saffron); background: var(--saffron-pale); }
 .limit-col-head { font-size: 0.62rem; font-weight: 700; color: var(--text-light); text-align: center; letter-spacing: 0.06em; text-transform: uppercase; }
 
+/* ─── DAY DETAIL MODAL ─── */
+.day-modal {
+  background: #fff; border-radius: 18px; max-width: 680px; width: 96%;
+  box-shadow: 0 24px 64px rgba(30,15,0,0.28); overflow: hidden; max-height: 92vh; display: flex; flex-direction: column;
+}
+.day-modal-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, var(--saffron-dark), var(--saffron));
+  flex-shrink: 0;
+}
+.day-modal-header h3 { font-size: 1.15rem; color: #fff; font-family: 'Cormorant Garamond', serif; }
+.day-modal-header p  { font-size: 0.75rem; color: rgba(255,255,255,0.72); margin-top: 2px; }
+.day-modal-close {
+  background: rgba(255,255,255,0.18); border: none; color: #fff;
+  width: 30px; height: 30px; border-radius: 50%; font-size: 1rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.day-modal-body { padding: 22px 24px; overflow-y: auto; flex: 1; }
+.day-modal-footer {
+  padding: 14px 24px 20px; display: flex; gap: 10px; justify-content: flex-end;
+  border-top: 1px solid var(--border-light); flex-shrink: 0;
+}
+
+/* meal status cards in modal */
+.dm-meal-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 22px; }
+.dm-meal-card {
+  border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 10px;
+  display: flex; flex-direction: column; gap: 6px; background: var(--cream);
+  transition: border-color 0.2s;
+}
+.dm-meal-card.stopped { border-color: var(--red); background: var(--red-pale); }
+.dm-meal-card-top { display: flex; align-items: center; gap: 6px; }
+.dm-meal-icon { font-size: 1.1rem; }
+.dm-meal-name { font-size: 0.72rem; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.04em; }
+.dm-meal-count { font-size: 1.4rem; font-weight: 700; color: var(--brown-dark); font-family: 'Cormorant Garamond', serif; line-height: 1; }
+.dm-meal-sub   { font-size: 0.65rem; color: var(--text-light); }
+.dm-cap-bar    { height: 5px; border-radius: 50px; background: var(--border); overflow: hidden; }
+.dm-cap-fill   { height: 100%; border-radius: 50px; background: linear-gradient(to right, var(--saffron), var(--gold)); transition: width 0.3s; }
+.dm-cap-fill.full   { background: var(--red); }
+.dm-cap-fill.warn   { background: #f57c00; }
+.dm-stop-btn {
+  width: 100%; padding: 5px 8px; border-radius: 6px; border: 1.5px solid; font-size: 0.7rem;
+  font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.dm-stop-btn.open   { border-color: var(--red); color: var(--red); background: #fff; }
+.dm-stop-btn.open:hover   { background: var(--red-pale); }
+.dm-stop-btn.closed { border-color: var(--green); color: var(--green); background: #fff; }
+.dm-stop-btn.closed:hover { background: #e8f5e9; }
+.dm-stopped-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.62rem; font-weight: 700; color: var(--red);
+  background: var(--red-pale); padding: 2px 7px; border-radius: 50px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+/* bookings table inside modal */
+.dm-section-head {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-mid); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.dm-section-head::after { content:''; flex:1; height:1px; background:var(--border); }
+.dm-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.dm-table th {
+  text-align: left; padding: 7px 10px; font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-light);
+  border-bottom: 1.5px solid var(--border-light); background: var(--cream);
+}
+.dm-table td { padding: 9px 10px; border-bottom: 1px solid var(--border-light); color: var(--text-dark); vertical-align: middle; }
+.dm-table tr:last-child td { border-bottom: none; }
+.dm-table tr:hover td { background: var(--saffron-pale); }
+.dm-empty { padding: 28px; text-align: center; color: var(--text-light); font-size: 0.82rem; }
+
+/* ─── BOOKING SUMMARY CALENDAR ─── */
+.booking-cal-section {
+  background: var(--white); border: 1.5px solid var(--saffron-pale);
+  border-radius: 14px; overflow: hidden; margin-top: 28px;
+  box-shadow: 0 2px 14px rgba(232,98,26,0.08);
+}
+.booking-cal-header {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  padding: 16px 22px; border-bottom: 1.5px solid rgba(232,98,26,0.15);
+  background: linear-gradient(135deg, var(--saffron-dark), var(--saffron));
+}
+.booking-cal-header h3 { font-size: 1rem; color: #fff; }
+.booking-cal-header p  { font-size: 0.72rem; color: rgba(255,255,255,0.7); margin-top: 2px; }
+.bk-dow-row { display: grid; grid-template-columns: repeat(7,1fr); background: var(--cream); border-bottom: 1px solid var(--border-light); }
+.bk-cal-dow {
+  text-align: center; font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-light); padding: 8px 4px;
+}
+.bk-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; background: var(--border-light); }
+.bk-day {
+  background: #fff; padding: 8px 7px; min-height: 76px;
+  cursor: pointer; transition: background 0.15s;
+}
+.bk-day:hover { background: var(--saffron-pale); }
+.bk-day.empty  { background: var(--cream); cursor: default; }
+.bk-day.bk-today { background: var(--gold-pale); }
+.bk-day.has-bookings { border-left: 3px solid var(--saffron); }
+.bk-day-num { font-size: 0.78rem; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
+.bk-day.bk-today .bk-day-num { color: var(--saffron-dark); }
+.bk-meal-row { display: flex; gap: 3px; flex-wrap: wrap; }
+.bk-chip {
+  font-size: 0.6rem; font-weight: 700; padding: 2px 5px; border-radius: 4px;
+  white-space: nowrap; display: inline-flex; align-items: center; gap: 2px;
+}
+.bk-chip.bfast  { background: var(--saffron-pale); color: var(--saffron-dark); }
+.bk-chip.lunch  { background: #fff8e1; color: #e65100; }
+.bk-chip.dinner { background: #ede7f6; color: #512da8; }
+.bk-chip.khich  { background: #e8f5e9; color: #2e7d32; }
+.bk-chip.bk-stopped-chip { opacity: 0.6; text-decoration: line-through; }
+.bk-day.bk-has-stopped { border-top: 3px solid var(--red); }
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
@@ -904,7 +1035,7 @@ tr:hover td { background: var(--ivory); }
     <span class="nav-badge" id="reg-count-badge">40</span>
   </button>
   <button class="nav-item" onclick="showPage('capacity')">
-    <span class="nav-icon">⚙️</span> Default Setting
+    <span class="nav-icon">⚙️</span> Default Settings
   </button>
   <button class="nav-item" onclick="showPage('pricing')">
     <span class="nav-icon">💰</span> Slot Management
@@ -923,7 +1054,7 @@ tr:hover td { background: var(--ivory); }
   <div class="sidebar-footer">
     HKM Chennai · Thiruvanmiyur & NLBR<br>
     Hare Krishna Movement<br><br>
-    <button onclick="window.location.href='hkm-home.html'" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);padding:6px 14px;border-radius:6px;font-size:0.7rem;cursor:pointer;width:100%">← Public Site</button>
+    <button onclick="window.location.href='index.html'" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);padding:6px 14px;border-radius:6px;font-size:0.7rem;cursor:pointer;width:100%">← Public Site</button>
   </div>
 </nav>
 
@@ -940,7 +1071,7 @@ tr:hover td { background: var(--ivory); }
     </div>
     <div class="topbar-right">
       <div class="topbar-date" id="today-date"></div>
-      <button class="btn btn-primary btn-sm" onclick="window.location.href='hkm-home.html'">🪷 Public Site</button>
+      <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html'">🪷 Public Site</button>
       <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -1385,79 +1516,6 @@ tr:hover td { background: var(--ivory); }
       </div>
     </div>
 
-    <!-- Manual Overrides -->
-    <div class="window-section">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <h3>🔧 Manual Slot Overrides</h3>
-        <button class="btn btn-outline btn-sm" onclick="toggleAddSlotForm()">+ Add Slot</button>
-      </div>
-      <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:16px">Close a specific slot early if the kitchen is at capacity before the auto-close deadline.</p>
-
-      <!-- Add slot form -->
-      <div id="add-slot-form" style="display:none;background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px">
-
-        <!-- Tab bar -->
-        <div class="slot-tab-bar">
-          <button class="slot-tab-btn active" onclick="switchSlotTab('general')">General</button>
-          <button class="slot-tab-btn" onclick="switchSlotTab('festival')">Festival</button>
-        </div>
-
-        <!-- General tab -->
-        <div class="slot-tab-pane active" id="slot-tab-general">
-          <div class="slot-form-row">
-            <div class="slot-form-field">
-              <label>Date</label>
-              <input class="form-input" id="new-slot-date" type="date" style="width:160px">
-            </div>
-            <div class="slot-form-field">
-              <label>Meal Type</label>
-              <select class="slot-form-select" id="new-slot-meal-gen">
-                <option value="">— Select Meal —</option>
-                <option value="Breakfast">Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Special Khichdi">Special Khichdi</option>
-              </select>
-            </div>
-            <div style="display:flex;gap:8px;align-items:flex-end">
-              <button class="btn btn-primary btn-sm" onclick="addSlotGeneral()">Add Slot</button>
-              <button class="btn btn-ghost btn-sm" onclick="toggleAddSlotForm()">Cancel</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Festival tab -->
-        <div class="slot-tab-pane" id="slot-tab-festival">
-          <div class="slot-form-row">
-            <div class="slot-form-field">
-              <label>Festival</label>
-              <select class="slot-form-select" id="new-slot-festival" style="min-width:220px">
-                <option value="">— Select Festival —</option>
-              </select>
-            </div>
-            <div class="slot-form-field">
-              <label>Meal Type</label>
-              <select class="slot-form-select" id="new-slot-meal-fest">
-                <option value="">— Select Meal —</option>
-                <option value="Breakfast">Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Special Khichdi">Special Khichdi</option>
-              </select>
-            </div>
-            <div style="display:flex;gap:8px;align-items:flex-end">
-              <button class="btn btn-primary btn-sm" onclick="addSlotFestival()">Add Slot</button>
-              <button class="btn btn-ghost btn-sm" onclick="toggleAddSlotForm()">Cancel</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="slot-override-grid" id="slot-overrides">
-        <!-- populated by JS -->
-      </div>
-    </div>
 
   </div>
 
@@ -1600,37 +1658,41 @@ tr:hover td { background: var(--ivory); }
             </div>
             <div style="margin-bottom:14px">
               <div style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-mid);margin-bottom:10px">Meal Rates for This Day</div>
-              <div class="meal-price-row">
+              <div class="meal-price-row" id="row-Breakfast">
                 <span class="meal-price-icon">🌅</span>
                 <span class="meal-price-name">Breakfast</span>
                 <span class="meal-price-default" id="def-Breakfast"></span>
                 <div class="price-input-wrap">
                   <input class="price-input" id="price-Breakfast" type="number" min="0" placeholder="0" oninput="markChanged(this)">
                 </div>
+                <button class="meal-remove-btn" id="rm-Breakfast" onclick="toggleMealRemoved('Breakfast')" title="Remove / restore this meal for this date">✕</button>
               </div>
-              <div class="meal-price-row">
+              <div class="meal-price-row" id="row-Lunch">
                 <span class="meal-price-icon">☀️</span>
                 <span class="meal-price-name">Lunch</span>
                 <span class="meal-price-default" id="def-Lunch"></span>
                 <div class="price-input-wrap">
                   <input class="price-input" id="price-Lunch" type="number" min="0" placeholder="0" oninput="markChanged(this)">
                 </div>
+                <button class="meal-remove-btn" id="rm-Lunch" onclick="toggleMealRemoved('Lunch')" title="Remove / restore this meal for this date">✕</button>
               </div>
-              <div class="meal-price-row">
+              <div class="meal-price-row" id="row-Dinner">
                 <span class="meal-price-icon">🌙</span>
                 <span class="meal-price-name">Dinner</span>
                 <span class="meal-price-default" id="def-Dinner"></span>
                 <div class="price-input-wrap">
                   <input class="price-input" id="price-Dinner" type="number" min="0" placeholder="0" oninput="markChanged(this)">
                 </div>
+                <button class="meal-remove-btn" id="rm-Dinner" onclick="toggleMealRemoved('Dinner')" title="Remove / restore this meal for this date">✕</button>
               </div>
-              <div class="meal-price-row">
+              <div class="meal-price-row" id="row-SundayKhichdi">
                 <span class="meal-price-icon">🥘</span>
                 <span class="meal-price-name">Sunday Khichdi</span>
                 <span class="meal-price-default" id="def-SundayKhichdi"></span>
                 <div class="price-input-wrap">
                   <input class="price-input" id="price-SundayKhichdi" type="number" min="0" placeholder="0" oninput="markChanged(this)">
                 </div>
+                <button class="meal-remove-btn" id="rm-SundayKhichdi" onclick="toggleMealRemoved('SundayKhichdi')" title="Remove / restore this meal for this date">✕</button>
               </div>
             </div>
             <!-- Slot limits for this date -->
@@ -1641,22 +1703,22 @@ tr:hover td { background: var(--ivory); }
               <div class="limit-col-head">Thiruvanmiyur</div>
               <div class="limit-col-head">NLBR</div>
             </div>
-            <div class="limit-loc-row">
+            <div class="limit-loc-row" id="limrow-Breakfast">
               <span class="limit-loc-label">🌅 Breakfast</span>
               <input class="limit-loc-input" id="lim-Thiruvanmiyur-Breakfast" type="number" min="1" placeholder="—" oninput="markChanged(this)">
               <input class="limit-loc-input" id="lim-NLBR-Breakfast"          type="number" min="1" placeholder="—" oninput="markChanged(this)">
             </div>
-            <div class="limit-loc-row">
+            <div class="limit-loc-row" id="limrow-Lunch">
               <span class="limit-loc-label">☀️ Lunch</span>
               <input class="limit-loc-input" id="lim-Thiruvanmiyur-Lunch" type="number" min="1" placeholder="—" oninput="markChanged(this)">
               <input class="limit-loc-input" id="lim-NLBR-Lunch"          type="number" min="1" placeholder="—" oninput="markChanged(this)">
             </div>
-            <div class="limit-loc-row">
+            <div class="limit-loc-row" id="limrow-Dinner">
               <span class="limit-loc-label">🌙 Dinner</span>
               <input class="limit-loc-input" id="lim-Thiruvanmiyur-Dinner" type="number" min="1" placeholder="—" oninput="markChanged(this)">
               <input class="limit-loc-input" id="lim-NLBR-Dinner"          type="number" min="1" placeholder="—" oninput="markChanged(this)">
             </div>
-            <div class="limit-loc-row">
+            <div class="limit-loc-row" id="limrow-SundayKhichdi">
               <span class="limit-loc-label">🥘 Khichdi</span>
               <input class="limit-loc-input" id="lim-Thiruvanmiyur-SundayKhichdi" type="number" min="1" placeholder="—" oninput="markChanged(this)">
               <input class="limit-loc-input" id="lim-NLBR-SundayKhichdi"          type="number" min="1" placeholder="—" oninput="markChanged(this)">
@@ -1673,6 +1735,40 @@ tr:hover td { background: var(--ivory); }
       </div>
 
     </div>
+
+    <!-- ─── BOOKING SUMMARY CALENDAR ─── -->
+    <div class="booking-cal-section">
+      <div class="booking-cal-header">
+        <div>
+          <h3>Monthly Booking Summary</h3>
+          <p>Total coupons booked per meal for each date — from all registrations</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <span class="bk-chip bfast">🌅 Breakfast</span>
+            <span class="bk-chip lunch">☀️ Lunch</span>
+            <span class="bk-chip dinner">🌙 Dinner</span>
+            <span class="bk-chip khich">🥘 Khichdi</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px">
+            <button class="cal-nav-btn" onclick="shiftMonth(-1)" title="Previous month">&#8592;</button>
+            <span id="bk-month-label" style="font-size:0.88rem;font-weight:700;color:#fff;min-width:110px;text-align:center"></span>
+            <button class="cal-nav-btn" onclick="shiftMonth(1)" title="Next month">&#8594;</button>
+          </div>
+        </div>
+      </div>
+      <div class="bk-dow-row">
+        <div class="bk-cal-dow">Sun</div>
+        <div class="bk-cal-dow">Mon</div>
+        <div class="bk-cal-dow">Tue</div>
+        <div class="bk-cal-dow">Wed</div>
+        <div class="bk-cal-dow">Thu</div>
+        <div class="bk-cal-dow">Fri</div>
+        <div class="bk-cal-dow">Sat</div>
+      </div>
+      <div class="bk-cal-grid" id="bk-cal-grid"></div>
+    </div>
+
   </div>
 
   <!-- ═══ PAGE: REPORTS ═══ -->
@@ -1745,12 +1841,6 @@ tr:hover td { background: var(--ivory); }
 
           <!-- TX ID + Upload form -->
           <div class="pay-form-section">
-            <div class="form-group">
-              <label class="form-label">UPI Transaction ID <span class="req">*</span></label>
-              <input class="form-input" id="ps-txid" type="text" placeholder="e.g. UPI-2026-12345678" oninput="this.value=this.value.toUpperCase()">
-              <div style="font-size:0.7rem;color:var(--text-light);margin-top:5px">Copy from your UPI app payment confirmation screen</div>
-            </div>
-
             <div class="form-group">
               <label class="form-label">Payment Screenshot <span class="req">*</span></label>
               <div class="pay-proof-upload" id="proof-drop" onclick="document.getElementById('ps-proof').click()">
@@ -1854,7 +1944,7 @@ tr:hover td { background: var(--ivory); }
       <div class="table-header">
         <h3>💳 Payment Submissions</h3>
         <div class="search-box">
-          <input type="text" id="pay-search" placeholder="Search name or TX ID…" oninput="renderPaymentsTable()">
+          <input type="text" id="pay-search" placeholder="Search name or booking ID…" oninput="renderPaymentsTable()">
         </div>
         <select class="filter-select" id="pay-filter-status" onchange="renderPaymentsTable()">
           <option value="">All Statuses</option>
@@ -1875,7 +1965,6 @@ tr:hover td { background: var(--ivory); }
               <th>Booking ID</th>
               <th>Pilgrim</th>
               <th>Amount Claimed</th>
-              <th>UPI TX ID</th>
               <th>Submitted</th>
               <th style="text-align:center">Screenshot</th>
               <th>Status</th>
@@ -1923,10 +2012,6 @@ tr:hover td { background: var(--ivory); }
         <span class="pay-detail-val" id="pmd-amount" style="color:var(--saffron);font-size:1.05rem">—</span>
       </div>
       <div class="pay-detail-row">
-        <span class="pay-detail-key">UPI Transaction ID</span>
-        <span class="pay-detail-val" id="pmd-txid" style="font-family:monospace;font-size:0.82rem">—</span>
-      </div>
-      <div class="pay-detail-row">
         <span class="pay-detail-key">Submitted At</span>
         <span class="pay-detail-val" id="pmd-submitted">—</span>
       </div>
@@ -1943,6 +2028,32 @@ tr:hover td { background: var(--ivory); }
       <button class="btn btn-ghost" onclick="closePayModal()">Close</button>
       <button class="btn btn-danger" id="pmd-decline-btn" onclick="payModalAction('declined')">✕ Decline</button>
       <button class="btn btn-success" id="pmd-approve-btn" onclick="payModalAction('verified')">✓ Verify Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- DAY DETAIL MODAL -->
+<div class="modal-overlay" id="day-modal-overlay" onclick="closeDayModalOutside(event)">
+  <div class="day-modal">
+    <div class="day-modal-header">
+      <div>
+        <h3 id="dm-title">—</h3>
+        <p id="dm-sub">Booking overview &amp; slot controls</p>
+      </div>
+      <button class="day-modal-close" onclick="closeDayModal()">✕</button>
+    </div>
+    <div class="day-modal-body">
+
+      <!-- Meal status cards -->
+      <div class="dm-section-head">Meal Slot Status</div>
+      <div class="dm-meal-cards" id="dm-meal-cards">
+        <!-- populated by JS -->
+      </div>
+
+    </div>
+    <div class="day-modal-footer">
+      <button class="btn btn-ghost" onclick="closeDayModal()">Close</button>
+      <button class="btn btn-primary" onclick="closeDayModal(); renderBookingCalendar(); showToast('Slot settings saved')">Save</button>
     </div>
   </div>
 </div>
@@ -2058,7 +2169,7 @@ const pageTitles = {
   register:      ['Register for Prasadam',   'Book your sacred meal coupon'],
   dashboard:     ['Live Dashboard',           'Real-time fill rates & alerts'],
   registrations: ['All Registrations',        'Search, filter and manage bookings'],
-  capacity:      ['Default Setting', 'Set limits and booking windows'],
+  capacity:      ['Default Settings', 'Set limits and booking windows'],
   coupon:        ['Email Coupon Preview',     'Digital ticket sent to devotees'],
   pricing:       ['Slot Management', 'Set special-day food rates by date'],
   reports:       ['Reports & Exports',        'PDF & Excel data exports'],
@@ -2076,7 +2187,7 @@ function showPage(id) {
   document.getElementById('topbar-title').textContent = title;
   document.getElementById('topbar-sub').textContent = sub;
   if (id === 'registrations') renderAllTable();
-  if (id === 'capacity') { renderSlotOverrides(); renderDefaultRateInputs(); renderDefaultLimitInputs(); }
+  if (id === 'capacity') { renderDefaultRateInputs(); renderDefaultLimitInputs(); }
   if (id === 'coupon') renderCoupon();
   if (id === 'dashboard') { updateDashboardStats(); populateDateFilter(); refreshFillBars(); }
   if (id === 'pricing') renderCalendar();
@@ -2521,6 +2632,7 @@ function printDistributionList() {
 
 // ─── SLOT OVERRIDES ───
 function renderSlotOverrides() {
+  if (!document.getElementById('slot-overrides')) return;
   if (!slots.length) {
     document.getElementById('slot-overrides').innerHTML =
       '<div style="padding:28px;text-align:center;color:var(--text-light);font-size:0.82rem">No slot overrides configured. Click "+ Add Slot" to create one.</div>';
@@ -2647,6 +2759,10 @@ var limitOverrides = {
 var MEALS = ['Breakfast','Lunch','Dinner','SundayKhichdi'];
 var MEAL_ICONS = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙', SundayKhichdi:'🥘' };
 var MEAL_LABELS = { Breakfast:'Breakfast', Lunch:'Lunch', Dinner:'Dinner', SundayKhichdi:'Khichdi' };
+// stoppedSlots: { 'YYYY-MM-DD': { Breakfast: true, Lunch: false, … } }
+var stoppedSlots = {};
+// removedMeals: { 'YYYY-MM-DD': { Breakfast: true, … } } — meal not offered on that date
+var removedMeals = {};
 
 var pricingOverrides = {
   '2026-04-27': { label: 'Sunday Khichdi Day',  Breakfast: 30, Lunch: 60, Dinner: 50, SundayKhichdi: 25 },
@@ -2692,6 +2808,7 @@ function renderCalendar() {
   document.getElementById('cal-days').innerHTML = html;
   renderDefaultRateInputs();
   renderSpecialDaysList();
+  renderBookingCalendar();
 }
 
 function shiftMonth(delta) {
@@ -2699,6 +2816,124 @@ function shiftMonth(delta) {
   if (calMonth > 11) { calMonth = 0;  calYear++; }
   if (calMonth < 0)  { calMonth = 11; calYear--; }
   renderCalendar();
+}
+
+function renderBookingCalendar() {
+  var grid = document.getElementById('bk-cal-grid');
+  if (!grid) return;
+
+  var lbl = document.getElementById('bk-month-label');
+  if (lbl) lbl.textContent = MONTH_NAMES[calMonth] + ' ' + calYear;
+
+  var firstDay    = new Date(calYear, calMonth, 1).getDay();
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  var today       = '2026-04-21';
+
+  // aggregate registrations by date → meal → total qty
+  var byDate = {};
+  registrations.forEach(function(r) {
+    var mealKey = r.meal === 'Sunday Khichdi' ? 'SundayKhichdi' : r.meal;
+    if (!byDate[r.date]) byDate[r.date] = {};
+    byDate[r.date][mealKey] = (byDate[r.date][mealKey] || 0) + (parseInt(r.qty) || 1);
+  });
+
+  var html = '';
+  for (var e = 0; e < firstDay; e++) {
+    html += '<div class="bk-day empty"></div>';
+  }
+  for (var d = 1; d <= daysInMonth; d++) {
+    var mm  = String(calMonth + 1).padStart(2, '0');
+    var dd  = String(d).padStart(2, '0');
+    var key = calYear + '-' + mm + '-' + dd;
+    var bk  = byDate[key] || {};
+    var hasAny = bk.Breakfast || bk.Lunch || bk.Dinner || bk.SundayKhichdi;
+    var hasStopped = stoppedSlots[key] && Object.values(stoppedSlots[key]).some(Boolean);
+    var cls = 'bk-day'
+            + (key === today ? ' bk-today' : '')
+            + (hasAny ? ' has-bookings' : '')
+            + (hasStopped ? ' bk-has-stopped' : '');
+
+    var chips = '';
+    if (bk.Breakfast)     chips += '<span class="bk-chip bfast' + (stoppedSlots[key] && stoppedSlots[key].Breakfast ? ' bk-stopped-chip' : '') + '">🌅 ' + bk.Breakfast + (stoppedSlots[key] && stoppedSlots[key].Breakfast ? ' 🔴' : '') + '</span>';
+    if (bk.Lunch)         chips += '<span class="bk-chip lunch' + (stoppedSlots[key] && stoppedSlots[key].Lunch ? ' bk-stopped-chip' : '') + '">☀️ ' + bk.Lunch + (stoppedSlots[key] && stoppedSlots[key].Lunch ? ' 🔴' : '') + '</span>';
+    if (bk.Dinner)        chips += '<span class="bk-chip dinner' + (stoppedSlots[key] && stoppedSlots[key].Dinner ? ' bk-stopped-chip' : '') + '">🌙 ' + bk.Dinner + (stoppedSlots[key] && stoppedSlots[key].Dinner ? ' 🔴' : '') + '</span>';
+    if (bk.SundayKhichdi) chips += '<span class="bk-chip khich' + (stoppedSlots[key] && stoppedSlots[key].SundayKhichdi ? ' bk-stopped-chip' : '') + '">🥘 ' + bk.SundayKhichdi + (stoppedSlots[key] && stoppedSlots[key].SundayKhichdi ? ' 🔴' : '') + '</span>';
+
+    // show a "stopped" pill if any meal is stopped even if 0 bookings
+    if (!hasAny && hasStopped) chips += '<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--red)"></span>';
+
+    html += '<div class="' + cls + '" onclick="openDayModal(\'' + key + '\')">'
+          + '<div class="bk-day-num">' + d + '</div>'
+          + (chips ? '<div class="bk-meal-row">' + chips + '</div>' : '')
+          + '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+// ─── DAY DETAIL MODAL ───
+function openDayModal(dateKey) {
+  window._dmDate = dateKey;
+  var d = new Date(dateKey + 'T12:00:00');
+  var weekday = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()];
+  var label = weekday + ', ' + d.getDate() + ' ' + MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
+  document.getElementById('dm-title').textContent = '📅 ' + label;
+
+  // aggregate bookings for this date
+  var bk = {};
+  registrations.forEach(function(r) {
+    if (r.date !== dateKey) return;
+    var mk = r.meal === 'Sunday Khichdi' ? 'SundayKhichdi' : r.meal;
+    bk[mk] = (bk[mk] || 0) + (parseInt(r.qty) || 1);
+  });
+  var totalBookings = Object.values(bk).reduce(function(s, v) { return s + v; }, 0);
+  document.getElementById('dm-sub').textContent =
+    totalBookings + ' total coupon' + (totalBookings !== 1 ? 's' : '') + ' booked · click a meal to stop / reopen';
+
+  // render meal cards
+  var stopped = stoppedSlots[dateKey] || {};
+  var limOver  = (limitOverrides[dateKey] || {});
+  var cardsHtml = MEALS.map(function(m) {
+    var isStopped = !!stopped[m];
+    var used  = bk[m] || 0;
+    var lim   = (limOver.Thiruvanmiyur && limOver.Thiruvanmiyur[m]) || defaultLimits.Thiruvanmiyur[m] || 100;
+    var pct   = Math.min(100, Math.round(used / lim * 100));
+    var fillCls = pct >= 90 ? ' full' : pct >= 70 ? ' warn' : '';
+    return '<div class="dm-meal-card' + (isStopped ? ' stopped' : '') + '">'
+      + '<div class="dm-meal-card-top">'
+      +   '<span class="dm-meal-icon">' + MEAL_ICONS[m] + '</span>'
+      +   '<span class="dm-meal-name">' + MEAL_LABELS[m] + '</span>'
+      +   (isStopped ? '<span style="margin-left:auto;width:12px;height:12px;border-radius:3px;background:var(--red);display:inline-block;flex-shrink:0"></span>' : '')
+      + '</div>'
+      + '<div class="dm-meal-count">' + used + '</div>'
+      + '<div class="dm-meal-sub">' + used + ' / ' + lim + ' slots used</div>'
+      + '<div class="dm-cap-bar"><div class="dm-cap-fill' + fillCls + '" style="width:' + pct + '%"></div></div>'
+      + '<button class="dm-stop-btn ' + (isStopped ? 'closed' : 'open') + '" onclick="toggleMealStop(\'' + dateKey + '\',\'' + m + '\')">'
+      +   (isStopped ? '🟢 Reopen Booking' : '🔴 Stop Booking')
+      + '</button>'
+      + '</div>';
+  }).join('');
+  document.getElementById('dm-meal-cards').innerHTML = cardsHtml;
+
+  document.getElementById('day-modal-overlay').classList.add('show');
+}
+
+function closeDayModal() {
+  document.getElementById('day-modal-overlay').classList.remove('show');
+}
+
+function closeDayModalOutside(e) {
+  if (e.target === document.getElementById('day-modal-overlay')) closeDayModal();
+}
+
+function toggleMealStop(dateKey, meal) {
+  if (!stoppedSlots[dateKey]) stoppedSlots[dateKey] = {};
+  stoppedSlots[dateKey][meal] = !stoppedSlots[dateKey][meal];
+  if (!Object.values(stoppedSlots[dateKey]).some(Boolean)) delete stoppedSlots[dateKey];
+  openDayModal(dateKey);  // refresh modal contents
+  renderBookingCalendar(); // refresh calendar cell indicator
+  var mealLabel = MEAL_LABELS[meal] || meal;
+  var isStopped = stoppedSlots[dateKey] && stoppedSlots[dateKey][meal];
+  showToast((isStopped ? '🔴 Bookings stopped for ' : '🟢 Bookings reopened for ') + mealLabel + ' on ' + dateKey.split('-').reverse().join(' '));
 }
 
 function selectCalDay(key) {
@@ -2718,13 +2953,21 @@ function openPriceEditor(key) {
   document.getElementById('price-day-label').textContent      = label;
   document.getElementById('price-day-name').value             = override.label || '';
 
-  // populate rate inputs
+  // populate rate inputs + removed state
+  var rmd = removedMeals[key] || {};
   MEALS.forEach(function(m) {
-    var inp   = document.getElementById('price-' + m);
-    var defEl = document.getElementById('def-' + m);
-    inp.value = override[m] !== undefined ? override[m] : defaultRates[m];
+    var inp    = document.getElementById('price-' + m);
+    var defEl  = document.getElementById('def-' + m);
+    var row    = document.getElementById('row-' + m);
+    var rmBtn  = document.getElementById('rm-' + m);
+    var isRmd  = !!rmd[m];
+    inp.value  = override[m] !== undefined ? override[m] : defaultRates[m];
     inp.classList.remove('changed');
     if (defEl) defEl.textContent = 'Default ₹' + defaultRates[m];
+    if (row)   row.classList.toggle('removed', isRmd);
+    if (rmBtn) { rmBtn.classList.toggle('is-removed', isRmd); rmBtn.textContent = isRmd ? '+' : '✕'; rmBtn.title = isRmd ? 'Add this meal back' : 'Remove this meal for this date'; }
+    var limRow = document.getElementById('limrow-' + m);
+    if (limRow) limRow.style.display = isRmd ? 'none' : '';
   });
 
   // populate limit inputs (per location × meal)
@@ -2738,6 +2981,16 @@ function openPriceEditor(key) {
       inp.classList.remove('changed');
     });
   });
+}
+
+function toggleMealRemoved(meal) {
+  if (!selectedDate) return;
+  if (!removedMeals[selectedDate]) removedMeals[selectedDate] = {};
+  removedMeals[selectedDate][meal] = !removedMeals[selectedDate][meal];
+  if (!Object.values(removedMeals[selectedDate]).some(Boolean)) delete removedMeals[selectedDate];
+  openPriceEditor(selectedDate);
+  var isNowRemoved = removedMeals[selectedDate] && removedMeals[selectedDate][meal];
+  showToast((isNowRemoved ? '❌ ' + MEAL_LABELS[meal] + ' removed for this date' : '✅ ' + MEAL_LABELS[meal] + ' added back'));
 }
 
 function markChanged(inp) {
@@ -2782,12 +3035,13 @@ function saveDayPricing() {
 }
 
 function clearDayPricing() {
-  if (!selectedDate || (!pricingOverrides[selectedDate] && !limitOverrides[selectedDate])) {
+  if (!selectedDate || (!pricingOverrides[selectedDate] && !limitOverrides[selectedDate] && !removedMeals[selectedDate])) {
     showToast('No custom settings for this date');
     return;
   }
   delete pricingOverrides[selectedDate];
   delete limitOverrides[selectedDate];
+  delete removedMeals[selectedDate];
   document.getElementById('price-panel-empty').style.display = 'block';
   document.getElementById('price-panel-form').style.display  = 'none';
   selectedDate = null;
@@ -2932,7 +3186,7 @@ function renderPaymentsTable() {
   var locF      = (document.getElementById('pay-filter-loc')    ? document.getElementById('pay-filter-loc').value    : '');
 
   var rows = payments.filter(function(p) {
-    if (search  && (p.name.toLowerCase().indexOf(search) === -1 && p.txid.toLowerCase().indexOf(search) === -1 && p.id.toLowerCase().indexOf(search) === -1)) return false;
+    if (search  && (p.name.toLowerCase().indexOf(search) === -1 && p.id.toLowerCase().indexOf(search) === -1)) return false;
     if (statusF && p.status !== statusF) return false;
     if (locF    && p.loc    !== locF)    return false;
     return true;
@@ -2966,7 +3220,6 @@ function renderPaymentsTable() {
       + '<td><strong style="color:var(--saffron)">' + p.id + '</strong></td>'
       + '<td>' + p.name + '</td>'
       + '<td><strong>₹' + p.amount.toLocaleString('en-IN') + '</strong></td>'
-      + '<td style="font-family:monospace;font-size:0.78rem">' + p.txid + '</td>'
       + '<td style="white-space:nowrap">' + p.submitted + '</td>'
       + '<td style="text-align:center"><span class="ss-thumb" title="View screenshot" onclick="openPayModal(' + idx + ')">📸</span></td>'
       + '<td>' + (statusBadge[p.status] || p.status) + '</td>'
@@ -3013,7 +3266,6 @@ function openPayModal(idx) {
   document.getElementById('pmd-meal-date').textContent = (mealIcon[p.meal] || '🍽') + ' ' + p.meal + ' · ' + p.date;
   document.getElementById('pmd-loc').textContent       = 'HKM ' + p.loc;
   document.getElementById('pmd-amount').textContent    = '₹' + p.amount.toLocaleString('en-IN');
-  document.getElementById('pmd-txid').textContent      = p.txid;
   document.getElementById('pmd-submitted').textContent = p.submitted;
   document.getElementById('pmd-status-badge').innerHTML = statusBadge[p.status] || p.status;
 
@@ -3182,10 +3434,8 @@ function resetProofUI() {
 }
 
 function confirmPayment() {
-  var txid  = document.getElementById('ps-txid').value.trim();
   var proof = document.getElementById('ps-proof').files;
 
-  if (!txid) { showToast('Please enter your UPI Transaction ID ⚠️'); return; }
   if (!proof || !proof.length) { showToast('Please upload your payment screenshot ⚠️'); return; }
 
   // Add to payments list as pending
@@ -3198,7 +3448,7 @@ function confirmPayment() {
       id: pendingEntry.id, name: pendingEntry.name,
       mobile: pendingEntry.mobile, loc: pendingEntry.loc,
       meal: pendingEntry.meal, date: pendingEntry.date, qty: pendingEntry.qty,
-      amount: rate * pendingEntry.qty, txid: txid,
+      amount: rate * pendingEntry.qty, txid: '',
       submitted: new Date().toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}),
       status: 'pending'
     });

@@ -1072,11 +1072,6 @@ section { padding: 88px 40px; }
         </div>
         <div class="pay-form-body">
           <div class="form-group">
-            <label class="form-label">UPI Transaction ID <span class="req">*</span></label>
-            <input class="form-input" id="hp-txid" type="text" placeholder="e.g. UPI-2026-12345678" oninput="this.value=this.value.toUpperCase()">
-            <div style="font-size:0.7rem;color:var(--text-light);margin-top:5px">Copy from your UPI app payment confirmation</div>
-          </div>
-          <div class="form-group">
             <label class="form-label">Payment Screenshot <span class="req">*</span></label>
             <div class="proof-drop" id="hp-proof-drop" onclick="document.getElementById('hp-proof').click()">
               <input type="file" id="hp-proof" accept="image/*" onchange="handleHPProof(this)">
@@ -1377,7 +1372,6 @@ function submitReg() {
   document.getElementById('hp-meta').textContent       = (mealIcon[meal.value] || '🍽') + ' ' + meal.value + ' · ' + date + ' · ' + qty + ' coupon(s)';
   document.getElementById('hp-total').textContent      = rate ? '₹' + (rate * qty) + '/-' : 'Free';
 
-  document.getElementById('hp-txid').value = '';
   document.getElementById('hp-proof').value = '';
   resetHPProofUI();
 
@@ -1451,9 +1445,7 @@ function resetHPProofUI() {
 
 // ─── CONFIRM PAYMENT ───
 function confirmHPPayment() {
-  var txid  = document.getElementById('hp-txid').value.trim();
   var proof = document.getElementById('hp-proof').files;
-  if (!txid)               { showHPToast('Please enter your UPI Transaction ID ⚠️'); return; }
   if (!proof || !proof.length) { showHPToast('Please upload your payment screenshot ⚠️'); return; }
   document.getElementById('hp-success-id').textContent = hpPending ? hpPending.id : '—';
   if (hpPending) {
