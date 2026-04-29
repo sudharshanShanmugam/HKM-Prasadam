@@ -192,6 +192,10 @@ input, select, textarea { font-family: 'Inter', sans-serif; }
 .stat-num.red { color: var(--red); }
 .stat-num.gold { color: var(--gold); }
 .stat-delta { font-size: 0.72rem; color: var(--text-light); margin-top: 6px; }
+.bdy-stat-card { background:#fff; border-radius:14px; border:1.5px solid #f0e6d3; padding:16px 20px; display:flex; align-items:center; gap:16px; box-shadow:0 2px 10px rgba(0,0,0,.06); flex:1; min-width:150px; }
+.bdy-stat-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+.bdy-stat-num { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:700; line-height:1; color:var(--brown-dark); }
+.bdy-stat-lbl { font-size:.7rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#aaa; margin-top:3px; }
 .stat-icon { position: absolute; right: 18px; top: 20px; font-size: 1.7rem; width: 44px; height: 44px; background: var(--saffron-pale); border-radius: 12px; display: flex; align-items: center; justify-content: center; opacity: 0.85; }
 
 /* ─── FILL RATE BAR ─── */
@@ -910,26 +914,37 @@ tr:hover td { background: var(--ivory); }
 }
 
 /* meal status cards in modal */
-.dm-meal-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 22px; }
+.dm-meal-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
 .dm-meal-card {
-  border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 10px;
-  display: flex; flex-direction: column; gap: 6px; background: var(--cream);
-  transition: border-color 0.2s;
+  border: 1.5px solid var(--border); border-radius: 12px;
+  overflow: hidden; background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.dm-meal-card.stopped { border-color: var(--red); background: var(--red-pale); }
-.dm-meal-card-top { display: flex; align-items: center; gap: 6px; }
-.dm-meal-icon { font-size: 1.1rem; }
-.dm-meal-name { font-size: 0.72rem; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.04em; }
-.dm-meal-count { font-size: 1.4rem; font-weight: 700; color: var(--brown-dark); font-family: 'Cormorant Garamond', serif; line-height: 1; }
-.dm-meal-sub   { font-size: 0.65rem; color: var(--text-light); }
-.dm-cap-bar    { height: 5px; border-radius: 50px; background: var(--border); overflow: hidden; }
+.dm-meal-card.stopped { border-color: var(--red); }
+.dm-meal-card-stripe { height: 4px; background: linear-gradient(to right, var(--saffron), var(--gold)); }
+.dm-meal-card.stopped .dm-meal-card-stripe { background: linear-gradient(to right, var(--red), #e57373); }
+.dm-meal-card-inner { padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+.dm-meal-card-top { display: flex; align-items: center; gap: 7px; }
+.dm-meal-icon { font-size: 1.15rem; flex-shrink: 0; }
+.dm-meal-name { font-size: 0.72rem; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.05em; flex: 1; }
+.dm-meal-status-pill {
+  font-size: 0.58rem; font-weight: 800; padding: 2px 7px; border-radius: 50px;
+  letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
+}
+.dm-meal-status-pill.open    { background: #e8f5e9; color: #2e7d32; }
+.dm-meal-status-pill.stopped { background: var(--red-pale); color: var(--red); }
+.dm-meal-count { font-size: 2.1rem; font-weight: 700; color: var(--brown-dark); font-family: 'Cormorant Garamond', serif; line-height: 1; }
+.dm-meal-sub   { font-size: 0.65rem; color: var(--text-light); margin-top: -4px; }
+.dm-cap-row    { display: flex; align-items: center; justify-content: space-between; font-size: 0.62rem; color: var(--text-light); }
+.dm-cap-bar    { height: 6px; border-radius: 50px; background: var(--border); overflow: hidden; }
 .dm-cap-fill   { height: 100%; border-radius: 50px; background: linear-gradient(to right, var(--saffron), var(--gold)); transition: width 0.3s; }
 .dm-cap-fill.full   { background: var(--red); }
 .dm-cap-fill.warn   { background: #f57c00; }
 .dm-stop-btn {
-  width: 100%; padding: 5px 8px; border-radius: 6px; border: 1.5px solid; font-size: 0.7rem;
+  width: 100%; padding: 7px 8px; border-radius: 7px; border: 1.5px solid; font-size: 0.71rem;
   font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
-  display: flex; align-items: center; justify-content: center; gap: 4px;
+  display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px;
 }
 .dm-stop-btn.open   { border-color: var(--red); color: var(--red); background: #fff; }
 .dm-stop-btn.open:hover   { background: var(--red-pale); }
@@ -982,6 +997,7 @@ tr:hover td { background: var(--ivory); }
 .bk-day {
   background: #fff; padding: 8px 7px; min-height: 76px;
   cursor: pointer; transition: background 0.15s;
+  position: relative;
 }
 .bk-day:hover { background: var(--saffron-pale); }
 .bk-day.empty  { background: var(--cream); cursor: default; }
@@ -1000,6 +1016,34 @@ tr:hover td { background: var(--ivory); }
 .bk-chip.khich  { background: #e8f5e9; color: #2e7d32; }
 .bk-chip.bk-stopped-chip { opacity: 0.6; text-decoration: line-through; }
 .bk-day.bk-has-stopped { border-top: 3px solid var(--red); }
+.bk-day.bk-all-stopped { background: #fff4f4 !important; border-left: 3px solid var(--red) !important; }
+.bk-day.bk-all-stopped .bk-day-num { color: var(--red); text-decoration: line-through; }
+.bk-day-stop-btn {
+  position: absolute; bottom: 4px; right: 4px;
+  background: none; border: 1px solid transparent; border-radius: 4px;
+  font-size: 0.55rem; padding: 1px 5px; cursor: pointer; color: var(--text-light);
+  opacity: 0; transition: opacity 0.15s; white-space: nowrap; font-weight: 600;
+  line-height: 1.6;
+}
+.bk-day:hover .bk-day-stop-btn { opacity: 1; border-color: var(--border); background: #fff; }
+.bk-day.bk-all-stopped .bk-day-stop-btn {
+  opacity: 1; color: var(--red); border-color: #f5c6c6; background: #fdecea;
+}
+.bk-stopped-date-badge {
+  font-size: 0.55rem; font-weight: 800; color: var(--red); text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 1px 5px; background: #fdecea;
+  border-radius: 3px; display: inline-block; margin-top: 3px;
+}
+.dm-date-stop-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 16px; border-radius: 10px; margin-bottom: 18px;
+  border: 1.5px solid var(--border);
+}
+.dm-date-stop-bar.stopped { background: #fdecea; border-color: #f5c6c6; }
+.dm-date-stop-bar.open    { background: var(--cream); border-color: var(--border); }
+.dm-stop-bar-icon { font-size: 1.6rem; flex-shrink: 0; line-height: 1; }
+.dm-stop-bar-title { font-size: 0.82rem; font-weight: 700; }
+.dm-stop-bar-sub   { font-size: 0.7rem; color: var(--text-light); margin-top: 2px; }
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
@@ -1049,6 +1093,10 @@ tr:hover td { background: var(--ivory); }
   </button>
   <button class="nav-item" onclick="showPage('reports')">
     <span class="nav-icon">📤</span> Reports & Exports
+  </button>
+  <button class="nav-item" onclick="showPage('birthday')">
+    <span class="nav-icon">🎉</span> Party Enquiries
+    <span class="nav-badge" id="bdy-pending-badge">0</span>
   </button>
 
   <div class="sidebar-footer">
@@ -1148,49 +1196,49 @@ tr:hover td { background: var(--ivory); }
           </div>
 
           <div class="form-group">
-            <label class="form-label">Meal Type (Prasadam For) <span class="req">*</span></label>
-            <div class="pill-group">
-              <div class="pill-opt">
-                <input type="radio" name="meal" id="meal-break" value="Breakfast" onchange="updateSummary()">
-                <label for="meal-break">🌅 Breakfast</label>
+            <label class="form-label">Coupons per Meal <span class="req">*</span></label>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:0.82rem;color:var(--text-mid)">🌅 Breakfast</span>
+                <div class="qty-stepper">
+                  <button class="qty-btn" onclick="changeMealQty('Breakfast',-1)">−</button>
+                  <input class="qty-input" id="f-qty-breakfast" type="number" value="0" min="0" max="10" oninput="updateSummary(); checkBulk()">
+                  <button class="qty-btn" onclick="changeMealQty('Breakfast',1)">+</button>
+                </div>
               </div>
-              <div class="pill-opt">
-                <input type="radio" name="meal" id="meal-lunch" value="Lunch" onchange="updateSummary()">
-                <label for="meal-lunch">☀️ Lunch</label>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:0.82rem;color:var(--text-mid)">☀️ Lunch</span>
+                <div class="qty-stepper">
+                  <button class="qty-btn" onclick="changeMealQty('Lunch',-1)">−</button>
+                  <input class="qty-input" id="f-qty-lunch" type="number" value="0" min="0" max="10" oninput="updateSummary(); checkBulk()">
+                  <button class="qty-btn" onclick="changeMealQty('Lunch',1)">+</button>
+                </div>
               </div>
-              <div class="pill-opt">
-                <input type="radio" name="meal" id="meal-din" value="Dinner" onchange="updateSummary()">
-                <label for="meal-din">🌙 Dinner</label>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:0.82rem;color:var(--text-mid)">🌙 Dinner</span>
+                <div class="qty-stepper">
+                  <button class="qty-btn" onclick="changeMealQty('Dinner',-1)">−</button>
+                  <input class="qty-input" id="f-qty-dinner" type="number" value="0" min="0" max="10" oninput="updateSummary(); checkBulk()">
+                  <button class="qty-btn" onclick="changeMealQty('Dinner',1)">+</button>
+                </div>
               </div>
-              <div class="pill-opt">
-                <input type="radio" name="meal" id="meal-khichdi" value="Sunday Khichdi" onchange="updateSummary()">
-                <label for="meal-khichdi">🥘 Sunday Khichdi</label>
-              </div>
+            </div>
+            <div class="bulk-warning" id="bulk-warning">
+              ⚠️ Bulk request detected (≥8 coupons). Admin review may be required.
             </div>
           </div>
 
           <hr style="border:none;border-top:1px solid var(--border-light);margin:8px 0 20px">
 
-          <!-- Step 4: Date & Quantity -->
+          <!-- Step 4: Date -->
           <div style="margin-bottom:8px">
-            <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--saffron)">Step 4 — Date & Quantity</span>
+            <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--saffron)">Step 4 — Date</span>
           </div>
           <div class="form-row" style="margin-bottom:0">
             <div class="form-group">
               <label class="form-label">Event Date <span class="req">*</span></label>
               <input class="form-input" id="f-date" type="date" onchange="updateSummary(); checkDateWindow()">
               <div class="form-hint" id="date-window-hint" style="margin-top:6px"></div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Number of Coupons <span class="req">*</span></label>
-              <div class="qty-stepper">
-                <button class="qty-btn" onclick="changeQty(-1)">−</button>
-                <input class="qty-input" id="f-qty" type="number" value="1" min="1" max="10" oninput="updateSummary(); checkBulk()">
-                <button class="qty-btn" onclick="changeQty(1)">+</button>
-              </div>
-              <div class="bulk-warning" id="bulk-warning">
-                ⚠️ Bulk request detected (≥8 coupons). Admin review may be required.
-              </div>
             </div>
           </div>
 
@@ -1199,16 +1247,20 @@ tr:hover td { background: var(--ivory); }
             <!-- Price breakdown -->
             <div style="background:var(--cream);padding:16px 18px">
               <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light)">
-                <span style="font-size:0.78rem;color:var(--text-mid);font-weight:500">Price per Coupon</span>
-                <span style="font-size:0.88rem;font-weight:700;color:var(--text-dark)" id="price-per-coupon">₹40/-</span>
+                <span style="font-size:0.78rem;color:var(--text-mid);font-weight:500">🌅 Breakfast</span>
+                <span style="font-size:0.88rem;font-weight:700;color:var(--text-dark)" id="price-breakfast">—</span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light)">
-                <span style="font-size:0.78rem;color:var(--text-mid);font-weight:500">Quantity</span>
-                <span style="font-size:0.88rem;font-weight:700;color:var(--text-dark)" id="price-qty-display">1</span>
+                <span style="font-size:0.78rem;color:var(--text-mid);font-weight:500">☀️ Lunch</span>
+                <span style="font-size:0.88rem;font-weight:700;color:var(--text-dark)" id="price-lunch">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light)">
+                <span style="font-size:0.78rem;color:var(--text-mid);font-weight:500">🌙 Dinner</span>
+                <span style="font-size:0.88rem;font-weight:700;color:var(--text-dark)" id="price-dinner">—</span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0 4px">
                 <span style="font-size:0.82rem;font-weight:700;color:var(--brown-dark)">Total Amount</span>
-                <span style="font-size:1.08rem;font-weight:700;color:var(--saffron)" id="price-total">₹40/-</span>
+                <span style="font-size:1.08rem;font-weight:700;color:var(--saffron)" id="price-total">₹0/-</span>
               </div>
             </div>
 
@@ -1265,16 +1317,20 @@ tr:hover td { background: var(--ivory); }
             <span class="summary-val" id="sum-cat">—</span>
           </div>
           <div class="summary-row">
-            <span class="summary-key">Meal</span>
-            <span class="summary-val" id="sum-meal">—</span>
+            <span class="summary-key">🌅 Breakfast</span>
+            <span class="summary-val" id="sum-breakfast">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">☀️ Lunch</span>
+            <span class="summary-val" id="sum-lunch">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">🌙 Dinner</span>
+            <span class="summary-val" id="sum-dinner">0</span>
           </div>
           <div class="summary-row">
             <span class="summary-key">Date</span>
             <span class="summary-val" id="sum-date">—</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-key">Coupons</span>
-            <span class="summary-val" id="sum-qty">—</span>
           </div>
           <div class="summary-uid">
             Unique ID will be: <br><strong id="sum-uid">HKM-XXXXXX</strong>
@@ -1312,7 +1368,7 @@ tr:hover td { background: var(--ivory); }
       <div class="alert-banner-icon">🔔</div>
       <div class="alert-banner-text">
         <h4>Bulk Order Alert</h4>
-        <p>3 registrations with ≥ 8 coupons for Sunday Khichdi (Apr 27) are awaiting admin approval. <a href="#" onclick="showPage('registrations')" style="color:var(--saffron);font-weight:600">View →</a></p>
+        <p>3 registrations with ≥ 8 coupons (Apr 27) are awaiting admin approval. <a href="#" onclick="showPage('registrations')" style="color:var(--saffron);font-weight:600">View →</a></p>
       </div>
     </div>
 
@@ -1348,7 +1404,7 @@ tr:hover td { background: var(--ivory); }
         <tbody id="recent-tbody">
           <tr><td><span class="badge badge-gold">HKM-004812</span></td><td>Gopika Devi</td><td>98XXXXXX12</td><td><span class="badge badge-saffron">Thiruvanmiyur</span></td><td>Lunch</td><td>21 Apr 2026</td><td>2</td><td><span class="badge badge-green">Confirmed</span></td></tr>
           <tr><td><span class="badge badge-gold">HKM-004811</span></td><td>Madhava Das</td><td>97XXXXXX44</td><td><span class="badge badge-maroon">NLBR</span></td><td>Breakfast</td><td>21 Apr 2026</td><td>9 <span class="bulk-flag">BULK</span></td><td><span class="badge badge-gold">Review</span></td></tr>
-          <tr><td><span class="badge badge-gold">HKM-004810</span></td><td>Tulasi Priya</td><td>91XXXXXX88</td><td><span class="badge badge-saffron">Thiruvanmiyur</span></td><td>Sunday Khichdi</td><td>27 Apr 2026</td><td>4</td><td><span class="badge badge-green">Confirmed</span></td></tr>
+          <tr><td><span class="badge badge-gold">HKM-004810</span></td><td>Tulasi Priya</td><td>91XXXXXX88</td><td><span class="badge badge-saffron">Thiruvanmiyur</span></td><td>Lunch</td><td>27 Apr 2026</td><td>4</td><td><span class="badge badge-green">Confirmed</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -1372,7 +1428,6 @@ tr:hover td { background: var(--ivory); }
           <option>Breakfast</option>
           <option>Lunch</option>
           <option>Dinner</option>
-          <option>Sunday Khichdi</option>
         </select>
         <select class="filter-select" id="filter-bulk" onchange="filterTable()">
           <option value="">All Quantities</option>
@@ -1423,12 +1478,6 @@ tr:hover td { background: var(--ivory); }
             <input class="price-input" id="gdef-Dinner" type="number" min="0" style="width:100%;font-size:1.1rem;padding:9px 10px 9px 24px" oninput="updateDefaultRate('Dinner',this.value)">
           </div>
         </div>
-        <div style="background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px">
-          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-light);margin-bottom:10px">🥘 Sunday Khichdi</div>
-          <div class="price-input-wrap">
-            <input class="price-input" id="gdef-SundayKhichdi" type="number" min="0" style="width:100%;font-size:1.1rem;padding:9px 10px 9px 24px" oninput="updateDefaultRate('SundayKhichdi',this.value)">
-          </div>
-        </div>
       </div>
     </div>
 
@@ -1442,15 +1491,14 @@ tr:hover td { background: var(--ivory); }
         <button class="btn btn-primary btn-sm" onclick="saveDefaultLimits()">💾 Save Limits</button>
       </div>
       <!-- column headers -->
-      <div style="display:grid;grid-template-columns:1fr repeat(4,1fr);gap:12px;margin-bottom:8px;padding:0 4px">
+      <div style="display:grid;grid-template-columns:1fr repeat(3,1fr);gap:12px;margin-bottom:8px;padding:0 4px">
         <div></div>
         <div style="text-align:center;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light)">🌅 Breakfast</div>
         <div style="text-align:center;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light)">☀️ Lunch</div>
         <div style="text-align:center;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light)">🌙 Dinner</div>
-        <div style="text-align:center;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light)">🥘 Khichdi</div>
       </div>
       <!-- Thiruvanmiyur row -->
-      <div style="display:grid;grid-template-columns:1fr repeat(4,1fr);gap:12px;margin-bottom:10px;align-items:center">
+      <div style="display:grid;grid-template-columns:1fr repeat(3,1fr);gap:12px;margin-bottom:10px;align-items:center">
         <div style="background:var(--saffron-pale);border:1.5px solid rgba(232,98,26,.2);border-radius:8px;padding:10px 14px">
           <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--saffron-dark)">📍 Thiruvanmiyur</div>
         </div>
@@ -1463,12 +1511,9 @@ tr:hover td { background: var(--ivory); }
         <div style="background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:12px 10px;text-align:center">
           <input class="limit-loc-input" id="glim-Thiruvanmiyur-Dinner" type="number" min="1" oninput="updateDefaultLimit('Thiruvanmiyur','Dinner',this.value)">
         </div>
-        <div style="background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:12px 10px;text-align:center">
-          <input class="limit-loc-input" id="glim-Thiruvanmiyur-SundayKhichdi" type="number" min="1" oninput="updateDefaultLimit('Thiruvanmiyur','SundayKhichdi',this.value)">
-        </div>
       </div>
       <!-- NLBR row -->
-      <div style="display:grid;grid-template-columns:1fr repeat(4,1fr);gap:12px;align-items:center">
+      <div style="display:grid;grid-template-columns:1fr repeat(3,1fr);gap:12px;align-items:center">
         <div style="background:#fdeaea;border:1.5px solid rgba(123,29,29,.15);border-radius:8px;padding:10px 14px">
           <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--maroon)">📍 NLBR</div>
         </div>
@@ -1480,9 +1525,6 @@ tr:hover td { background: var(--ivory); }
         </div>
         <div style="background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:12px 10px;text-align:center">
           <input class="limit-loc-input" id="glim-NLBR-Dinner" type="number" min="1" oninput="updateDefaultLimit('NLBR','Dinner',this.value)">
-        </div>
-        <div style="background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:12px 10px;text-align:center">
-          <input class="limit-loc-input" id="glim-NLBR-SundayKhichdi" type="number" min="1" oninput="updateDefaultLimit('NLBR','SundayKhichdi',this.value)">
         </div>
       </div>
     </div>
@@ -1685,15 +1727,6 @@ tr:hover td { background: var(--ivory); }
                 </div>
                 <button class="meal-remove-btn" id="rm-Dinner" onclick="toggleMealRemoved('Dinner')" title="Remove / restore this meal for this date">✕</button>
               </div>
-              <div class="meal-price-row" id="row-SundayKhichdi">
-                <span class="meal-price-icon">🥘</span>
-                <span class="meal-price-name">Sunday Khichdi</span>
-                <span class="meal-price-default" id="def-SundayKhichdi"></span>
-                <div class="price-input-wrap">
-                  <input class="price-input" id="price-SundayKhichdi" type="number" min="0" placeholder="0" oninput="markChanged(this)">
-                </div>
-                <button class="meal-remove-btn" id="rm-SundayKhichdi" onclick="toggleMealRemoved('SundayKhichdi')" title="Remove / restore this meal for this date">✕</button>
-              </div>
             </div>
             <!-- Slot limits for this date -->
             <div class="limit-section-head">Slot Limits for This Date</div>
@@ -1717,11 +1750,6 @@ tr:hover td { background: var(--ivory); }
               <span class="limit-loc-label">🌙 Dinner</span>
               <input class="limit-loc-input" id="lim-Thiruvanmiyur-Dinner" type="number" min="1" placeholder="—" oninput="markChanged(this)">
               <input class="limit-loc-input" id="lim-NLBR-Dinner"          type="number" min="1" placeholder="—" oninput="markChanged(this)">
-            </div>
-            <div class="limit-loc-row" id="limrow-SundayKhichdi">
-              <span class="limit-loc-label">🥘 Khichdi</span>
-              <input class="limit-loc-input" id="lim-Thiruvanmiyur-SundayKhichdi" type="number" min="1" placeholder="—" oninput="markChanged(this)">
-              <input class="limit-loc-input" id="lim-NLBR-SundayKhichdi"          type="number" min="1" placeholder="—" oninput="markChanged(this)">
             </div>
             <p style="font-size:0.72rem;color:var(--text-light);margin-top:8px">
               Leave blank to use global defaults. Edit global defaults in <button onclick="showPage('capacity')" style="background:none;border:none;color:var(--saffron);font-size:0.72rem;font-weight:600;cursor:pointer;padding:0;text-decoration:underline">Capacity &amp; Slots ↗</button>
@@ -1748,7 +1776,6 @@ tr:hover td { background: var(--ivory); }
             <span class="bk-chip bfast">🌅 Breakfast</span>
             <span class="bk-chip lunch">☀️ Lunch</span>
             <span class="bk-chip dinner">🌙 Dinner</span>
-            <span class="bk-chip khich">🥘 Khichdi</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px">
             <button class="cal-nav-btn" onclick="shiftMonth(-1)" title="Previous month">&#8592;</button>
@@ -1978,7 +2005,69 @@ tr:hover td { background: var(--ivory); }
     </div>
   </div>
 
+  <!-- ═══ PAGE: BIRTHDAY ENQUIRIES ═══ -->
+  <div class="page" id="page-birthday">
+
+    <!-- Stats row -->
+    <div id="bdy-stats-row" style="margin-bottom:20px">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Upcoming deliveries strip -->
+    <div id="bdy-upcoming-strip" style="margin-bottom:20px"></div>
+
+    <!-- Filters -->
+    <div class="window-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <h3 style="font-size:1.05rem;color:var(--brown-dark)">🎂 Party Enquiries</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select class="filter-select" id="bdy-filter-status" onchange="renderBirthdayPage()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="declined">Declined</option>
+          </select>
+          <input type="text" class="filter-select" id="bdy-search" placeholder="🔍 Search name, mobile or ID…" oninput="renderBirthdayPage()" style="min-width:200px">
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="min-width:860px">
+          <thead>
+            <tr>
+              <th>Enquiry ID</th>
+              <th>Customer</th>
+              <th>Event Date</th>
+              <th>Meal Preference</th>
+              <th style="text-align:center">Portions</th>
+              <th>Occasion Note</th>
+              <th style="text-align:center">Status</th>
+              <th style="text-align:center">Payment</th>
+              <th style="text-align:center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bdy-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
 </div><!-- /main -->
+
+<!-- BIRTHDAY DETAIL MODAL -->
+<div class="modal-overlay" id="bdy-modal-overlay" onclick="if(event.target===this)closeBdyModal()" style="z-index:1100">
+  <div style="background:#fff;border-radius:14px;width:min(540px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.22);display:flex;flex-direction:column">
+    <div style="background:linear-gradient(135deg,#c0392b,#8e1a0e);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-radius:14px 14px 0 0">
+      <div>
+        <div style="color:#fff;font-weight:700;font-size:1.05rem">🎂 Enquiry Details</div>
+        <div id="bdy-modal-id" style="color:rgba(255,255,255,.7);font-size:.78rem;margin-top:2px"></div>
+      </div>
+      <button onclick="closeBdyModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="padding:20px 22px;display:flex;flex-direction:column;gap:14px" id="bdy-modal-body"></div>
+    <div id="bdy-modal-footer" style="padding:14px 22px;border-top:1px solid #f0e6d3;display:flex;gap:10px;justify-content:flex-end"></div>
+  </div>
+</div>
 
 <!-- PAYMENT DETAIL MODAL -->
 <div class="modal-overlay" id="pay-modal-overlay">
@@ -2044,6 +2133,9 @@ tr:hover td { background: var(--ivory); }
     </div>
     <div class="day-modal-body">
 
+      <!-- Date-level stop control -->
+      <div id="dm-date-stop-bar"></div>
+
       <!-- Meal status cards -->
       <div class="dm-section-head">Meal Slot Status</div>
       <div class="dm-meal-cards" id="dm-meal-cards">
@@ -2053,7 +2145,6 @@ tr:hover td { background: var(--ivory); }
     </div>
     <div class="day-modal-footer">
       <button class="btn btn-ghost" onclick="closeDayModal()">Close</button>
-      <button class="btn btn-primary" onclick="closeDayModal(); renderBookingCalendar(); showToast('Slot settings saved')">Save</button>
     </div>
   </div>
 </div>
@@ -2077,40 +2168,40 @@ tr:hover td { background: var(--ivory); }
 const registrations = [
   { id: 'HKM-004812', name: 'Gopika Devi',          mobile: '9876543212', email: 'gopika@example.com',       loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Lunch',          date: '2026-04-21', qty: 2  },
   { id: 'HKM-004811', name: 'Madhava Das',           mobile: '9745123444', email: 'madhava@example.com',      loc: 'NLBR',          cat: 'General',  meal: 'Breakfast',      date: '2026-04-21', qty: 9  },
-  { id: 'HKM-004810', name: 'Tulasi Priya',          mobile: '9198765488', email: 'tulasi@example.com',       loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Sunday Khichdi', date: '2026-04-27', qty: 4  },
+  { id: 'HKM-004810', name: 'Tulasi Priya',          mobile: '9198765488', email: 'tulasi@example.com',       loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Dinner', date: '2026-04-27', qty: 4  },
   { id: 'HKM-004809', name: 'Radha Mohan',           mobile: '8867452301', email: '',                         loc: 'NLBR',          cat: 'General',  meal: 'Dinner',         date: '2026-04-21', qty: 3  },
   { id: 'HKM-004808', name: 'Vrindavani Dasi',       mobile: '9012345678', email: 'vrindavani@example.com',   loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Lunch',          date: '2026-04-22', qty: 8  },
   { id: 'HKM-004807', name: 'Hari Priya',            mobile: '7654321098', email: '',                         loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Breakfast',      date: '2026-04-22', qty: 1  },
-  { id: 'HKM-004806', name: 'Narayana Das',          mobile: '9988776655', email: 'narayana@example.com',     loc: 'NLBR',          cat: 'General',  meal: 'Sunday Khichdi', date: '2026-04-27', qty: 10 },
+  { id: 'HKM-004806', name: 'Narayana Das',          mobile: '9988776655', email: 'narayana@example.com',     loc: 'NLBR',          cat: 'General',  meal: 'Dinner', date: '2026-04-27', qty: 10 },
   { id: 'HKM-004805', name: 'Sarada Devi',           mobile: '8123456789', email: 'sarada@example.com',       loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Dinner',         date: '2026-04-22', qty: 2  },
   { id: 'HKM-004804', name: 'Venkatesan R',          mobile: '9345678901', email: 'venkat@example.com',       loc: 'NLBR',          cat: 'General',  meal: 'Lunch',          date: '2026-04-21', qty: 1  },
   { id: 'HKM-004803', name: 'Alamelu Nachiar',       mobile: '8234567890', email: 'alamelu@example.com',      loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Breakfast',      date: '2026-04-23', qty: 5  },
   { id: 'HKM-004802', name: 'Krishnamurthy S',       mobile: '9123456780', email: '',                         loc: 'NLBR',          cat: 'General',  meal: 'Dinner',         date: '2026-04-23', qty: 2  },
   { id: 'HKM-004801', name: 'Bhavani Devi',          mobile: '7890123456', email: 'bhavani@example.com',      loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Lunch',          date: '2026-04-23', qty: 3  },
-  { id: 'HKM-004800', name: 'Suresh Babu',           mobile: '9567123890', email: 'suresh@example.com',       loc: 'NLBR',          cat: 'General',  meal: 'Sunday Khichdi', date: '2026-04-27', qty: 6  },
-  { id: 'HKM-004799', name: 'Padmavathi Ammal',      mobile: '8901234567', email: '',                         loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Sunday Khichdi', date: '2026-04-27', qty: 8  },
+  { id: 'HKM-004800', name: 'Suresh Babu',           mobile: '9567123890', email: 'suresh@example.com',       loc: 'NLBR',          cat: 'General',  meal: 'Dinner', date: '2026-04-27', qty: 6  },
+  { id: 'HKM-004799', name: 'Padmavathi Ammal',      mobile: '8901234567', email: '',                         loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Dinner', date: '2026-04-27', qty: 8  },
   { id: 'HKM-004798', name: 'Janardhan Pillai',      mobile: '9678901234', email: 'janardhan@example.com',    loc: 'NLBR',          cat: 'General',  meal: 'Breakfast',      date: '2026-04-22', qty: 2  },
   { id: 'HKM-004797', name: 'Kamakshi Devi',         mobile: '7412369850', email: 'kamakshi@example.com',     loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Dinner',         date: '2026-04-24', qty: 1  },
   { id: 'HKM-004796', name: 'Ananda Raman',          mobile: '9852147630', email: '',                         loc: 'NLBR',          cat: 'Festival', meal: 'Lunch',          date: '2026-04-24', qty: 4  },
   { id: 'HKM-004795', name: 'Meenakshi Sundaram',    mobile: '8523697410', email: 'meena@example.com',        loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Breakfast',      date: '2026-04-24', qty: 2  },
   { id: 'HKM-004794', name: 'Parthasarathy V',       mobile: '9631478520', email: 'partha@example.com',       loc: 'NLBR',          cat: 'General',  meal: 'Dinner',         date: '2026-04-24', qty: 3  },
-  { id: 'HKM-004793', name: 'Rukmini Dasi',          mobile: '7896541230', email: 'rukmini@example.com',      loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Sunday Khichdi', date: '2026-04-27', qty: 9  },
+  { id: 'HKM-004793', name: 'Rukmini Dasi',          mobile: '7896541230', email: 'rukmini@example.com',      loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Dinner', date: '2026-04-27', qty: 9  },
   { id: 'HKM-004792', name: 'Govindaraj M',          mobile: '9753182640', email: '',                         loc: 'NLBR',          cat: 'General',  meal: 'Lunch',          date: '2026-04-25', qty: 1  },
   { id: 'HKM-004791', name: 'Saroja Devi',           mobile: '8147258369', email: 'saroja@example.com',       loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Lunch',          date: '2026-04-25', qty: 2  },
   { id: 'HKM-004790', name: 'Balamurugan K',         mobile: '9264817305', email: 'balu@example.com',         loc: 'NLBR',          cat: 'General',  meal: 'Breakfast',      date: '2026-04-25', qty: 3  },
   { id: 'HKM-004789', name: 'Vasantha Kumari',       mobile: '7531864209', email: '',                         loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Dinner',         date: '2026-04-25', qty: 5  },
-  { id: 'HKM-004788', name: 'Ramachandran S',        mobile: '9081726354', email: 'ramachandran@example.com', loc: 'NLBR',          cat: 'General',  meal: 'Sunday Khichdi', date: '2026-04-27', qty: 2  },
+  { id: 'HKM-004788', name: 'Ramachandran S',        mobile: '9081726354', email: 'ramachandran@example.com', loc: 'NLBR',          cat: 'General',  meal: 'Dinner', date: '2026-04-27', qty: 2  },
   { id: 'HKM-004787', name: 'Devaki Ammal',          mobile: '8362941075', email: 'devaki@example.com',       loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Breakfast',      date: '2026-04-26', qty: 1  },
   { id: 'HKM-004786', name: 'Murugesan P',           mobile: '9174836205', email: '',                         loc: 'NLBR',          cat: 'General',  meal: 'Dinner',         date: '2026-04-26', qty: 4  },
   { id: 'HKM-004785', name: 'Kalaiselvi R',          mobile: '7820935416', email: 'kalai@example.com',        loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Lunch',          date: '2026-04-26', qty: 3  },
   { id: 'HKM-004784', name: 'Sundareswaran N',       mobile: '9503827416', email: 'sundar@example.com',       loc: 'NLBR',          cat: 'General',  meal: 'Breakfast',      date: '2026-04-26', qty: 2  },
-  { id: 'HKM-004783', name: 'Mangalam Iyer',         mobile: '8219630547', email: '',                         loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Sunday Khichdi', date: '2026-04-27', qty: 10 },
-  { id: 'HKM-004782', name: 'Thilaga Devi',          mobile: '9640182537', email: 'thilaga@example.com',      loc: 'NLBR',          cat: 'Festival', meal: 'Sunday Khichdi', date: '2026-04-27', qty: 7  },
+  { id: 'HKM-004783', name: 'Mangalam Iyer',         mobile: '8219630547', email: '',                         loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Dinner', date: '2026-04-27', qty: 10 },
+  { id: 'HKM-004782', name: 'Thilaga Devi',          mobile: '9640182537', email: 'thilaga@example.com',      loc: 'NLBR',          cat: 'Festival', meal: 'Dinner', date: '2026-04-27', qty: 7  },
   { id: 'HKM-004781', name: 'Aravindhan C',          mobile: '7305816429', email: 'aravind@example.com',      loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Lunch',          date: '2026-04-28', qty: 1  },
   { id: 'HKM-004780', name: 'Ponnammal Devi',        mobile: '9827461305', email: '',                         loc: 'NLBR',          cat: 'General',  meal: 'Dinner',         date: '2026-04-28', qty: 2  },
   { id: 'HKM-004779', name: 'Dhanasekaran V',        mobile: '8416305279', email: 'dhanasekaran@example.com', loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Breakfast',      date: '2026-04-28', qty: 3  },
   { id: 'HKM-004778', name: 'Umamaheswari S',        mobile: '9051738264', email: 'uma@example.com',          loc: 'NLBR',          cat: 'Festival', meal: 'Lunch',          date: '2026-04-28', qty: 6  },
-  { id: 'HKM-004777', name: 'Krishnapriya Dasi',     mobile: '7638294015', email: 'krishnapriya@example.com', loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Sunday Khichdi', date: '2026-05-04', qty: 4  },
+  { id: 'HKM-004777', name: 'Krishnapriya Dasi',     mobile: '7638294015', email: 'krishnapriya@example.com', loc: 'Thiruvanmiyur', cat: 'Festival', meal: 'Dinner', date: '2026-05-04', qty: 4  },
   { id: 'HKM-004776', name: 'Selvakumar R',          mobile: '9274015836', email: '',                         loc: 'NLBR',          cat: 'General',  meal: 'Lunch',          date: '2026-04-29', qty: 2  },
   { id: 'HKM-004775', name: 'Nirmala Devi',          mobile: '8103947265', email: 'nirmala@example.com',      loc: 'Thiruvanmiyur', cat: 'General',  meal: 'Dinner',         date: '2026-04-29', qty: 1  },
   { id: 'HKM-004774', name: 'Jayarama Das',          mobile: '9586203471', email: 'jayarama@example.com',     loc: 'NLBR',          cat: 'General',  meal: 'Breakfast',      date: '2026-04-29', qty: 8  },
@@ -2123,12 +2214,12 @@ var payments = [
   { id: 'ISKC-0347', name: 'Ramachandran Iyer',    mobile: '9876541230', loc: 'Thiruvanmiyur', meal: 'Lunch',          date: '2026-04-21', qty: 5,  amount: 12250, txid: 'UPI-2025-98472634', submitted: 'Mar 10, 9:12am',  status: 'pending'  },
   { id: 'ISKC-0345', name: 'Suresh Krishnamurthy', mobile: '8765432109', loc: 'NLBR',          meal: 'Breakfast',      date: '2026-04-21', qty: 6,  amount: 15000, txid: 'UPI-2025-87361524', submitted: 'Mar 9, 3:45pm',   status: 'pending'  },
   { id: 'ISKC-0341', name: 'Kavitha Rajan',         mobile: '9012345678', loc: 'Thiruvanmiyur', meal: 'Dinner',         date: '2026-04-22', qty: 4,  amount:  9800, txid: 'UPI-2025-76250413', submitted: 'Mar 8, 11:20am', status: 'pending'  },
-  { id: 'ISKC-0346', name: 'Priya Venkataraman',   mobile: '7654321098', loc: 'Thiruvanmiyur', meal: 'Sunday Khichdi', date: '2026-04-27', qty: 8,  amount: 19600, txid: 'UPI-2025-65149302', submitted: 'Mar 7, 6:55pm',  status: 'verified' },
+  { id: 'ISKC-0346', name: 'Priya Venkataraman',   mobile: '7654321098', loc: 'Thiruvanmiyur', meal: 'Dinner', date: '2026-04-27', qty: 8,  amount: 19600, txid: 'UPI-2025-65149302', submitted: 'Mar 7, 6:55pm',  status: 'verified' },
   { id: 'ISKC-0342', name: 'Anand Subramanian',    mobile: '9988776655', loc: 'NLBR',          meal: 'Lunch',          date: '2026-04-22', qty: 3,  amount:  7350, txid: 'UPI-2025-54238191', submitted: 'Mar 7, 2:10pm',  status: 'verified' },
   { id: 'ISKC-0340', name: 'Meena Krishnan',        mobile: '8123456789', loc: 'Thiruvanmiyur', meal: 'Breakfast',      date: '2026-04-23', qty: 2,  amount:  4900, txid: 'UPI-2025-43127080', submitted: 'Mar 6, 4:35pm',  status: 'verified' },
   { id: 'ISKC-0339', name: 'Bala Murugan',          mobile: '9345678901', loc: 'NLBR',          meal: 'Dinner',         date: '2026-04-23', qty: 7,  amount: 17150, txid: 'UPI-2025-32015969', submitted: 'Mar 6, 10:00am', status: 'verified' },
   { id: 'ISKC-0337', name: 'Saranya Devi',          mobile: '8234567890', loc: 'Thiruvanmiyur', meal: 'Lunch',          date: '2026-04-24', qty: 2,  amount:  4900, txid: 'UPI-2025-21904858', submitted: 'Mar 5, 5:20pm',  status: 'verified' },
-  { id: 'ISKC-0336', name: 'Ramesh Pillai',         mobile: '9123456780', loc: 'NLBR',          meal: 'Sunday Khichdi', date: '2026-04-27', qty: 10, amount: 24500, txid: 'UPI-2025-10793747', submitted: 'Mar 5, 12:05pm', status: 'verified' },
+  { id: 'ISKC-0336', name: 'Ramesh Pillai',         mobile: '9123456780', loc: 'NLBR',          meal: 'Dinner', date: '2026-04-27', qty: 10, amount: 24500, txid: 'UPI-2025-10793747', submitted: 'Mar 5, 12:05pm', status: 'verified' },
   { id: 'ISKC-0333', name: 'Lalitha Natarajan',    mobile: '7890123456', loc: 'Thiruvanmiyur', meal: 'Breakfast',      date: '2026-04-25', qty: 3,  amount:  7350, txid: 'UPI-2025-99682636', submitted: 'Mar 4, 8:40am',  status: 'verified' },
   { id: 'ISKC-0331', name: 'Vimal Kumar',           mobile: '9567123890', loc: 'NLBR',          meal: 'Lunch',          date: '2026-04-25', qty: 4,  amount:  9800, txid: 'UPI-2025-88571525', submitted: 'Mar 3, 7:15pm',  status: 'verified' },
   { id: 'ISKC-0328', name: 'Padma Devi',            mobile: '8901234567', loc: 'Thiruvanmiyur', meal: 'Dinner',         date: '2026-04-26', qty: 9,  amount: 22050, txid: 'UPI-2025-77460414', submitted: 'Mar 2, 3:50pm',  status: 'declined' },
@@ -2144,13 +2235,11 @@ const fillData = {
     { icon: '🌅', meal: 'Breakfast',      used: 64,  limit: 100 },
     { icon: '☀️', meal: 'Lunch',          used: 88,  limit: 100 },
     { icon: '🌙', meal: 'Dinner',         used: 41,  limit: 100 },
-    { icon: '🥘', meal: 'Sunday Khichdi', used: 35,  limit: 200 },
   ],
   'NLBR': [
     { icon: '🌅', meal: 'Breakfast',      used: 44,  limit: 80  },
     { icon: '☀️', meal: 'Lunch',          used: 78,  limit: 80  },
     { icon: '🌙', meal: 'Dinner',         used: 16,  limit: 80  },
-    { icon: '🥘', meal: 'Sunday Khichdi', used: 33,  limit: 150 },
   ],
 };
 
@@ -2158,7 +2247,6 @@ const slots = [
   { label: 'Lunch · Thiruvanmiyur', date: 'Apr 21',  status: 'open'   },
   { label: 'Lunch · NLBR',          date: 'Apr 21',  status: 'closed' },
   { label: 'Breakfast · NLBR',      date: 'Apr 22',  status: 'open'   },
-  { label: 'Sunday Khichdi',        date: 'Apr 27',  status: 'open'   },
 ];
 
 // last confirmed registration for coupon preview
@@ -2175,6 +2263,7 @@ const pageTitles = {
   reports:       ['Reports & Exports',        'PDF & Excel data exports'],
   payments:      ['Payments',                 'Review and verify UPI payment submissions'],
   payment:       ['Complete Payment',         'Scan QR & submit your UPI transaction details'],
+  birthday:      ['Party Enquiries',           'Review and manage party door delivery orders'],
 };
 
 function showPage(id) {
@@ -2192,6 +2281,7 @@ function showPage(id) {
   if (id === 'dashboard') { updateDashboardStats(); populateDateFilter(); refreshFillBars(); }
   if (id === 'pricing') renderCalendar();
   if (id === 'payments') renderPaymentsTable();
+  if (id === 'birthday') renderBirthdayPage();
   if (id === 'payment' && !pendingEntry) showPage('register'); // guard: no direct nav
   // close mobile sidebar
   document.getElementById('main-sidebar').classList.remove('open');
@@ -2224,53 +2314,55 @@ function updateSummary() {
   const email  = document.getElementById('f-email').value.trim()  || '—';
   const loc    = document.querySelector('input[name=location]:checked')?.value || '—';
   const cat    = document.querySelector('input[name=category]:checked')?.value || '—';
-  const meal   = document.querySelector('input[name=meal]:checked')?.value     || '—';
   const date   = document.getElementById('f-date').value;
-  const qty    = document.getElementById('f-qty').value || '1';
+  const meals = {
+    Breakfast: parseInt(document.getElementById('f-qty-breakfast').value) || 0,
+    Lunch:     parseInt(document.getElementById('f-qty-lunch').value) || 0,
+    Dinner:    parseInt(document.getElementById('f-qty-dinner').value) || 0
+  };
+  const totalQty = meals.Breakfast + meals.Lunch + meals.Dinner;
 
-  document.getElementById('sum-name').textContent   = name;
-  document.getElementById('sum-mobile').textContent = mobile;
-  document.getElementById('sum-email').textContent  = email;
-  document.getElementById('sum-loc').textContent    = loc;
-  document.getElementById('sum-cat').textContent    = cat;
-  document.getElementById('sum-meal').textContent   = meal;
-  document.getElementById('sum-date').textContent   = date ? new Date(date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
-  document.getElementById('sum-qty').textContent    = qty + (parseInt(qty) >= 8 ? ' ⚠️ Bulk' : '');
-  document.getElementById('sum-uid').textContent    = 'HKM-00' + couponCounter;
+  document.getElementById('sum-name').textContent      = name;
+  document.getElementById('sum-mobile').textContent    = mobile;
+  document.getElementById('sum-email').textContent     = email;
+  document.getElementById('sum-loc').textContent       = loc;
+  document.getElementById('sum-cat').textContent       = cat;
+  document.getElementById('sum-breakfast').textContent = meals.Breakfast;
+  document.getElementById('sum-lunch').textContent     = meals.Lunch;
+  document.getElementById('sum-dinner').textContent    = meals.Dinner;
+  document.getElementById('sum-date').textContent      = date ? new Date(date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  document.getElementById('sum-uid').textContent       = 'HKM-00' + couponCounter;
 
-  // ── price breakdown panel ──
-  var mealKey = meal === 'Sunday Khichdi' ? 'SundayKhichdi' : meal;
   var dateOverride = (typeof pricingOverrides !== 'undefined' && date) ? pricingOverrides[date] : null;
-  var rate = 0;
-  if (mealKey && mealKey !== '—') {
-    if (dateOverride && dateOverride[mealKey] !== undefined) {
-      rate = dateOverride[mealKey];
-    } else if (typeof defaultRates !== 'undefined' && defaultRates[mealKey] !== undefined) {
-      rate = defaultRates[mealKey];
+  var grandTotal = 0;
+  ['Breakfast','Lunch','Dinner'].forEach(function(mk) {
+    var qty = meals[mk];
+    var rate = 0;
+    if (typeof defaultRates !== 'undefined') {
+      rate = (dateOverride && dateOverride[mk] !== undefined) ? dateOverride[mk] : (defaultRates[mk] || 0);
     }
-  }
-  var qtyNum = parseInt(qty) || 1;
-  var total  = rate * qtyNum;
-  var ppcEl  = document.getElementById('price-per-coupon');
-  var pqdEl  = document.getElementById('price-qty-display');
-  var ptlEl  = document.getElementById('price-total');
-  if (ppcEl) ppcEl.textContent = rate ? '₹' + rate + '/-' : '—';
-  if (pqdEl) pqdEl.textContent = qtyNum;
-  if (ptlEl) ptlEl.textContent = rate ? '₹' + total + '/-' : '—';
+    var subtotal = rate * qty;
+    grandTotal += subtotal;
+    var idMap = { Breakfast:'price-breakfast', Lunch:'price-lunch', Dinner:'price-dinner' };
+    var el = document.getElementById(idMap[mk]);
+    if (el) el.textContent = qty > 0 ? qty + ' × ₹' + rate + '/- = ₹' + subtotal + '/-' : '—';
+  });
+  var ptlEl = document.getElementById('price-total');
+  if (ptlEl) ptlEl.textContent = grandTotal > 0 ? '₹' + grandTotal + '/-' : '—';
 }
 
-function changeQty(delta) {
-  const inp = document.getElementById('f-qty');
-  let v = parseInt(inp.value) + delta;
-  v = Math.max(1, Math.min(10, v));
-  inp.value = v;
+function changeMealQty(meal, delta) {
+  var idMap = { Breakfast:'f-qty-breakfast', Lunch:'f-qty-lunch', Dinner:'f-qty-dinner' };
+  var inp = document.getElementById(idMap[meal]);
+  inp.value = Math.max(0, Math.min(10, (parseInt(inp.value) || 0) + delta));
   updateSummary();
   checkBulk();
 }
 
 function checkBulk() {
-  const v = parseInt(document.getElementById('f-qty').value);
-  document.getElementById('bulk-warning').classList.toggle('show', v >= 8);
+  const total = ['f-qty-breakfast','f-qty-lunch','f-qty-dinner']
+    .reduce((s, id) => s + (parseInt(document.getElementById(id).value) || 0), 0);
+  document.getElementById('bulk-warning').classList.toggle('show', total >= 8);
 }
 
 function checkDateWindow() {
@@ -2299,24 +2391,38 @@ function submitRegistration() {
   const email  = document.getElementById('f-email').value.trim();
   const loc    = document.querySelector('input[name=location]:checked')?.value;
   const cat    = document.querySelector('input[name=category]:checked')?.value;
-  const meal   = document.querySelector('input[name=meal]:checked')?.value;
   const date   = document.getElementById('f-date').value;
-  const qty    = parseInt(document.getElementById('f-qty').value);
+  const meals  = {
+    Breakfast: parseInt(document.getElementById('f-qty-breakfast').value) || 0,
+    Lunch:     parseInt(document.getElementById('f-qty-lunch').value) || 0,
+    Dinner:    parseInt(document.getElementById('f-qty-dinner').value) || 0
+  };
+  const totalQty = meals.Breakfast + meals.Lunch + meals.Dinner;
 
-  if (!name || !mobile || !loc || !cat || !meal || !date) {
+  if (!name || !mobile || !loc || !cat || !date) {
     showToast('Please fill all required fields ⚠️'); return;
   }
   if (mobile.length !== 10 || !/^\d+$/.test(mobile)) {
     showToast('Enter a valid 10-digit mobile number'); return;
   }
+  if (totalQty < 1) {
+    showToast('Please select at least 1 coupon ⚠️'); return;
+  }
+
+  var dateOverride = (typeof pricingOverrides !== 'undefined' && date) ? pricingOverrides[date] : null;
+  var grandTotal = 0;
+  Object.keys(meals).forEach(function(mk) {
+    var rate = (dateOverride && dateOverride[mk] !== undefined) ? dateOverride[mk]
+               : (typeof defaultRates !== 'undefined' ? (defaultRates[mk] || 0) : 0);
+    grandTotal += rate * meals[mk];
+  });
 
   const uid = 'HKM-00' + couponCounter++;
-  const entry = { id: uid, name, mobile, email, loc, cat, meal, date, qty };
+  const entry = { id: uid, name, mobile, email, loc, cat, meals, date, qty: totalQty };
   registrations.unshift(entry);
   lastConfirmed = entry;
   document.getElementById('reg-count-badge').textContent = registrations.length;
 
-  // navigate to payment step
   showPage('payment');
   loadPaymentStep(entry);
 }
@@ -2328,8 +2434,14 @@ function closeModal() {
 // ─── DASHBOARD STATS ───
 function updateDashboardStats() {
   const total     = registrations.length;
-  const totalCoupons = registrations.reduce((s, r) => s + r.qty, 0);
-  const bulk      = registrations.filter(r => r.qty >= 8).length;
+  const totalCoupons = registrations.reduce((s, r) => {
+    if (r.meals) return s + Object.values(r.meals).reduce((a,v)=>a+v,0);
+    return s + (r.qty || 0);
+  }, 0);
+  const bulk      = registrations.filter(r => {
+    var total = r.meals ? Object.values(r.meals).reduce((a,v)=>a+v,0) : (r.qty||0);
+    return total >= 8;
+  }).length;
   const openSlots = slots.filter(s => s.status === 'open').length;
 
   const els = document.querySelectorAll('.stat-num');
@@ -2339,18 +2451,28 @@ function updateDashboardStats() {
   // update recent table
   const tbody = document.getElementById('recent-tbody');
   if (!tbody) return;
-  tbody.innerHTML = registrations.slice(0, 5).map(r => `
-    <tr>
+  const mealIcons = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙' };
+  tbody.innerHTML = registrations.slice(0, 5).map(r => {
+    var mealDisplay, totalQty;
+    if (r.meals) {
+      var parts = Object.keys(r.meals).filter(k => r.meals[k] > 0).map(k => mealIcons[k] + r.meals[k]);
+      mealDisplay = parts.join(' ') || '—';
+      totalQty = Object.values(r.meals).reduce((s, v) => s + v, 0);
+    } else {
+      mealDisplay = r.meal;
+      totalQty = r.qty;
+    }
+    return `<tr>
       <td><span class="badge badge-gold">${r.id}</span></td>
       <td>${r.name}</td>
       <td>${r.mobile.replace(/(\d{2})(\d{4})(\d{4})/,'$1XXXX$3')}</td>
       <td>${r.loc === 'Thiruvanmiyur' ? '<span class="badge badge-saffron">Thiruvanmiyur</span>' : '<span class="badge badge-maroon">NLBR</span>'}</td>
-      <td>${r.meal}</td>
+      <td>${mealDisplay}</td>
       <td>${new Date(r.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
-      <td>${r.qty}${r.qty >= 8 ? ' <span class="bulk-flag">BULK</span>' : ''}</td>
-      <td>${r.qty >= 8 ? '<span class="badge badge-gold">Review</span>' : '<span class="badge badge-green">Confirmed</span>'}</td>
-    </tr>
-  `).join('');
+      <td>${totalQty}${totalQty >= 8 ? ' <span class="bulk-flag">BULK</span>' : ''}</td>
+      <td>${totalQty >= 8 ? '<span class="badge badge-gold">Review</span>' : '<span class="badge badge-green">Confirmed</span>'}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ─── FILL-RATE TICKER ───
@@ -2444,11 +2566,21 @@ function renderAllTable() {
       var locBadge  = r.loc === 'Thiruvanmiyur'
         ? '<span class="badge badge-saffron">Thiruvanmiyur</span>'
         : '<span class="badge badge-maroon">NLBR</span>';
-      var mealBadge = '<span class="badge badge-gold">' + r.meal + '</span>';
+      var mealIcons = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙' };
+      var mealDisplay, totalQty;
+      if (r.meals) {
+        var parts = Object.keys(r.meals).filter(k => r.meals[k] > 0).map(k => mealIcons[k] + r.meals[k]);
+        mealDisplay = parts.join(' ') || '—';
+        totalQty = Object.values(r.meals).reduce((s, v) => s + v, 0);
+      } else {
+        mealDisplay = r.meal;
+        totalQty = r.qty;
+      }
+      var mealBadge = '<span class="badge badge-gold">' + mealDisplay + '</span>';
       var maskedMob = r.mobile.replace(/(\d{2})(\d{4})(\d{4})/, '$1XXXX$3');
       var dateObj   = new Date(r.date + 'T12:00:00');
       var dateStr   = dateObj.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dateObj.getMonth()] + ' ' + dateObj.getFullYear();
-      var bulkTag   = r.qty >= 8 ? ' <span class="bulk-flag">BULK</span>' : '';
+      var bulkTag   = totalQty >= 8 ? ' <span class="bulk-flag">BULK</span>' : '';
       html += '<tr>'
         + '<td><span class="badge badge-grey">' + r.id + '</span></td>'
         + '<td style="font-weight:500">' + r.name + '</td>'
@@ -2457,7 +2589,7 @@ function renderAllTable() {
         + '<td>' + r.cat + '</td>'
         + '<td>' + mealBadge + '</td>'
         + '<td style="white-space:nowrap">' + dateStr + '</td>'
-        + '<td>' + r.qty + bulkTag + '</td>'
+        + '<td>' + totalQty + bulkTag + '</td>'
         + '<td>'
         +   '<button class="btn btn-ghost btn-sm" title="Preview coupon" onclick="previewCouponFor(' + idx + ')">🎟️</button> '
         +   '<button class="btn btn-danger btn-sm" title="Delete" onclick="deleteReg(' + idx + ')">🗑️</button>'
@@ -2495,14 +2627,25 @@ function renderCoupon() {
   const r = lastConfirmed || registrations[0];
   if (!r) return;
   const dateStr = new Date(r.date + 'T12:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  const mealIcon = { 'Breakfast':'🌅','Lunch':'☀️','Dinner':'🌙','Sunday Khichdi':'🥘' }[r.meal] || '🍽️';
+  const mealLabels = { Breakfast:'Breakfast', Lunch:'Lunch', Dinner:'Dinner' };
+  const mealIcons  = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙' };
+  var mealText, totalQty;
+  if (r.meals) {
+    var parts = Object.keys(r.meals).filter(k => r.meals[k] > 0)
+      .map(k => mealIcons[k] + ' ' + mealLabels[k] + ' ×' + r.meals[k]);
+    mealText = parts.join(', ') || '—';
+    totalQty = Object.values(r.meals).reduce((s, v) => s + v, 0);
+  } else {
+    mealText = (mealIcons[r.meal] || '🍽️') + ' ' + r.meal;
+    totalQty = r.qty || 0;
+  }
   document.getElementById('coupon-recipient').textContent = r.name;
   document.getElementById('coupon-location').textContent  = 'HKM ' + r.loc;
   document.getElementById('coupon-category').textContent  = r.cat + ' Prasadam';
-  document.getElementById('coupon-meal-icon').textContent = mealIcon;
-  document.getElementById('coupon-meal').textContent      = r.meal;
+  document.getElementById('coupon-meal-icon').textContent = '';
+  document.getElementById('coupon-meal').textContent      = mealText;
   document.getElementById('coupon-date').textContent      = dateStr;
-  document.getElementById('coupon-qty').textContent       = r.qty + (r.qty === 1 ? ' person' : ' persons');
+  document.getElementById('coupon-qty').textContent       = totalQty + (totalQty === 1 ? ' person' : ' persons');
   document.getElementById('coupon-uid-val').textContent   = r.id;
   document.getElementById('coupon-send-btn').textContent  = r.email ? `📧 Send to ${r.email}` : '📧 Send Email';
 }
@@ -2510,11 +2653,14 @@ function renderCoupon() {
 // ─── REAL CSV EXPORT ───
 function exportCSV(scope) {
   let rows = registrations;
-  if (scope === 'bulk') rows = rows.filter(r => r.qty >= 8);
-  const header = ['Coupon ID','Name','Mobile','Email','Location','Category','Meal','Date','Quantity'];
-  const lines = [header.join(','), ...rows.map(r =>
-    [r.id, `"${r.name}"`, r.mobile, r.email || '', r.loc, r.cat, r.meal, r.date, r.qty].join(',')
-  )];
+  if (scope === 'bulk') rows = rows.filter(r => (r.qty || 0) >= 8 || (r.meals && Object.values(r.meals).reduce((s,v)=>s+v,0) >= 8));
+  const header = ['Coupon ID','Name','Mobile','Email','Location','Category','Breakfast','Lunch','Dinner','Date','Total Qty'];
+  const lines = [header.join(','), ...rows.map(r => {
+    var m = r.meals || {};
+    var total = r.qty || Object.values(m).reduce((s,v)=>s+v,0);
+    return [r.id, `"${r.name}"`, r.mobile, r.email || '', r.loc, r.cat,
+      m.Breakfast||0, m.Lunch||0, m.Dinner||0, r.date, total].join(',');
+  })];
   const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -2540,7 +2686,6 @@ function printDistributionList() {
     { key: 'Breakfast',      label: 'Breakfast',      icon: '&#127749;' },
     { key: 'Lunch',          label: 'Lunch',          icon: '&#9728;&#65039;' },
     { key: 'Dinner',         label: 'Dinner',         icon: '&#127769;' },
-    { key: 'Sunday Khichdi', label: 'Sunday Khichdi', icon: '&#129368;' }
   ];
 
   function buildSection(meal) {
@@ -2672,7 +2817,7 @@ function removeSlot(i) {
 var adminFestivals = [
   { date: '2026-04-30', name: 'Sri Rama Navami' },
   { date: '2026-05-03', name: 'Hanuman Jayanti' },
-  { date: '2026-05-04', name: 'Sunday Feast (Khichdi)' },
+  { date: '2026-05-04', name: 'Sunday Special' },
   { date: '2026-05-10', name: 'Mohini Ekadashi' },
   { date: '2026-05-11', name: 'Parashurama Jayanti' },
   { date: '2026-05-24', name: 'Narasimha Chaturdashi' },
@@ -2745,30 +2890,32 @@ function showToast(msg) {}
 // ════════════════════════════════════════
 // PRICING CALENDAR
 // ════════════════════════════════════════
-var defaultRates  = { Breakfast: 20, Lunch: 40, Dinner: 35, SundayKhichdi: 20 };
+var defaultRates  = { Breakfast: 20, Lunch: 40, Dinner: 35 };
 var defaultLimits = {
-  Thiruvanmiyur: { Breakfast: 100, Lunch: 100, Dinner: 100, SundayKhichdi: 200 },
-  NLBR:          { Breakfast: 80,  Lunch: 80,  Dinner: 80,  SundayKhichdi: 150 }
+  Thiruvanmiyur: { Breakfast: 100, Lunch: 100, Dinner: 100 },
+  NLBR:          { Breakfast: 80,  Lunch: 80,  Dinner: 80  }
 };
 var limitOverrides = {
   '2026-04-27': {
-    Thiruvanmiyur: { Breakfast: 150, Lunch: 150, Dinner: 120, SundayKhichdi: 400 },
-    NLBR:          { Breakfast: 100, Lunch: 100, Dinner: 80,  SundayKhichdi: 250 }
+    Thiruvanmiyur: { Breakfast: 150, Lunch: 150, Dinner: 120 },
+    NLBR:          { Breakfast: 100, Lunch: 100, Dinner: 80  }
   }
 };
-var MEALS = ['Breakfast','Lunch','Dinner','SundayKhichdi'];
-var MEAL_ICONS = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙', SundayKhichdi:'🥘' };
-var MEAL_LABELS = { Breakfast:'Breakfast', Lunch:'Lunch', Dinner:'Dinner', SundayKhichdi:'Khichdi' };
+var MEALS = ['Breakfast','Lunch','Dinner'];
+var MEAL_ICONS = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙' };
+var MEAL_LABELS = { Breakfast:'Breakfast', Lunch:'Lunch', Dinner:'Dinner' };
 // stoppedSlots: { 'YYYY-MM-DD': { Breakfast: true, Lunch: false, … } }
 var stoppedSlots = {};
+// stoppedDates: { 'YYYY-MM-DD': true } — all bookings blocked for that date
+var stoppedDates = {};
 // removedMeals: { 'YYYY-MM-DD': { Breakfast: true, … } } — meal not offered on that date
 var removedMeals = {};
 
 var pricingOverrides = {
-  '2026-04-27': { label: 'Sunday Khichdi Day',  Breakfast: 30, Lunch: 60, Dinner: 50, SundayKhichdi: 25 },
-  '2026-05-01': { label: 'Labour Day',          Breakfast: 25, Lunch: 50, Dinner: 45, SundayKhichdi: 20 },
-  '2026-05-04': { label: 'Sunday Special',      Breakfast: 30, Lunch: 55, Dinner: 45, SundayKhichdi: 30 },
-  '2026-08-16': { label: 'Janmashtami',         Breakfast: 0,  Lunch: 50, Dinner: 60, SundayKhichdi: 0  },
+  '2026-04-27': { label: 'Special Day',   Breakfast: 30, Lunch: 60, Dinner: 50 },
+  '2026-05-01': { label: 'Labour Day',    Breakfast: 25, Lunch: 50, Dinner: 45 },
+  '2026-05-04': { label: 'Sunday Special',Breakfast: 30, Lunch: 55, Dinner: 45 },
+  '2026-08-16': { label: 'Janmashtami',   Breakfast: 0,  Lunch: 50, Dinner: 60 },
 };
 
 var calYear  = 2026;
@@ -2829,12 +2976,18 @@ function renderBookingCalendar() {
   var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
   var today       = '2026-04-21';
 
-  // aggregate registrations by date → meal → total qty
+  // aggregate registrations by date → meal → total qty (handles both r.meals object and legacy r.meal+r.qty)
   var byDate = {};
   registrations.forEach(function(r) {
-    var mealKey = r.meal === 'Sunday Khichdi' ? 'SundayKhichdi' : r.meal;
     if (!byDate[r.date]) byDate[r.date] = {};
-    byDate[r.date][mealKey] = (byDate[r.date][mealKey] || 0) + (parseInt(r.qty) || 1);
+    if (r.meals) {
+      ['Breakfast','Lunch','Dinner'].forEach(function(mk) {
+        if (r.meals[mk]) byDate[r.date][mk] = (byDate[r.date][mk] || 0) + r.meals[mk];
+      });
+    } else if (r.meal) {
+      var mk = r.meal;
+      byDate[r.date][mk] = (byDate[r.date][mk] || 0) + (parseInt(r.qty) || 1);
+    }
   });
 
   var html = '';
@@ -2846,25 +2999,32 @@ function renderBookingCalendar() {
     var dd  = String(d).padStart(2, '0');
     var key = calYear + '-' + mm + '-' + dd;
     var bk  = byDate[key] || {};
-    var hasAny = bk.Breakfast || bk.Lunch || bk.Dinner || bk.SundayKhichdi;
+    var hasAny     = bk.Breakfast || bk.Lunch || bk.Dinner;
     var hasStopped = stoppedSlots[key] && Object.values(stoppedSlots[key]).some(Boolean);
+    var allStopped = !!stoppedDates[key];
     var cls = 'bk-day'
-            + (key === today ? ' bk-today' : '')
-            + (hasAny ? ' has-bookings' : '')
-            + (hasStopped ? ' bk-has-stopped' : '');
+            + (key === today  ? ' bk-today'       : '')
+            + (hasAny         ? ' has-bookings'    : '')
+            + (hasStopped     ? ' bk-has-stopped'  : '')
+            + (allStopped     ? ' bk-all-stopped'  : '');
 
     var chips = '';
-    if (bk.Breakfast)     chips += '<span class="bk-chip bfast' + (stoppedSlots[key] && stoppedSlots[key].Breakfast ? ' bk-stopped-chip' : '') + '">🌅 ' + bk.Breakfast + (stoppedSlots[key] && stoppedSlots[key].Breakfast ? ' 🔴' : '') + '</span>';
-    if (bk.Lunch)         chips += '<span class="bk-chip lunch' + (stoppedSlots[key] && stoppedSlots[key].Lunch ? ' bk-stopped-chip' : '') + '">☀️ ' + bk.Lunch + (stoppedSlots[key] && stoppedSlots[key].Lunch ? ' 🔴' : '') + '</span>';
-    if (bk.Dinner)        chips += '<span class="bk-chip dinner' + (stoppedSlots[key] && stoppedSlots[key].Dinner ? ' bk-stopped-chip' : '') + '">🌙 ' + bk.Dinner + (stoppedSlots[key] && stoppedSlots[key].Dinner ? ' 🔴' : '') + '</span>';
-    if (bk.SundayKhichdi) chips += '<span class="bk-chip khich' + (stoppedSlots[key] && stoppedSlots[key].SundayKhichdi ? ' bk-stopped-chip' : '') + '">🥘 ' + bk.SundayKhichdi + (stoppedSlots[key] && stoppedSlots[key].SundayKhichdi ? ' 🔴' : '') + '</span>';
+    if (allStopped) {
+      chips = '<span class="bk-stopped-date-badge">⛔ Stopped</span>';
+    } else {
+      if (bk.Breakfast) chips += '<span class="bk-chip bfast' + (stoppedSlots[key] && stoppedSlots[key].Breakfast ? ' bk-stopped-chip' : '') + '">🌅 ' + bk.Breakfast + (stoppedSlots[key] && stoppedSlots[key].Breakfast ? ' 🔴' : '') + '</span>';
+      if (bk.Lunch)     chips += '<span class="bk-chip lunch'  + (stoppedSlots[key] && stoppedSlots[key].Lunch    ? ' bk-stopped-chip' : '') + '">☀️ ' + bk.Lunch    + (stoppedSlots[key] && stoppedSlots[key].Lunch    ? ' 🔴' : '') + '</span>';
+      if (bk.Dinner)    chips += '<span class="bk-chip dinner' + (stoppedSlots[key] && stoppedSlots[key].Dinner   ? ' bk-stopped-chip' : '') + '">🌙 ' + bk.Dinner   + (stoppedSlots[key] && stoppedSlots[key].Dinner   ? ' 🔴' : '') + '</span>';
+      if (!hasAny && hasStopped) chips += '<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--red)"></span>';
+    }
 
-    // show a "stopped" pill if any meal is stopped even if 0 bookings
-    if (!hasAny && hasStopped) chips += '<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--red)"></span>';
+    var stopBtn = '<button class="bk-day-stop-btn" onclick="toggleDateStop(\'' + key + '\',event)">'
+                + (allStopped ? '▶ Open' : '⏹ Stop') + '</button>';
 
     html += '<div class="' + cls + '" onclick="openDayModal(\'' + key + '\')">'
           + '<div class="bk-day-num">' + d + '</div>'
           + (chips ? '<div class="bk-meal-row">' + chips + '</div>' : '')
+          + stopBtn
           + '</div>';
   }
   grid.innerHTML = html;
@@ -2878,38 +3038,71 @@ function openDayModal(dateKey) {
   var label = weekday + ', ' + d.getDate() + ' ' + MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
   document.getElementById('dm-title').textContent = '📅 ' + label;
 
-  // aggregate bookings for this date
+  // aggregate bookings for this date (handles both r.meals object and legacy r.meal+r.qty)
   var bk = {};
   registrations.forEach(function(r) {
     if (r.date !== dateKey) return;
-    var mk = r.meal === 'Sunday Khichdi' ? 'SundayKhichdi' : r.meal;
-    bk[mk] = (bk[mk] || 0) + (parseInt(r.qty) || 1);
+    if (r.meals) {
+      ['Breakfast','Lunch','Dinner'].forEach(function(mk) {
+        if (r.meals[mk]) bk[mk] = (bk[mk] || 0) + r.meals[mk];
+      });
+    } else if (r.meal) {
+      bk[r.meal] = (bk[r.meal] || 0) + (parseInt(r.qty) || 1);
+    }
   });
   var totalBookings = Object.values(bk).reduce(function(s, v) { return s + v; }, 0);
   document.getElementById('dm-sub').textContent =
     totalBookings + ' total coupon' + (totalBookings !== 1 ? 's' : '') + ' booked · click a meal to stop / reopen';
 
+  // date-level stop bar
+  var allStopped = !!stoppedDates[dateKey];
+  var stopBarHtml = '<div class="dm-date-stop-bar ' + (allStopped ? 'stopped' : 'open') + '">'
+    + '<div style="display:flex;align-items:center;gap:12px">'
+    +   '<div class="dm-stop-bar-icon">' + (allStopped ? '⛔' : '📅') + '</div>'
+    +   '<div>'
+    +     '<div class="dm-stop-bar-title" style="color:' + (allStopped ? 'var(--red)' : 'var(--brown-dark)') + '">'
+    +       (allStopped ? 'All bookings stopped' : 'Bookings open')
+    +     '</div>'
+    +     '<div class="dm-stop-bar-sub">'
+    +       (allStopped ? 'New registrations are blocked for this date' : 'Use per-meal buttons below to stop individual meals')
+    +     '</div>'
+    +   '</div>'
+    + '</div>'
+    + '<button class="btn btn-sm ' + (allStopped ? 'btn-success' : 'btn-danger') + '" style="white-space:nowrap" onclick="toggleDateStop(\'' + dateKey + '\'); openDayModal(\'' + dateKey + '\')">'
+    +   (allStopped ? '🟢 Reopen All' : '🔴 Stop Entire Date')
+    + '</button>'
+    + '</div>';
+  document.getElementById('dm-date-stop-bar').innerHTML = stopBarHtml;
+
   // render meal cards
   var stopped = stoppedSlots[dateKey] || {};
   var limOver  = (limitOverrides[dateKey] || {});
   var cardsHtml = MEALS.map(function(m) {
-    var isStopped = !!stopped[m];
+    var isStopped = allStopped || !!stopped[m];
     var used  = bk[m] || 0;
     var lim   = (limOver.Thiruvanmiyur && limOver.Thiruvanmiyur[m]) || defaultLimits.Thiruvanmiyur[m] || 100;
     var pct   = Math.min(100, Math.round(used / lim * 100));
     var fillCls = pct >= 90 ? ' full' : pct >= 70 ? ' warn' : '';
+    var stopBtnHtml = allStopped
+      ? '<button class="dm-stop-btn closed" disabled style="opacity:0.45;cursor:not-allowed">⛔ Date blocked</button>'
+      : '<button class="dm-stop-btn ' + (isStopped ? 'closed' : 'open') + '" onclick="toggleMealStop(\'' + dateKey + '\',\'' + m + '\')">'
+        + (isStopped ? '🟢 Reopen Booking' : '🔴 Stop Booking') + '</button>';
+    var statusPill = '<span class="dm-meal-status-pill ' + (isStopped ? 'stopped' : 'open') + '">'
+      + (isStopped ? '⛔ Stopped' : '● Open') + '</span>';
     return '<div class="dm-meal-card' + (isStopped ? ' stopped' : '') + '">'
-      + '<div class="dm-meal-card-top">'
-      +   '<span class="dm-meal-icon">' + MEAL_ICONS[m] + '</span>'
-      +   '<span class="dm-meal-name">' + MEAL_LABELS[m] + '</span>'
-      +   (isStopped ? '<span style="margin-left:auto;width:12px;height:12px;border-radius:3px;background:var(--red);display:inline-block;flex-shrink:0"></span>' : '')
+      + '<div class="dm-meal-card-stripe"></div>'
+      + '<div class="dm-meal-card-inner">'
+      +   '<div class="dm-meal-card-top">'
+      +     '<span class="dm-meal-icon">' + MEAL_ICONS[m] + '</span>'
+      +     '<span class="dm-meal-name">' + MEAL_LABELS[m] + '</span>'
+      +     statusPill
+      +   '</div>'
+      +   '<div class="dm-meal-count">' + used + '</div>'
+      +   '<div class="dm-meal-sub">coupons booked</div>'
+      +   '<div class="dm-cap-row"><span>' + used + ' / ' + lim + ' slots</span><span>' + pct + '%</span></div>'
+      +   '<div class="dm-cap-bar"><div class="dm-cap-fill' + fillCls + '" style="width:' + pct + '%"></div></div>'
+      +   stopBtnHtml
       + '</div>'
-      + '<div class="dm-meal-count">' + used + '</div>'
-      + '<div class="dm-meal-sub">' + used + ' / ' + lim + ' slots used</div>'
-      + '<div class="dm-cap-bar"><div class="dm-cap-fill' + fillCls + '" style="width:' + pct + '%"></div></div>'
-      + '<button class="dm-stop-btn ' + (isStopped ? 'closed' : 'open') + '" onclick="toggleMealStop(\'' + dateKey + '\',\'' + m + '\')">'
-      +   (isStopped ? '🟢 Reopen Booking' : '🔴 Stop Booking')
-      + '</button>'
       + '</div>';
   }).join('');
   document.getElementById('dm-meal-cards').innerHTML = cardsHtml;
@@ -2934,6 +3127,17 @@ function toggleMealStop(dateKey, meal) {
   var mealLabel = MEAL_LABELS[meal] || meal;
   var isStopped = stoppedSlots[dateKey] && stoppedSlots[dateKey][meal];
   showToast((isStopped ? '🔴 Bookings stopped for ' : '🟢 Bookings reopened for ') + mealLabel + ' on ' + dateKey.split('-').reverse().join(' '));
+}
+
+function toggleDateStop(dateKey, event) {
+  if (event) event.stopPropagation();
+  stoppedDates[dateKey] = !stoppedDates[dateKey];
+  if (!stoppedDates[dateKey]) delete stoppedDates[dateKey];
+  renderBookingCalendar();
+  var isStopped = !!stoppedDates[dateKey];
+  showToast(isStopped
+    ? '🔴 All bookings stopped for ' + dateKey.split('-').reverse().join(' ')
+    : '🟢 Bookings reopened for '    + dateKey.split('-').reverse().join(' '));
 }
 
 function selectCalDay(key) {
@@ -3059,7 +3263,7 @@ function updateDefaultRate(meal, val) {
 }
 
 function renderDefaultRateInputs() {
-  ['Breakfast','Lunch','Dinner','SundayKhichdi'].forEach(function(m) {
+  ['Breakfast','Lunch','Dinner'].forEach(function(m) {
     var el = document.getElementById('gdef-' + m);
     if (el) el.value = defaultRates[m];
   });
@@ -3093,7 +3297,7 @@ function renderDefaultLimitInputs() {
 }
 
 function saveDefaultRates() {
-  ['Breakfast','Lunch','Dinner','SundayKhichdi'].forEach(function(m) {
+  ['Breakfast','Lunch','Dinner'].forEach(function(m) {
     var el = document.getElementById('gdef-' + m);
     if (el) {
       var v = parseFloat(el.value);
@@ -3120,7 +3324,7 @@ function renderSpecialDaysList() {
     container.innerHTML = '<div style="padding:28px;text-align:center;color:var(--text-light);font-size:0.82rem">No special days in ' + MONTH_NAMES[calMonth] + ' ' + calYear + '.</div>';
     return;
   }
-  var mealLabels = { Breakfast:'🌅 Breakfast', Lunch:'☀️ Lunch', Dinner:'🌙 Dinner', SundayKhichdi:'🥘 Khichdi' };
+  var mealLabels = { Breakfast:'🌅 Breakfast', Lunch:'☀️ Lunch', Dinner:'🌙 Dinner' };
   container.innerHTML = keys.map(function(k) {
     var ov = pricingOverrides[k];
     var d  = new Date(k + 'T12:00:00');
@@ -3257,7 +3461,7 @@ function openPayModal(idx) {
     declined: '<span class="badge badge-maroon">✖ DECLINED</span>'
   };
 
-  var mealIcon = { 'Breakfast':'🌅', 'Lunch':'☀️', 'Dinner':'🌙', 'Sunday Khichdi':'🥘' };
+  var mealIcon = { 'Breakfast':'🌅', 'Lunch':'☀️', 'Dinner':'🌙' };
 
   document.getElementById('pmd-title').textContent     = p.name;
   document.getElementById('pmd-booking-id').textContent = p.id;
@@ -3374,29 +3578,44 @@ function loadPaymentStep(entry) {
   resetProofUI();
 
   // fill order summary
-  var mealIcon = { 'Breakfast':'🌅','Lunch':'☀️','Dinner':'🌙','Sunday Khichdi':'🥘' };
-  var mealKey  = entry.meal === 'Sunday Khichdi' ? 'SundayKhichdi' : entry.meal;
+  var mealLabels = { Breakfast:'🌅 Breakfast', Lunch:'☀️ Lunch', Dinner:'🌙 Dinner' };
   var override = (typeof pricingOverrides !== 'undefined') ? pricingOverrides[entry.date] : null;
-  var rate = (override && override[mealKey] !== undefined) ? override[mealKey]
-             : (typeof defaultRates !== 'undefined' ? (defaultRates[mealKey] || 0) : 0);
-  var total = rate * entry.qty;
-
+  var total = 0;
+  var mealParts = [];
+  if (entry.meals) {
+    Object.keys(entry.meals).forEach(function(mk) {
+      var qty = entry.meals[mk];
+      if (qty <= 0) return;
+      var rate = (override && override[mk] !== undefined) ? override[mk]
+                 : (typeof defaultRates !== 'undefined' ? (defaultRates[mk] || 0) : 0);
+      total += rate * qty;
+      mealParts.push((mealLabels[mk] || mk) + ' ×' + qty);
+    });
+  } else {
+    var mealKey = entry.meal;
+    var rate = (override && override[mealKey] !== undefined) ? override[mealKey]
+               : (typeof defaultRates !== 'undefined' ? (defaultRates[mealKey] || 0) : 0);
+    total = rate * (entry.qty || 0);
+    mealParts.push((mealLabels[mealKey] || entry.meal) + ' ×' + (entry.qty || 0));
+  }
+  var mealSummaryText = mealParts.join(', ');
   document.getElementById('ps-booking-id').textContent = entry.id;
   document.getElementById('ps-name').textContent       = entry.name;
-  document.getElementById('ps-meal-info').textContent  =
-    (mealIcon[entry.meal] || '🍽') + ' ' + entry.meal + ' · ' + entry.date + ' · ' + entry.qty + ' coupon(s)';
-  document.getElementById('ps-total').textContent = rate ? '₹' + total + '/-' : 'Free';
+  document.getElementById('ps-meal-info').textContent  = mealSummaryText + ' · ' + entry.date;
+  document.getElementById('ps-total').textContent      = total ? '₹' + total + '/-' : 'Free';
 
   // render QR
   document.getElementById('qr-frame').innerHTML = generateQRSvg();
 
   // reset the registration form silently
   ['f-name','f-mobile','f-email'].forEach(function(id) { document.getElementById(id).value = ''; });
-  ['location','category','meal'].forEach(function(n) {
+  ['location','category'].forEach(function(n) {
     var el = document.querySelector('input[name=' + n + ']:checked');
     if (el) el.checked = false;
   });
-  document.getElementById('f-qty').value = 1;
+  ['f-qty-breakfast','f-qty-lunch','f-qty-dinner'].forEach(function(id) {
+    document.getElementById(id).value = 0;
+  });
   document.getElementById('bulk-warning').classList.remove('show');
   updateSummary();
 }
@@ -3440,15 +3659,26 @@ function confirmPayment() {
 
   // Add to payments list as pending
   if (pendingEntry) {
-    var mealKey  = pendingEntry.meal === 'Sunday Khichdi' ? 'SundayKhichdi' : pendingEntry.meal;
     var override = (typeof pricingOverrides !== 'undefined') ? pricingOverrides[pendingEntry.date] : null;
-    var rate = (override && override[mealKey] !== undefined) ? override[mealKey]
-               : (typeof defaultRates !== 'undefined' ? (defaultRates[mealKey] || 0) : 0);
+    var amount = 0;
+    if (pendingEntry.meals) {
+      Object.keys(pendingEntry.meals).forEach(function(mk) {
+        var qty = pendingEntry.meals[mk];
+        var rate = (override && override[mk] !== undefined) ? override[mk]
+                   : (typeof defaultRates !== 'undefined' ? (defaultRates[mk] || 0) : 0);
+        amount += rate * qty;
+      });
+    } else {
+      var mealKey = pendingEntry.meal;
+      var rate = (override && override[mealKey] !== undefined) ? override[mealKey]
+                 : (typeof defaultRates !== 'undefined' ? (defaultRates[mealKey] || 0) : 0);
+      amount = rate * (pendingEntry.qty || 0);
+    }
     payments.unshift({
       id: pendingEntry.id, name: pendingEntry.name,
       mobile: pendingEntry.mobile, loc: pendingEntry.loc,
-      meal: pendingEntry.meal, date: pendingEntry.date, qty: pendingEntry.qty,
-      amount: rate * pendingEntry.qty, txid: '',
+      meals: pendingEntry.meals, date: pendingEntry.date, qty: pendingEntry.qty,
+      amount: amount, txid: '',
       submitted: new Date().toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}),
       status: 'pending'
     });
@@ -3459,6 +3689,302 @@ function confirmPayment() {
   document.getElementById('pay-step-success').style.display = '';
   document.getElementById('ps-success-id').textContent = pendingEntry ? pendingEntry.id : '—';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Birthday Enquiries ────────────────────────────────────────────────────────
+
+var bdyAdminEnquiries = [
+  { id: 'BDY-1001', name: 'Priya Ramachandran', mobile: '9876543210',
+    eventDate: '2026-05-10', meals: { Breakfast: 0, Lunch: 30, Dinner: 0 },
+    address: '12, Rose Garden, Anna Nagar, Chennai - 600040',
+    note: 'Birthday for my son turning 5',
+    submitted: '24 Apr 2026, 10:15 AM', status: 'pending' },
+  { id: 'BDY-1002', name: 'Suresh Kumar', mobile: '9845012345',
+    eventDate: '2026-05-15', meals: { Breakfast: 50, Lunch: 0, Dinner: 0 },
+    address: '8/3, Venkatesa Agraharam, Mylapore, Chennai - 600004',
+    note: 'Silver jubilee wedding anniversary celebration',
+    submitted: '23 Apr 2026, 3:40 PM', status: 'accepted', price: 1000, paid: false },
+  { id: 'BDY-1003', name: 'Meena Krishnan', mobile: '9790001122',
+    eventDate: '2026-05-02', meals: { Breakfast: 0, Lunch: 0, Dinner: 20 },
+    address: '45, Luz Avenue, Alwarpet, Chennai - 600018',
+    note: '',
+    submitted: '22 Apr 2026, 9:00 AM', status: 'declined' }
+];
+
+function bdyDaysToGo(dateStr) {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var ev = new Date(dateStr); ev.setHours(0,0,0,0);
+  return Math.round((ev - today) / 86400000);
+}
+
+function bdyDateChip(dateStr) {
+  var d = bdyDaysToGo(dateStr);
+  var label = d === 0 ? 'Today' : d === 1 ? 'Tomorrow' : d < 0 ? (Math.abs(d) + 'd ago') : ('in ' + d + 'd');
+  var color = d < 0 ? '#aaa' : d <= 3 ? '#c0392b' : d <= 7 ? '#e67e22' : '#27ae60';
+  var parts = dateStr.split('-');
+  var display = parts[2] + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(parts[1])-1] + ' ' + parts[0];
+  return display + ' <span style="background:' + color + '1a;color:' + color + ';border:1px solid ' + color + '44;border-radius:10px;padding:1px 7px;font-size:.75rem;font-weight:700;white-space:nowrap">' + label + '</span>';
+}
+
+function bdyStatusBadge(status) {
+  return status === 'pending'
+    ? '<span style="background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:700;white-space:nowrap;display:inline-block">⏳ Pending</span>'
+    : status === 'accepted'
+    ? '<span style="background:#d4edda;color:#155724;border:1px solid #28a745;border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:700;white-space:nowrap;display:inline-block">✅ Accepted</span>'
+    : '<span style="background:#f8d7da;color:#721c24;border:1px solid #dc3545;border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:700;white-space:nowrap;display:inline-block">❌ Declined</span>';
+}
+
+function bdyRowColor(status) {
+  return status === 'pending' ? 'background:#fffdf0' : status === 'accepted' ? 'background:#f4fdf6' : 'background:#fdf8f8';
+}
+
+function renderBdyStatsRow() {
+  var total = bdyAdminEnquiries.length;
+  var pending = bdyAdminEnquiries.filter(function(e){ return e.status === 'pending'; }).length;
+  var accepted = bdyAdminEnquiries.filter(function(e){ return e.status === 'accepted'; }).length;
+  var declined = bdyAdminEnquiries.filter(function(e){ return e.status === 'declined'; }).length;
+  var row = document.getElementById('bdy-stats-row');
+  if (!row) return;
+  function bdySC(icon, iconBg, num, lbl) {
+    return '<div class="bdy-stat-card">' +
+      '<div class="bdy-stat-icon" style="background:' + iconBg + '">' + icon + '</div>' +
+      '<div><div class="bdy-stat-num">' + num + '</div><div class="bdy-stat-lbl">' + lbl + '</div></div>' +
+      '</div>';
+  }
+  row.innerHTML =
+    bdySC('📋', '#f5ece0', total,   'Total') +
+    bdySC('⏳', '#fff8e1', pending,  'Pending') +
+    bdySC('✅', '#e8f5e9', accepted, 'Accepted') +
+    bdySC('❌', '#fdecea', declined, 'Declined');
+  row.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px';
+  var badge = document.getElementById('bdy-pending-badge');
+  if (badge) {
+    badge.textContent = pending > 0 ? pending : '';
+    badge.style.display = pending > 0 ? 'inline-flex' : 'none';
+  }
+}
+
+function renderBdyUpcomingStrip() {
+  var strip = document.getElementById('bdy-upcoming-strip');
+  if (!strip) return;
+  var today = new Date(); today.setHours(0,0,0,0);
+  var in7 = new Date(today); in7.setDate(in7.getDate() + 7);
+  var list = bdyAdminEnquiries.filter(function(e) {
+    var ev = new Date(e.eventDate); ev.setHours(0,0,0,0);
+    return e.status === 'accepted' && ev >= today && ev <= in7;
+  }).sort(function(a,b){ return new Date(a.eventDate) - new Date(b.eventDate); });
+  if (list.length === 0) { strip.innerHTML = ''; return; }
+  strip.innerHTML = '<div style="background:linear-gradient(135deg,#8e44ad,#6c3483);border-radius:12px;padding:14px 18px;color:#fff">' +
+    '<div style="font-weight:700;font-size:.88rem;margin-bottom:10px;opacity:.9">🚚 Upcoming Deliveries — Next 7 Days</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:10px">' +
+    list.map(function(e) {
+      var d = bdyDaysToGo(e.eventDate);
+      var when = d === 0 ? 'TODAY' : d === 1 ? 'TOMORROW' : 'in ' + d + ' days';
+      var mealIconsUpcoming = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙' };
+      var mealText;
+      if (e.meals) {
+        var parts = Object.keys(e.meals).filter(m => e.meals[m] > 0)
+          .map(m => mealIconsUpcoming[m] + ' ' + e.meals[m]);
+        mealText = parts.join(' · ') + ' portions';
+      } else {
+        mealText = e.meal + ' · ' + e.portions + ' portions';
+      }
+      return '<div style="background:rgba(255,255,255,.15);border-radius:8px;padding:8px 14px;min-width:180px">' +
+        '<div style="font-weight:700;font-size:.82rem">' + e.name + '</div>' +
+        '<div style="font-size:.75rem;opacity:.85;margin-top:2px">' + mealText + '</div>' +
+        '<div style="font-size:.72rem;opacity:.75;margin-top:3px">' + e.eventDate + ' <strong>' + when + '</strong></div>' +
+        '</div>';
+    }).join('') +
+    '</div></div>';
+}
+
+function renderBirthdayPage() {
+  renderBdyStatsRow();
+  renderBdyUpcomingStrip();
+  var statusFilter = (document.getElementById('bdy-filter-status') || {}).value || '';
+  var search = ((document.getElementById('bdy-search') || {}).value || '').toLowerCase();
+  var tbody = document.getElementById('bdy-tbody');
+  if (!tbody) return;
+  var list = bdyAdminEnquiries.filter(function(e) {
+    if (statusFilter && e.status !== statusFilter) return false;
+    if (search && !(e.name.toLowerCase().includes(search) || e.mobile.includes(search) || e.id.toLowerCase().includes(search) || e.address.toLowerCase().includes(search))) return false;
+    return true;
+  });
+  list.sort(function(a,b) {
+    var order = { pending: 0, accepted: 1, declined: 2 };
+    if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+    return new Date(a.eventDate) - new Date(b.eventDate);
+  });
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2.5rem 1rem"><div style="font-size:2rem;margin-bottom:8px">🎂</div><div style="color:#999;font-size:.9rem">No enquiries match your filters</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(function(e) {
+    var noteDisplay = e.note
+      ? '<span title="' + e.note.replace(/"/g,'&quot;') + '" style="cursor:default">' + (e.note.length > 40 ? e.note.slice(0,40) + '…' : e.note) + '</span>'
+      : '<span style="color:#ccc">—</span>';
+    var actions = '<div class="pay-action-group">' +
+      '<button class="pay-action-btn view" title="View details" onclick="openBdyModal(\'' + e.id + '\');event.stopPropagation()">👁</button>' +
+      (e.status === 'pending'
+        ? '<button class="pay-action-btn approve" title="Accept" onclick="acceptBdy(\'' + e.id + '\');event.stopPropagation()">✓</button>' +
+          '<button class="pay-action-btn decline" title="Decline" onclick="declineBdy(\'' + e.id + '\');event.stopPropagation()">✕</button>'
+        : '') +
+      '</div>';
+    var mealSummary, totalPortions;
+    if (e.meals) {
+      var parts = Object.keys(e.meals).filter(m => e.meals[m] > 0)
+        .map(m => m);
+      mealSummary = parts.join(', ') || '—';
+      totalPortions = Object.values(e.meals).reduce((s,v)=>s+v,0);
+    } else {
+      mealSummary = e.meal;
+      totalPortions = e.portions;
+    }
+    var paymentCell;
+    if (e.status === 'accepted') {
+      var priceDisplay = e.price != null
+        ? '<span style="font-weight:700;font-size:.9rem">₹' + e.price.toLocaleString('en-IN') + '</span>'
+        : '<span style="color:#bbb;font-size:.78rem">Not set</span>';
+      var paidBadge = e.paid
+        ? '<span style="background:#d4edda;color:#155724;border:1px solid #28a74544;border-radius:20px;padding:2px 8px;font-size:.7rem;font-weight:700">✅ Paid</span>'
+        : '<span style="background:#fdecea;color:#721c24;border:1px solid #dc354544;border-radius:20px;padding:2px 8px;font-size:.7rem;font-weight:700">💰 Unpaid</span>';
+      paymentCell = '<td style="text-align:center;white-space:nowrap;vertical-align:middle"><div>' + priceDisplay + '</div><div style="margin-top:4px">' + paidBadge + '</div></td>';
+    } else {
+      paymentCell = '<td style="text-align:center;color:#ccc">—</td>';
+    }
+    return '<tr style="cursor:pointer;' + bdyRowColor(e.status) + '" onclick="openBdyModal(\'' + e.id + '\')">' +
+      '<td style="font-weight:700;color:var(--primary);white-space:nowrap">' + e.id + '</td>' +
+      '<td><div style="font-weight:600">' + e.name + '</div><div style="font-size:.78rem;color:#888;margin-top:2px">📞 ' + e.mobile + '</div></td>' +
+      '<td style="white-space:nowrap">' + bdyDateChip(e.eventDate) + '</td>' +
+      '<td>' + mealSummary + '</td>' +
+      '<td style="text-align:center;font-weight:700">' + totalPortions + '</td>' +
+      '<td style="font-size:.83rem;color:#555">' + noteDisplay + '</td>' +
+      '<td style="text-align:center;vertical-align:middle">' + bdyStatusBadge(e.status) + '</td>' +
+      paymentCell +
+      '<td style="white-space:nowrap;text-align:center" onclick="event.stopPropagation()">' + actions + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function openBdyModal(id) {
+  var e = bdyAdminEnquiries.find(function(x){ return x.id === id; });
+  if (!e) return;
+  document.getElementById('bdy-modal-id').textContent = e.id + ' · Submitted ' + e.submitted;
+  var d = bdyDaysToGo(e.eventDate);
+  var countdownColor = d < 0 ? '#aaa' : d <= 3 ? '#c0392b' : d <= 7 ? '#e67e22' : '#27ae60';
+  var countdownLabel = d < 0 ? (Math.abs(d) + ' days ago') : d === 0 ? 'Today!' : d === 1 ? 'Tomorrow' : 'in ' + d + ' days';
+  document.getElementById('bdy-modal-body').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
+      '<div style="background:#fdf8f0;border-radius:8px;padding:12px">' +
+        '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:4px">CUSTOMER</div>' +
+        '<div style="font-weight:700;font-size:1rem">' + e.name + '</div>' +
+        '<div style="color:#666;font-size:.85rem;margin-top:4px">📞 ' + e.mobile + '</div>' +
+      '</div>' +
+      '<div style="background:#fdf8f0;border-radius:8px;padding:12px">' +
+        '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:4px">STATUS</div>' +
+        bdyStatusBadge(e.status) +
+      '</div>' +
+    '</div>' +
+    '<div style="background:#fff8f0;border:1px solid #f0d9b0;border-radius:8px;padding:14px">' +
+      '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:8px">EVENT DETAILS</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+        '<div><span style="color:#888;font-size:.8rem">Event Date</span><br><strong style="color:' + countdownColor + '">' + e.eventDate + '</strong> <span style="font-size:.78rem;color:' + countdownColor + '">(' + countdownLabel + ')</span></div>' +
+        (function() {
+          var mealIcons = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙' };
+          var mealDisplay, totalPortions;
+          if (e.meals) {
+            var parts = Object.keys(e.meals).filter(function(m) { return e.meals[m] > 0; })
+              .map(function(m) { return mealIcons[m] + ' ' + m + ' ×' + e.meals[m]; });
+            mealDisplay = parts.join('<br>') || '—';
+            totalPortions = Object.values(e.meals).reduce(function(s,v){return s+v;},0);
+          } else {
+            mealDisplay = e.meal;
+            totalPortions = e.portions;
+          }
+          return '<div><span style="color:#888;font-size:.8rem">Meal Preference</span><br><strong>' + mealDisplay + '</strong></div>' +
+            '<div><span style="color:#888;font-size:.8rem">Portions</span><br><strong style="font-size:1.2rem">' + totalPortions + '</strong></div>';
+        })() +
+      '</div>' +
+    '</div>' +
+    '<div style="background:#f8f4ff;border:1px solid #d8c5f0;border-radius:8px;padding:14px">' +
+      '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:6px">🚚 DELIVERY ADDRESS</div>' +
+      '<div style="font-size:.9rem;line-height:1.5;color:#333">' + e.address + '</div>' +
+    '</div>' +
+    (e.note ? '<div style="background:#f0f8f0;border:1px solid #b8dfc0;border-radius:8px;padding:14px">' +
+      '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:6px">📝 OCCASION NOTE</div>' +
+      '<div style="font-size:.9rem;color:#333;line-height:1.5">' + e.note + '</div>' +
+    '</div>' : '') +
+    (e.status === 'accepted' ?
+      '<div style="background:#f0fff8;border:1.5px solid #a8d8c0;border-radius:8px;padding:14px">' +
+        '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:10px">💰 PAYMENT</div>' +
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
+          '<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:190px">' +
+            '<span style="font-size:.82rem;color:#555;white-space:nowrap">Total Amount:</span>' +
+            '<div style="position:relative;flex:1">' +
+              '<span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:.82rem;color:#888;pointer-events:none">₹</span>' +
+              '<input type="number" id="bdy-price-inp" value="' + (e.price != null ? e.price : '') + '" min="0" placeholder="Enter amount" ' +
+                'style="width:100%;padding:7px 10px 7px 22px;border:1.5px solid #a8d8c0;border-radius:7px;font-size:.9rem;outline:none;box-sizing:border-box">' +
+            '</div>' +
+            '<button onclick="saveBdyPrice(\'' + e.id + '\')" style="background:#1a7a5e;color:#fff;border:none;border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:.82rem;white-space:nowrap">Save</button>' +
+          '</div>' +
+          '<button id="bdy-paid-btn" onclick="toggleBdyPaid(\'' + e.id + '\')" style="' +
+            (e.paid
+              ? 'background:#d4edda;color:#155724;border:1.5px solid #28a74555'
+              : 'background:#fdecea;color:#721c24;border:1.5px solid #dc354555') +
+            ';border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:.82rem;white-space:nowrap">' +
+            (e.paid ? '✅ Paid — Mark Unpaid' : '💰 Unpaid — Mark Paid') +
+          '</button>' +
+        '</div>' +
+      '</div>'
+    : '');
+  var footer = document.getElementById('bdy-modal-footer');
+  footer.innerHTML = e.status === 'pending'
+    ? '<button onclick="acceptBdy(\'' + e.id + '\');closeBdyModal()" style="background:#27ae60;color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-weight:700;font-size:.9rem">✅ Accept Order</button>' +
+      '<button onclick="declineBdy(\'' + e.id + '\');closeBdyModal()" style="background:#c0392b;color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-weight:700;font-size:.9rem">❌ Decline</button>' +
+      '<button onclick="closeBdyModal()" style="background:#eee;color:#555;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-size:.9rem">Close</button>'
+    : '<button onclick="closeBdyModal()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-weight:700;font-size:.9rem">Close</button>';
+  document.getElementById('bdy-modal-overlay').classList.add('show');
+}
+
+function closeBdyModal() {
+  document.getElementById('bdy-modal-overlay').classList.remove('show');
+}
+
+function acceptBdy(id) {
+  var e = bdyAdminEnquiries.find(function(x){ return x.id === id; });
+  if (e) { e.status = 'accepted'; renderBirthdayPage(); }
+}
+
+function declineBdy(id) {
+  var e = bdyAdminEnquiries.find(function(x){ return x.id === id; });
+  if (e) { e.status = 'declined'; renderBirthdayPage(); }
+}
+
+function saveBdyPrice(id) {
+  var e = bdyAdminEnquiries.find(function(x){ return x.id === id; });
+  if (!e) return;
+  var val = parseInt(document.getElementById('bdy-price-inp').value);
+  e.price = isNaN(val) ? null : val;
+  renderBirthdayPage();
+  showToast('💰 Price saved for ' + e.name);
+}
+
+function toggleBdyPaid(id) {
+  var e = bdyAdminEnquiries.find(function(x){ return x.id === id; });
+  if (!e) return;
+  e.paid = !e.paid;
+  renderBirthdayPage();
+  var btn = document.getElementById('bdy-paid-btn');
+  if (btn) {
+    if (e.paid) {
+      btn.textContent = '✅ Paid — Mark Unpaid';
+      btn.style.cssText = 'background:#d4edda;color:#155724;border:1.5px solid #28a74555;border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:.82rem;white-space:nowrap';
+    } else {
+      btn.textContent = '💰 Unpaid — Mark Paid';
+      btn.style.cssText = 'background:#fdecea;color:#721c24;border:1.5px solid #dc354555;border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:.82rem;white-space:nowrap';
+    }
+  }
+  showToast(e.paid ? '✅ ' + e.name + ' marked as Paid' : '💰 ' + e.name + ' marked as Unpaid');
 }
 </script>
 </body>

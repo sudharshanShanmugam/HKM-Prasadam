@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n *)",
+      "Bash(grep -in *)",
+      "Bash(grep -c *)",
+      "Bash(sed -n *)",
+      "Bash(node --check *)",
+      "Bash(node --input-type=module *)"
+    ]
+  }
+}

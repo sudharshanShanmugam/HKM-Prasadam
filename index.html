@@ -561,6 +561,68 @@ section { padding: 88px 40px; }
 .terms-text { font-size: 0.72rem; color: var(--text-light); line-height: 1.6; text-align: center; margin-bottom: 14px; }
 .terms-text a { color: var(--saffron); font-weight: 600; }
 
+/* ─── BIRTHDAY BOOKING VIEW ─── */
+#view-birthday, #view-bdy-success {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 70% 40%, #FFD9BC 0%, #FFE8D4 40%, #FFF3EC 100%);
+  padding-top: 68px;
+}
+.bdy-wrap { max-width: 560px; margin: 0 auto; padding: 36px 20px 56px; }
+.bdy-header { text-align: center; margin-bottom: 28px; }
+.bdy-header h2 { font-size: 2rem; color: var(--brown-dark); margin-bottom: 6px; font-family: 'Cormorant Garamond', serif; }
+.bdy-header p  { font-size: 0.88rem; color: #888; }
+.bdy-card { background: #fff; border-radius: 18px; box-shadow: 0 8px 36px rgba(60,20,0,0.09); border: 1px solid rgba(232,210,190,0.5); overflow: hidden; }
+.bdy-card-header {
+  padding: 18px 24px 14px; border-bottom: 1px solid var(--border-light);
+  background: linear-gradient(135deg, #7b1d1d, #c0392b);
+}
+.bdy-card-header h3 { font-size: 1.05rem; color: #fff; }
+.bdy-card-header p  { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-top: 3px; }
+.bdy-card-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.bdy-info-banner {
+  background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px;
+  padding: 12px 16px; font-size: 0.78rem; color: #7b5800;
+  display: flex; gap: 10px; align-items: flex-start; line-height: 1.5;
+}
+.bdy-section-head {
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-light); margin-bottom: 10px;
+}
+.bdy-meal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bdy-meal-opt { display: none; }
+.bdy-meal-label {
+  display: flex; align-items: center; gap: 8px;
+  border: 1.5px solid var(--border); border-radius: 9px;
+  padding: 10px 12px; cursor: pointer; font-size: 0.82rem;
+  font-weight: 500; color: var(--text-mid); transition: all 0.15s;
+}
+.bdy-meal-opt:checked + .bdy-meal-label {
+  border-color: #c0392b; background: #fdecea; color: #c0392b; font-weight: 700;
+}
+.bdy-portions-row { display: flex; align-items: center; gap: 0; border: 1.5px solid var(--border); border-radius: 9px; overflow: hidden; width: fit-content; }
+.bdy-portions-btn { background: var(--cream); border: none; width: 40px; height: 42px; font-size: 1.2rem; font-weight: 600; color: var(--text-mid); cursor: pointer; transition: background 0.15s; }
+.bdy-portions-btn:hover { background: var(--border); }
+.bdy-portions-val { width: 56px; text-align: center; font-size: 0.95rem; font-weight: 700; color: var(--brown-dark); border: none; border-left: 1.5px solid var(--border); border-right: 1.5px solid var(--border); height: 42px; outline: none; }
+/* bdy success */
+.bdy-success-card { background: #fff; border-radius: 18px; box-shadow: 0 8px 36px rgba(60,20,0,0.09); padding: 40px 28px; text-align: center; }
+.bdy-success-icon { font-size: 3rem; margin-bottom: 14px; }
+.bdy-success-id { font-size: 1.5rem; font-weight: 700; color: #c0392b; font-family: 'Cormorant Garamond', serif; margin: 10px 0; }
+.bdy-success-msg { font-size: 0.85rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 24px; }
+/* bookings tabs */
+.bk-tabs { display: flex; border-bottom: 2px solid var(--border-light); padding: 0 24px; }
+.bk-tab-btn { padding: 12px 16px; font-size: 0.82rem; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--text-light); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+.bk-tab-btn.active { color: var(--saffron-dark); border-bottom-color: var(--saffron); }
+.bk-tab-pane { display: none; }
+.bk-tab-pane.active { display: block; }
+/* bdy enquiry item in bookings */
+.bdy-enq-item { padding: 16px 24px; border-bottom: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 6px; transition: background 0.15s; }
+.bdy-enq-item:last-child { border-bottom: none; }
+.bdy-enq-item:hover { background: #fdfaf6; }
+.bdy-enq-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bdy-enq-id { font-size: 0.72rem; font-weight: 700; color: #c0392b; letter-spacing: 0.05em; }
+.bdy-enq-name { font-size: 0.9rem; font-weight: 600; color: var(--brown-dark); flex: 1; }
+.bdy-enq-meta { font-size: 0.74rem; color: var(--text-light); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+
 /* ─── BOOKINGS VIEW ─── */
 #view-bookings {
   min-height: 100vh;
@@ -675,8 +737,8 @@ section { padding: 88px 40px; }
 .btn-primary-sm { background: linear-gradient(135deg, var(--saffron), var(--gold)); color: #fff; }
 
 /* toast */
-.toast { position: fixed; bottom: 28px; right: 28px; background: var(--brown-dark); color: #fff; padding: 14px 22px; border-radius: 12px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 8px 24px rgba(30,15,0,0.3); z-index: 1000; transform: translateY(120%); transition: transform 0.3s; display: flex; align-items: center; gap: 10px; }
-.toast.show { transform: translateY(0); }
+.toast { position: fixed; bottom: 28px; right: 28px; background: var(--brown-dark); color: #fff; padding: 14px 22px; border-radius: 12px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 8px 24px rgba(30,15,0,0.3); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; display: flex; align-items: center; gap: 10px; }
+.toast.show { opacity: 1; visibility: visible; }
 
 @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .reg-page-header, .reg-page-body { padding-left: 20px; padding-right: 20px; } }
 </style>
@@ -701,6 +763,7 @@ section { padding: 88px 40px; }
     <button class="nav-link" onclick="scrollToSection('about-section'); closeNav()">About</button>
     <button class="nav-link" id="nav-register" onclick="showView('register'); closeNav()">Prasadam Coupons</button>
     <button class="nav-link" onclick="showView('bookings'); closeNav()" id="nav-bookings">My Bookings</button>
+    <button class="nav-link" onclick="showView('birthday'); closeNav()" id="nav-birthday">🎉 Party Booking</button>
     <button class="nav-link" onclick="scrollToSection('footer-section'); closeNav()">Contact</button>
     <button class="btn-admin" onclick="window.location.href='hkm-prasadam-v2.html'">🔐 Admin</button>
   </nav>
@@ -973,42 +1036,42 @@ section { padding: 88px 40px; }
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Meal Type <span class="req">*</span></label>
-      <div class="pill-group">
-        <div class="pill-opt">
-          <input type="radio" name="r-meal" id="r-meal-b" value="Breakfast" onchange="updatePriceBox()">
-          <label for="r-meal-b">🌅 Breakfast</label>
+      <label class="form-label">Coupons per Meal <span class="req">*</span></label>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:0.82rem;color:var(--text-mid)">🌅 Breakfast</span>
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="changeRMealQty('Breakfast',-1)">−</button>
+            <input class="qty-input" id="r-qty-breakfast" type="number" value="0" min="0" oninput="updatePriceBox(); checkRBulk()">
+            <button class="qty-btn" onclick="changeRMealQty('Breakfast',1)">+</button>
+          </div>
         </div>
-        <div class="pill-opt">
-          <input type="radio" name="r-meal" id="r-meal-l" value="Lunch" onchange="updatePriceBox()">
-          <label for="r-meal-l">☀️ Lunch</label>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:0.82rem;color:var(--text-mid)">☀️ Lunch</span>
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="changeRMealQty('Lunch',-1)">−</button>
+            <input class="qty-input" id="r-qty-lunch" type="number" value="0" min="0" oninput="updatePriceBox(); checkRBulk()">
+            <button class="qty-btn" onclick="changeRMealQty('Lunch',1)">+</button>
+          </div>
         </div>
-        <div class="pill-opt">
-          <input type="radio" name="r-meal" id="r-meal-d" value="Dinner" onchange="updatePriceBox()">
-          <label for="r-meal-d">🌙 Dinner</label>
-        </div>
-        <div class="pill-opt">
-          <input type="radio" name="r-meal" id="r-meal-k" value="Sunday Khichdi" onchange="updatePriceBox()">
-          <label for="r-meal-k">🥘 Sunday Khichdi</label>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:0.82rem;color:var(--text-mid)">🌙 Dinner</span>
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="changeRMealQty('Dinner',-1)">−</button>
+            <input class="qty-input" id="r-qty-dinner" type="number" value="0" min="0" oninput="updatePriceBox(); checkRBulk()">
+            <button class="qty-btn" onclick="changeRMealQty('Dinner',1)">+</button>
+          </div>
         </div>
       </div>
+      <div class="bulk-warning" id="r-bulk-warning">⚠️ Bulk request (≥8 coupons). Admin review may be required.</div>
     </div>
 
     <hr class="hr-step">
-    <div style="margin-bottom:8px"><span class="step-tag">Step 4 — Date & Quantity</span></div>
+    <div style="margin-bottom:8px"><span class="step-tag">Step 4 — Date</span></div>
     <div class="form-row" style="margin-bottom:0">
       <div class="form-group">
         <label class="form-label">Event Date <span class="req">*</span></label>
         <input class="form-input" id="r-date" type="date" onchange="updatePriceBox()" min="2026-04-22">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Number of Coupons <span class="req">*</span></label>
-        <div class="qty-stepper">
-          <button class="qty-btn" onclick="changeRQty(-1)">−</button>
-          <input class="qty-input" id="r-qty" type="number" value="1" min="1" max="10" oninput="updatePriceBox(); checkRBulk()">
-          <button class="qty-btn" onclick="changeRQty(1)">+</button>
-        </div>
-        <div class="bulk-warning" id="r-bulk-warning">⚠️ Bulk request (≥8 coupons). Admin review may be required.</div>
       </div>
     </div>
 
@@ -1016,16 +1079,20 @@ section { padding: 88px 40px; }
     <div class="price-box">
       <div class="price-rows">
         <div class="price-row">
-          <span class="price-row-key">Price per Coupon</span>
-          <span class="price-row-val" id="r-price-per">₹40/-</span>
+          <span class="price-row-key">🌅 Breakfast</span>
+          <span class="price-row-val" id="r-price-breakfast">—</span>
         </div>
         <div class="price-row">
-          <span class="price-row-key">Quantity</span>
-          <span class="price-row-val" id="r-price-qty">1</span>
+          <span class="price-row-key">☀️ Lunch</span>
+          <span class="price-row-val" id="r-price-lunch">—</span>
+        </div>
+        <div class="price-row">
+          <span class="price-row-key">🌙 Dinner</span>
+          <span class="price-row-val" id="r-price-dinner">—</span>
         </div>
         <div class="price-row total">
           <span class="price-row-key">Total Amount</span>
-          <span class="price-row-val" id="r-price-total">₹40/-</span>
+          <span class="price-row-val" id="r-price-total">—</span>
         </div>
       </div>
       <div class="price-timing">
@@ -1141,12 +1208,144 @@ section { padding: 88px 40px; }
         <h3>Booking History</h3>
         <button class="btn-full" style="width:auto;padding:9px 20px;font-size:0.8rem;border-radius:8px" onclick="showView('register')">+ New Booking</button>
       </div>
-      <div id="bk-list">
-        <!-- rendered by JS -->
+      <div class="bk-tabs">
+        <button class="bk-tab-btn active" id="bktab-coupons" onclick="switchBkTab('coupons')">🎟 Prasadam Coupons</button>
+        <button class="bk-tab-btn" id="bktab-birthday" onclick="switchBkTab('birthday')">🎉 Party Enquiries</button>
+      </div>
+      <div class="bk-tab-pane active" id="bkpane-coupons">
+        <div id="bk-list"><!-- rendered by JS --></div>
+      </div>
+      <div class="bk-tab-pane" id="bkpane-birthday">
+        <div id="bk-bdy-list"><!-- rendered by JS --></div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- ══════════════════════════════════
+     BIRTHDAY BOOKING VIEW
+══════════════════════════════════ -->
+<div class="view" id="view-birthday">
+  <div class="bdy-wrap">
+    <div class="bdy-header">
+      <h2>🎉 Party Booking</h2>
+      <p>Order prasadam for your special day — delivered to your door</p>
+    </div>
+    <div class="bdy-card">
+      <div class="bdy-card-header">
+        <h3>🏠 Door Delivery Enquiry</h3>
+        <p>Admin will confirm your booking within 24–48 hours</p>
+      </div>
+      <div class="bdy-card-body">
+        <div class="bdy-info-banner">
+          ⏰ <span>Bookings must be placed <strong>at least 7 days</strong> before the event date. You will receive a confirmation call/message once the admin approves your request.</span>
+        </div>
+
+        <!-- Personal Details -->
+        <div>
+          <div class="bdy-section-head">Personal Details</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Full Name <span class="req">*</span></label>
+              <input class="form-input" id="bdy-name" type="text" placeholder="Your full name">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Mobile <span class="req">*</span></label>
+                <input class="form-input" id="bdy-mobile" type="tel" maxlength="10" placeholder="10-digit number">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Email</label>
+                <input class="form-input" id="bdy-email" type="email" placeholder="Optional">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Details -->
+        <div>
+          <div class="bdy-section-head">Event Details</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Event Date <span class="req">*</span></label>
+              <input class="form-input" id="bdy-date" type="date" style="max-width:200px">
+              <div style="font-size:0.7rem;color:var(--text-light);margin-top:4px">Minimum 7 days from today</div>
+            </div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Delivery Address <span class="req">*</span></label>
+              <textarea class="form-input" id="bdy-address" rows="3" placeholder="Full delivery address including landmark" style="resize:vertical"></textarea>
+            </div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Portions per Meal <span class="req">*</span></label>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:0.82rem;color:var(--text-mid)">🌅 Breakfast</span>
+                  <div class="bdy-portions-row">
+                    <button class="bdy-portions-btn" onclick="changeBdyMealPortions('Breakfast',-5)">−</button>
+                    <input class="bdy-portions-val" id="bdy-portions-breakfast" type="number" value="0" min="0" readonly>
+                    <button class="bdy-portions-btn" onclick="changeBdyMealPortions('Breakfast',5)">+</button>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:0.82rem;color:var(--text-mid)">☀️ Lunch</span>
+                  <div class="bdy-portions-row">
+                    <button class="bdy-portions-btn" onclick="changeBdyMealPortions('Lunch',-5)">−</button>
+                    <input class="bdy-portions-val" id="bdy-portions-lunch" type="number" value="0" min="0" readonly>
+                    <button class="bdy-portions-btn" onclick="changeBdyMealPortions('Lunch',5)">+</button>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:0.82rem;color:var(--text-mid)">🌙 Dinner</span>
+                  <div class="bdy-portions-row">
+                    <button class="bdy-portions-btn" onclick="changeBdyMealPortions('Dinner',-5)">−</button>
+                    <input class="bdy-portions-val" id="bdy-portions-dinner" type="number" value="0" min="0" readonly>
+                    <button class="bdy-portions-btn" onclick="changeBdyMealPortions('Dinner',5)">+</button>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size:0.7rem;color:var(--text-light);margin-top:6px">Minimum 10 total portions across all meals</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Occasion Note -->
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Occasion Note <span style="font-weight:400;color:var(--text-light)">(optional)</span></label>
+          <textarea class="form-input" id="bdy-note" rows="2" placeholder="e.g. Birthday for 5-year old, prefer mild spices…" style="resize:vertical"></textarea>
+        </div>
+
+        <button class="btn-full" onclick="submitBdyEnquiry()">🎂 Submit Enquiry</button>
+        <button class="btn-back" onclick="showView('landing')">← Back to Home</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /view-birthday -->
+
+<!-- BIRTHDAY SUCCESS VIEW -->
+<div class="view" id="view-bdy-success">
+  <div class="bdy-wrap">
+    <div class="bdy-card">
+      <div class="bdy-success-card">
+        <div class="bdy-success-icon">🎉</div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--brown-dark)">Enquiry Submitted!</div>
+        <div class="bdy-success-id" id="bdy-success-id">BDY-00000</div>
+        <div class="bdy-success-msg">
+          Your birthday party prasadam enquiry has been received.<br>
+          Our admin team will review and <strong>contact you within 24–48 hours</strong> to confirm availability, pricing and delivery details.
+        </div>
+        <div style="background:var(--saffron-pale);border-radius:10px;padding:14px 16px;font-size:0.78rem;color:var(--saffron-dark);text-align:left;margin-bottom:20px">
+          <strong>What happens next?</strong><br><br>
+          1. Admin reviews your enquiry<br>
+          2. You receive a confirmation call / message<br>
+          3. Payment details shared upon acceptance<br>
+          4. Prasadam delivered on your event date 🎂
+        </div>
+        <button class="btn-full" style="margin-bottom:10px" onclick="showView('bookings')">📋 View My Enquiries</button>
+        <button class="btn-back" onclick="showView('landing')">← Back to Home</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /view-bdy-success -->
 
 <!-- ══════════════════════════════════
      COUPON MODAL
@@ -1208,22 +1407,29 @@ section { padding: 88px 40px; }
 
 <script>
 // ─── RATES (mirrors admin panel) ───
-var defRates = { Breakfast: 20, Lunch: 40, Dinner: 35, SundayKhichdi: 20 };
+var defRates = { Breakfast: 20, Lunch: 40, Dinner: 35 };
 var priceOvr = {
-  '2026-04-27': { Breakfast: 30, Lunch: 60, Dinner: 50, SundayKhichdi: 25 },
-  '2026-05-01': { Breakfast: 25, Lunch: 50, Dinner: 45, SundayKhichdi: 20 },
-  '2026-05-04': { Breakfast: 30, Lunch: 55, Dinner: 45, SundayKhichdi: 30 },
+  '2026-04-27': { Breakfast: 30, Lunch: 60, Dinner: 50 },
+  '2026-05-01': { Breakfast: 25, Lunch: 50, Dinner: 45 },
+  '2026-05-04': { Breakfast: 30, Lunch: 55, Dinner: 45 },
 };
 var hpCounter = 5000;
 var hpPending = null;
 
 // ─── MY BOOKINGS store ───
 var myBookings = [
-  { id:'HKM-04901', name:'Gopika Devi',     mobile:'9876543212', loc:'Thiruvanmiyur', meal:'Lunch',          date:'2026-04-27', qty:2,  total:120, status:'approved' },
-  { id:'HKM-04900', name:'Madhava Das',     mobile:'9745123444', loc:'NLBR',          meal:'Breakfast',      date:'2026-04-28', qty:1,  total:20,  status:'pending'  },
-  { id:'HKM-04899', name:'Tulasi Priya',    mobile:'9198765488', loc:'Thiruvanmiyur', meal:'Sunday Khichdi', date:'2026-04-27', qty:4,  total:100, status:'approved' },
-  { id:'HKM-04898', name:'Radha Mohan',     mobile:'8867452301', loc:'NLBR',          meal:'Dinner',         date:'2026-04-29', qty:2,  total:70,  status:'pending'  },
-  { id:'HKM-04897', name:'Hari Priya',      mobile:'7654321098', loc:'Thiruvanmiyur', meal:'Breakfast',      date:'2026-04-30', qty:3,  total:60,  status:'declined' },
+  { id:'HKM-04901', name:'Gopika Devi',  mobile:'9876543212', loc:'Thiruvanmiyur', meals:{ Breakfast:0, Lunch:2, Dinner:0 }, date:'2026-04-27', total:80,  status:'approved' },
+  { id:'HKM-04900', name:'Madhava Das',  mobile:'9745123444', loc:'NLBR',          meals:{ Breakfast:1, Lunch:0, Dinner:0 }, date:'2026-04-28', total:20,  status:'pending'  },
+  { id:'HKM-04899', name:'Tulasi Priya', mobile:'9198765488', loc:'Thiruvanmiyur', meals:{ Breakfast:0, Lunch:4, Dinner:0 }, date:'2026-04-27', total:100, status:'approved' },
+  { id:'HKM-04898', name:'Radha Mohan',  mobile:'8867452301', loc:'NLBR',          meals:{ Breakfast:0, Lunch:0, Dinner:2 }, date:'2026-04-29', total:70,  status:'pending'  },
+  { id:'HKM-04897', name:'Hari Priya',   mobile:'7654321098', loc:'Thiruvanmiyur', meals:{ Breakfast:3, Lunch:0, Dinner:0 }, date:'2026-04-30', total:60,  status:'declined' },
+];
+
+// ─── BIRTHDAY ENQUIRIES store ───
+var bdyCounter = 1001;
+var bdyEnquiries = [
+  { id:'BDY-01000', name:'Priya Krishnan', mobile:'9876501234', email:'priya@example.com', eventDate:'2026-05-10', address:'12 Anna Nagar, Chennai - 600040', meals:{ Breakfast:0, Lunch:50, Dinner:0 }, note:'Birthday for my son — mild spices please', submitted:'Apr 20, 10:30am', status:'accepted' },
+  { id:'BDY-00999', name:'Suresh Raj',     mobile:'8765432109', email:'',                  eventDate:'2026-05-15', address:'34 T Nagar, Chennai - 600017',     meals:{ Breakfast:0, Lunch:0, Dinner:30 }, note:'Wedding anniversary dinner',                 submitted:'Apr 21, 2:15pm',  status:'pending'  },
 ];
 
 // ─── VIEW MANAGER ───
@@ -1235,7 +1441,7 @@ function showView(name) {
 
   // update nav active states
   document.querySelectorAll('.nav-link').forEach(function(b) { b.classList.remove('active'); });
-  var navMap = { register: 'nav-register', payment: 'nav-register', bookings: 'nav-bookings' };
+  var navMap = { register: 'nav-register', payment: 'nav-register', bookings: 'nav-bookings', birthday: 'nav-birthday', 'bdy-success': 'nav-birthday' };
   var activeNav = navMap[name] ? document.getElementById(navMap[name]) : null;
   if (activeNav) activeNav.classList.add('active');
 
@@ -1243,7 +1449,8 @@ function showView(name) {
     document.getElementById('hp-qr-frame').innerHTML = generateQR();
   }
   if (name === 'register') resetRegForm();
-  if (name === 'bookings') renderBookings();
+  if (name === 'bookings') { renderBookings(); renderBdyBookings(); }
+  if (name === 'birthday') initBdyForm();
 }
 
 function scrollToSection(id) {
@@ -1266,7 +1473,7 @@ function closeNav() {
 var festivalData = [
   { date: '2026-04-30', name: 'Sri Rama Navami',       desc: 'Appearance of Lord Sri Ramachandra' },
   { date: '2026-05-03', name: 'Hanuman Jayanti',        desc: 'Appearance of Lord Hanuman' },
-  { date: '2026-05-04', name: 'Sunday Feast (Khichdi)', desc: 'Weekly Sunday prasadam feast' },
+  { date: '2026-05-04', name: 'Sunday Special', desc: 'Weekly Sunday prasadam feast' },
   { date: '2026-05-10', name: 'Mohini Ekadashi',        desc: 'Auspicious Ekadashi fasting day' },
   { date: '2026-05-11', name: 'Parashurama Jayanti',    desc: 'Appearance of Lord Parashurama' },
   { date: '2026-05-24', name: 'Narasimha Chaturdashi',  desc: 'Appearance of Lord Narasimhadeva' },
@@ -1307,33 +1514,37 @@ function selectFestival(dateVal) {
 
 // ─── PRICE BOX ───
 function updatePriceBox() {
-  var meal = document.querySelector('input[name=r-meal]:checked');
   var date = document.getElementById('r-date').value;
-  var qty  = parseInt(document.getElementById('r-qty').value) || 1;
-  var mealVal = meal ? meal.value : '';
-  var mealKey = mealVal === 'Sunday Khichdi' ? 'SundayKhichdi' : mealVal;
-
-  var rate = 0;
-  if (mealKey) {
-    var ov = priceOvr[date];
-    rate = (ov && ov[mealKey] !== undefined) ? ov[mealKey] : (defRates[mealKey] || 0);
-  }
-  var total = rate * qty;
-
-  document.getElementById('r-price-per').textContent   = rate ? '₹' + rate + '/-' : '—';
-  document.getElementById('r-price-qty').textContent   = qty;
-  document.getElementById('r-price-total').textContent = rate ? '₹' + total + '/-' : '—';
+  var meals = {
+    Breakfast: parseInt(document.getElementById('r-qty-breakfast').value) || 0,
+    Lunch: parseInt(document.getElementById('r-qty-lunch').value) || 0,
+    Dinner: parseInt(document.getElementById('r-qty-dinner').value) || 0
+  };
+  var ov = priceOvr[date];
+  var grandTotal = 0;
+  var mealIds = { Breakfast:'r-price-breakfast', Lunch:'r-price-lunch', Dinner:'r-price-dinner' };
+  Object.keys(meals).forEach(function(mk) {
+    var qty = meals[mk];
+    var rate = (ov && ov[mk] !== undefined) ? ov[mk] : (defRates[mk] || 0);
+    var subtotal = rate * qty;
+    grandTotal += subtotal;
+    var el = document.getElementById(mealIds[mk]);
+    if (el) el.textContent = qty > 0 ? qty + ' × ₹' + rate + '/- = ₹' + subtotal + '/-' : '—';
+  });
+  var totalEl = document.getElementById('r-price-total');
+  if (totalEl) totalEl.textContent = grandTotal > 0 ? '₹' + grandTotal + '/-' : '—';
 }
 
-function changeRQty(d) {
-  var inp = document.getElementById('r-qty');
-  var v = Math.max(1, Math.min(10, (parseInt(inp.value) || 1) + d));
-  inp.value = v;
+function changeRMealQty(meal, d) {
+  var idMap = { Breakfast:'r-qty-breakfast', Lunch:'r-qty-lunch', Dinner:'r-qty-dinner' };
+  var inp = document.getElementById(idMap[meal]);
+  inp.value = Math.max(0, Math.min(10, (parseInt(inp.value) || 0) + d));
   updatePriceBox(); checkRBulk();
 }
 function checkRBulk() {
-  var v = parseInt(document.getElementById('r-qty').value) || 1;
-  document.getElementById('r-bulk-warning').classList.toggle('show', v >= 8);
+  var total = ['r-qty-breakfast','r-qty-lunch','r-qty-dinner']
+    .reduce(function(s, id) { return s + (parseInt(document.getElementById(id).value) || 0); }, 0);
+  document.getElementById('r-bulk-warning').classList.toggle('show', total >= 8);
 }
 
 // ─── SUBMIT REG ───
@@ -1343,38 +1554,51 @@ function submitReg() {
   var email  = document.getElementById('r-email').value.trim();
   var loc    = document.querySelector('input[name=r-location]:checked');
   var cat    = document.querySelector('input[name=r-category]:checked');
-  var meal   = document.querySelector('input[name=r-meal]:checked');
   var date   = document.getElementById('r-date').value;
-  var qty    = parseInt(document.getElementById('r-qty').value) || 1;
+  var meals  = {
+    Breakfast: parseInt(document.getElementById('r-qty-breakfast').value) || 0,
+    Lunch:     parseInt(document.getElementById('r-qty-lunch').value) || 0,
+    Dinner:    parseInt(document.getElementById('r-qty-dinner').value) || 0
+  };
+  var totalQty = meals.Breakfast + meals.Lunch + meals.Dinner;
 
-  if (!name || !mobile || !loc || !cat || !meal || !date) {
+  if (!name || !mobile || !loc || !cat || !date) {
     showHPToast('Please fill all required fields ⚠️'); return;
   }
   if (mobile.length !== 10 || !/^\d+$/.test(mobile)) {
     showHPToast('Enter a valid 10-digit mobile number'); return;
   }
+  if (totalQty < 1) {
+    showHPToast('Please select at least 1 coupon ⚠️'); return;
+  }
 
-  var mealKey = meal.value === 'Sunday Khichdi' ? 'SundayKhichdi' : meal.value;
-  var ov   = priceOvr[date];
-  var rate = (ov && ov[mealKey] !== undefined) ? ov[mealKey] : (defRates[mealKey] || 0);
+  var ov = priceOvr[date];
+  var grandTotal = 0;
+  Object.keys(meals).forEach(function(mk) {
+    var rate = (ov && ov[mk] !== undefined) ? ov[mk] : (defRates[mk] || 0);
+    grandTotal += rate * meals[mk];
+  });
+
+  var mealLabels = { Breakfast:'🌅 Breakfast', Lunch:'☀️ Lunch', Dinner:'🌙 Dinner' };
+  var mealSummary = Object.keys(meals).filter(function(mk) { return meals[mk] > 0; })
+    .map(function(mk) { return mealLabels[mk] + ' ×' + meals[mk]; }).join(', ');
 
   hpPending = {
     id: 'HKM-0' + hpCounter++,
     name: name, mobile: mobile, email: email,
-    loc: loc.value, cat: cat.value, meal: meal.value,
-    date: date, qty: qty,
-    rate: rate, total: rate * qty
+    loc: loc.value, cat: cat.value,
+    meals: meals,
+    date: date,
+    total: grandTotal
   };
 
-  var mealIcon = { 'Breakfast':'🌅','Lunch':'☀️','Dinner':'🌙','Sunday Khichdi':'🥘' };
   document.getElementById('hp-booking-id').textContent = hpPending.id;
   document.getElementById('hp-name').textContent       = name;
-  document.getElementById('hp-meta').textContent       = (mealIcon[meal.value] || '🍽') + ' ' + meal.value + ' · ' + date + ' · ' + qty + ' coupon(s)';
-  document.getElementById('hp-total').textContent      = rate ? '₹' + (rate * qty) + '/-' : 'Free';
+  document.getElementById('hp-meta').textContent       = mealSummary + ' · ' + date;
+  document.getElementById('hp-total').textContent      = grandTotal ? '₹' + grandTotal + '/-' : 'Free';
 
   document.getElementById('hp-proof').value = '';
   resetHPProofUI();
-
   showView('payment');
 }
 
@@ -1382,11 +1606,13 @@ function resetRegForm() {
   ['r-name','r-mobile','r-email'].forEach(function(id) {
     var el = document.getElementById(id); if (el) el.value = '';
   });
-  ['r-location','r-category','r-meal'].forEach(function(n) {
+  ['r-location','r-category'].forEach(function(n) {
     var el = document.querySelector('input[name=' + n + ']:checked');
     if (el) el.checked = false;
   });
-  var qty = document.getElementById('r-qty'); if (qty) qty.value = 1;
+  ['r-qty-breakfast','r-qty-lunch','r-qty-dinner'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = 0;
+  });
   document.getElementById('r-bulk-warning').classList.remove('show');
   updatePriceBox();
 }
@@ -1451,8 +1677,8 @@ function confirmHPPayment() {
   if (hpPending) {
     myBookings.unshift({
       id: hpPending.id, name: hpPending.name, mobile: hpPending.mobile,
-      loc: hpPending.loc, meal: hpPending.meal, date: hpPending.date,
-      qty: hpPending.qty, total: hpPending.total, status: 'pending'
+      loc: hpPending.loc, meals: hpPending.meals, date: hpPending.date,
+      total: hpPending.total, status: 'pending'
     });
   }
   showView('success');
@@ -1467,6 +1693,13 @@ function showHPToast(msg) {
   clearTimeout(hpToastTimer);
   hpToastTimer = setTimeout(function() { t.classList.remove('show'); }, 3200);
 }
+window.addEventListener('scroll', function() {
+  var t = document.getElementById('hp-toast');
+  if (t && t.classList.contains('show')) {
+    clearTimeout(hpToastTimer);
+    t.classList.remove('show');
+  }
+}, { passive: true });
 
 // ─── MY BOOKINGS ───
 function renderBookings() {
@@ -1476,18 +1709,25 @@ function renderBookings() {
     list.innerHTML = '<div class="bk-empty"><div class="bk-empty-icon">🎟</div><p>No bookings yet. Book your first prasadam coupon!</p></div>';
     return;
   }
-  var mealIcon = { 'Breakfast':'🌅', 'Lunch':'☀️', 'Dinner':'🌙', 'Sunday Khichdi':'🥘' };
+  var mealIcon = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙' };
   var html = '';
   for (var i = 0; i < myBookings.length; i++) {
     var b = myBookings[i];
-    var icon = mealIcon[b.meal] || '🍽';
+    var mealMeta;
+    if (b.meals) {
+      var parts = Object.keys(b.meals).filter(function(mk) { return b.meals[mk] > 0; })
+        .map(function(mk) { return mealIcon[mk] + b.meals[mk]; });
+      mealMeta = parts.join(' · ');
+    } else {
+      mealMeta = (mealIcon[b.meal] || '🍽') + ' ' + b.meal + ' ×' + b.qty;
+    }
     var statusLabel = b.status === 'approved' ? '✔ Approved' : b.status === 'declined' ? '✖ Declined' : '⏳ Pending';
     var canView = (b.status === 'approved');
     html += '<div class="bk-item">'
       + '<div class="bk-id">' + b.id + '</div>'
       + '<div class="bk-info">'
       +   '<div class="bk-name">' + b.name + '</div>'
-      +   '<div class="bk-meta">' + icon + ' ' + b.meal + ' &nbsp;·&nbsp; ' + b.date + ' &nbsp;·&nbsp; ' + b.qty + ' coupon(s) &nbsp;·&nbsp; HKM ' + b.loc + '</div>'
+      +   '<div class="bk-meta">' + mealMeta + ' &nbsp;·&nbsp; ' + b.date + ' &nbsp;·&nbsp; HKM ' + b.loc + '</div>'
       + '</div>'
       + '<div class="bk-status"><span class="bk-badge ' + b.status + '"><span class="bk-badge-dot"></span>' + statusLabel + '</span></div>'
       + '<button class="bk-view-btn' + (canView ? '' : ' disabled') + '" title="View Coupon" onclick="openCouponModal(' + i + ')">'
@@ -1500,19 +1740,31 @@ function renderBookings() {
 
 function openCouponModal(idx) {
   var b = myBookings[idx];
-  var mealIcon = { 'Breakfast':'🌅 Breakfast', 'Lunch':'☀️ Lunch', 'Dinner':'🌙 Dinner', 'Sunday Khichdi':'🥘 Sunday Khichdi' };
+  var mealIcon = { Breakfast:'🌅', Lunch:'☀️', Dinner:'🌙' };
+  var mealLabels = { Breakfast:'Breakfast', Lunch:'Lunch', Dinner:'Dinner' };
   var dateStr = '';
   try { dateStr = new Date(b.date + 'T12:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
   catch(e) { dateStr = b.date; }
 
+  var mealDisplay, totalQty;
+  if (b.meals) {
+    var parts = Object.keys(b.meals).filter(function(mk) { return b.meals[mk] > 0; })
+      .map(function(mk) { return mealIcon[mk] + ' ' + mealLabels[mk] + ' ×' + b.meals[mk]; });
+    mealDisplay = parts.join(', ') || '—';
+    totalQty = Object.values(b.meals).reduce(function(s, v) { return s + v; }, 0);
+  } else {
+    mealDisplay = (mealIcon[b.meal] || '') + ' ' + (b.meal || '—');
+    totalQty = b.qty || 0;
+  }
+
   document.getElementById('cm-name').textContent    = b.name;
   document.getElementById('cm-loc').textContent     = 'HKM ' + b.loc;
-  document.getElementById('cm-meal').textContent    = mealIcon[b.meal] || b.meal;
+  document.getElementById('cm-meal').textContent    = mealDisplay;
   document.getElementById('cm-date').textContent    = dateStr;
-  document.getElementById('cm-qty').textContent     = b.qty + (b.qty === 1 ? ' person' : ' persons');
+  document.getElementById('cm-qty').textContent     = totalQty + (totalQty === 1 ? ' person' : ' persons');
   document.getElementById('cm-amount').textContent  = '₹' + b.total + '/-';
   document.getElementById('cm-uid').textContent     = b.id;
-  document.getElementById('cm-subtitle').textContent = b.meal + ' · ' + b.date;
+  document.getElementById('cm-subtitle').textContent = b.date;
 
   var banner = document.getElementById('cm-status-banner');
   if (b.status === 'approved') {
@@ -1534,6 +1786,100 @@ function closeCouponModal() {
 document.addEventListener('click', function(e) {
   if (e.target === document.getElementById('coupon-overlay')) closeCouponModal();
 });
+
+// ─── BIRTHDAY BOOKING ───
+function initBdyForm() {
+  var inp = document.getElementById('bdy-date');
+  if (!inp) return;
+  var min = new Date();
+  min.setDate(min.getDate() + 7);
+  inp.min = min.toISOString().slice(0, 10);
+  if (!inp.value || inp.value < inp.min) inp.value = inp.min;
+}
+
+function changeBdyMealPortions(meal, delta) {
+  var id = 'bdy-portions-' + meal.toLowerCase();
+  var inp = document.getElementById(id);
+  inp.value = Math.max(0, (parseInt(inp.value) || 0) + delta);
+}
+
+function submitBdyEnquiry() {
+  var name      = document.getElementById('bdy-name').value.trim();
+  var mobile    = document.getElementById('bdy-mobile').value.trim();
+  var email     = document.getElementById('bdy-email').value.trim();
+  var date      = document.getElementById('bdy-date').value;
+  var address   = document.getElementById('bdy-address').value.trim();
+  var breakfast = parseInt(document.getElementById('bdy-portions-breakfast').value) || 0;
+  var lunch     = parseInt(document.getElementById('bdy-portions-lunch').value) || 0;
+  var dinner    = parseInt(document.getElementById('bdy-portions-dinner').value) || 0;
+  var total     = breakfast + lunch + dinner;
+  var note      = document.getElementById('bdy-note').value.trim();
+
+  if (!name)    { showHPToast('Please enter your name ⚠️'); return; }
+  if (!mobile || mobile.length !== 10 || !/^\d+$/.test(mobile)) { showHPToast('Enter a valid 10-digit mobile number ⚠️'); return; }
+  if (!date)    { showHPToast('Please select an event date ⚠️'); return; }
+  var minDate = new Date(); minDate.setDate(minDate.getDate() + 7);
+  if (new Date(date) < minDate) { showHPToast('Event date must be at least 7 days from today ⚠️'); return; }
+  if (!address) { showHPToast('Please enter a delivery address ⚠️'); return; }
+  if (total < 10) { showHPToast('Minimum 10 total portions required ⚠️'); return; }
+
+  var meals = { Breakfast: breakfast, Lunch: lunch, Dinner: dinner };
+  var id = 'BDY-0' + bdyCounter++;
+  var now = new Date().toLocaleString('en-IN', { day:'numeric', month:'short', hour:'numeric', minute:'2-digit' });
+  bdyEnquiries.unshift({ id, name, mobile, email, eventDate: date, address, meals, note, submitted: now, status: 'pending', adminNote: '' });
+
+  document.getElementById('bdy-success-id').textContent = id;
+  showView('bdy-success');
+}
+
+function renderBdyBookings() {
+  var list = document.getElementById('bk-bdy-list');
+  if (!list) return;
+  if (!bdyEnquiries.length) {
+    list.innerHTML = '<div class="bk-empty"><div class="bk-empty-icon">🎂</div><p>No birthday enquiries yet.</p><button class="btn-full" style="width:auto;padding:9px 20px;font-size:0.8rem;border-radius:8px;margin:0 auto" onclick="showView(\'birthday\')">+ New Enquiry</button></div>';
+    return;
+  }
+  var statusBadge = {
+    pending:  '<span class="bk-badge pending"><span class="bk-badge-dot"></span>⏳ Pending</span>',
+    accepted: '<span class="bk-badge approved"><span class="bk-badge-dot"></span>✔ Accepted</span>',
+    declined: '<span class="bk-badge declined"><span class="bk-badge-dot"></span>✖ Declined</span>'
+  };
+  var html = bdyEnquiries.map(function(e) {
+    var dateDisp = '';
+    try { dateDisp = new Date(e.eventDate + 'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }); }
+    catch(ex) { dateDisp = e.eventDate; }
+    var mealParts = [];
+    if (e.meals) {
+      if (e.meals.Breakfast > 0) mealParts.push('🌅' + e.meals.Breakfast);
+      if (e.meals.Lunch > 0)     mealParts.push('☀️' + e.meals.Lunch);
+      if (e.meals.Dinner > 0)    mealParts.push('🌙' + e.meals.Dinner);
+    } else {
+      mealParts.push('🍽 ' + e.meal + ' · ' + e.portions + ' portions');
+    }
+    var mealMeta = mealParts.join(' · ');
+    return '<div class="bdy-enq-item">'
+      + '<div class="bdy-enq-top">'
+      +   '<span class="bdy-enq-id">' + e.id + '</span>'
+      +   '<span class="bdy-enq-name">' + e.name + '</span>'
+      +   (statusBadge[e.status] || e.status)
+      + '</div>'
+      + '<div class="bdy-enq-meta">'
+      +   '<span>📅 ' + dateDisp + '</span>'
+      +   '<span>' + mealMeta + '</span>'
+      +   '<span>📍 ' + e.address.split(',')[0] + '</span>'
+      + '</div>'
+      + (e.adminNote ? '<div style="font-size:0.72rem;color:#c0392b;margin-top:3px">💬 Admin: ' + e.adminNote + '</div>' : '')
+      + '</div>';
+  }).join('');
+  list.innerHTML = html;
+}
+
+function switchBkTab(tab) {
+  document.querySelectorAll('.bk-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.bk-tab-pane').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('bktab-' + tab).classList.add('active');
+  document.getElementById('bkpane-' + tab).classList.add('active');
+}
 
 // ─── INIT ───
 window.addEventListener('load', function() {
