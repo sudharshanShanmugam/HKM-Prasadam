@@ -274,6 +274,8 @@ th {
 td { font-size: 0.83rem; color: var(--text-dark); padding: 12px 16px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: var(--ivory); }
+.compact-table th { padding: 10px 14px; }
+.compact-table td { padding: 10px 14px; font-size: 0.81rem; }
 .badge {
   display: inline-flex; align-items: center;
   padding: 3px 9px; border-radius: 50px;
@@ -819,6 +821,9 @@ tr:hover td { background: var(--ivory); }
 .meal-price-icon { font-size: 1rem; width: 22px; text-align: center; flex-shrink: 0; }
 .meal-price-name { font-size: 0.82rem; font-weight: 500; color: var(--text-mid); flex: 1; }
 .meal-price-default { font-size: 0.7rem; color: var(--text-light); white-space: nowrap; }
+.add-menu-btn { font-size: 0.7rem; font-weight: 700; color: var(--saffron-dark); background: #fff8ee; border: 1.5px solid #f5d78e; border-radius: 6px; padding: 3px 8px; cursor: pointer; white-space: nowrap; font-family: Inter, sans-serif; transition: background .15s; }
+.add-menu-btn:hover { background: #fef0d0; }
+.add-menu-btn.has-menu { color: var(--green); background: #f0fff8; border-color: #a8d8c0; }
 .price-input-wrap { position: relative; }
 .price-input-wrap::before { content: '₹'; position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 0.8rem; color: var(--text-light); pointer-events: none; }
 .price-input {
@@ -1096,6 +1101,9 @@ tr:hover td { background: var(--ivory); }
   </button>
   <button class="nav-item" onclick="showPage('birthday')">
     <span class="nav-icon">🎉</span> Party Enquiries
+  </button>
+  <button class="nav-item" onclick="showPage('internal')">
+    <span class="nav-icon">🏛</span> Internal Orders
     <span class="nav-badge" id="bdy-pending-badge">0</span>
   </button>
 
@@ -1703,7 +1711,7 @@ tr:hover td { background: var(--ivory); }
               <div class="meal-price-row" id="row-Breakfast">
                 <span class="meal-price-icon">🌅</span>
                 <span class="meal-price-name">Breakfast</span>
-                <span class="meal-price-default" id="def-Breakfast"></span>
+                <button class="add-menu-btn" id="menu-btn-Breakfast" onclick="openMenuModal('Breakfast')">+ Add Menu</button>
                 <div class="price-input-wrap">
                   <input class="price-input" id="price-Breakfast" type="number" min="0" placeholder="0" oninput="markChanged(this)">
                 </div>
@@ -1712,7 +1720,7 @@ tr:hover td { background: var(--ivory); }
               <div class="meal-price-row" id="row-Lunch">
                 <span class="meal-price-icon">☀️</span>
                 <span class="meal-price-name">Lunch</span>
-                <span class="meal-price-default" id="def-Lunch"></span>
+                <button class="add-menu-btn" id="menu-btn-Lunch" onclick="openMenuModal('Lunch')">+ Add Menu</button>
                 <div class="price-input-wrap">
                   <input class="price-input" id="price-Lunch" type="number" min="0" placeholder="0" oninput="markChanged(this)">
                 </div>
@@ -1721,7 +1729,7 @@ tr:hover td { background: var(--ivory); }
               <div class="meal-price-row" id="row-Dinner">
                 <span class="meal-price-icon">🌙</span>
                 <span class="meal-price-name">Dinner</span>
-                <span class="meal-price-default" id="def-Dinner"></span>
+                <button class="add-menu-btn" id="menu-btn-Dinner" onclick="openMenuModal('Dinner')">+ Add Menu</button>
                 <div class="price-input-wrap">
                   <input class="price-input" id="price-Dinner" type="number" min="0" placeholder="0" oninput="markChanged(this)">
                 </div>
@@ -2038,8 +2046,8 @@ tr:hover td { background: var(--ivory); }
               <th>Customer</th>
               <th>Event Date</th>
               <th>Meal Preference</th>
-              <th style="text-align:center">Portions</th>
-              <th>Occasion Note</th>
+              <th style="text-align:center">Plates</th>
+              <th>Preferred Menu / Price</th>
               <th style="text-align:center">Status</th>
               <th style="text-align:center">Payment</th>
               <th style="text-align:center">Actions</th>
@@ -2052,7 +2060,74 @@ tr:hover td { background: var(--ivory); }
 
   </div>
 
+  <!-- INTERNAL ORDERS PAGE -->
+  <div class="page" id="page-internal">
+
+    <div class="window-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <h3 style="font-size:1.05rem;color:var(--brown-dark)">🏛 Internal Prasadam Orders</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <a href="internal-booking.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--saffron);color:#fff;border-radius:8px;padding:7px 14px;font-size:.82rem;font-weight:700;text-decoration:none;white-space:nowrap">🏛 Open Booking Form ↗</a>
+          <select class="filter-select" id="int-filter-status" onchange="renderInternalPage()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="delivered">Delivered</option>
+          </select>
+          <input type="text" class="filter-select" id="int-search" placeholder="🔍 Search name, dept or ID…" oninput="renderInternalPage()" style="min-width:200px">
+          <button class="btn btn-ghost btn-sm" onclick="renderInternalPage()" style="white-space:nowrap">🔄 Refresh</button>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div id="int-stats-row" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px"></div>
+
+      <div style="overflow-x:auto">
+        <table class="compact-table" style="min-width:1000px">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Date</th>
+              <th>Department</th>
+              <th>Meal</th>
+              <th style="text-align:center">Count</th>
+              <th style="text-align:center">Accepted</th>
+              <th style="text-align:center">Delivered</th>
+              <th style="text-align:center"></th>
+            </tr>
+          </thead>
+          <tbody id="int-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
 </div><!-- /main -->
+
+<!-- MEAL MENU MODAL -->
+<div class="modal-overlay" id="menu-modal-overlay" onclick="if(event.target===this)closeMenuModal()" style="z-index:1200">
+  <div style="background:#fff;border-radius:14px;width:min(420px,94vw);box-shadow:0 8px 40px rgba(0,0,0,.22);display:flex;flex-direction:column;overflow:hidden">
+    <div style="background:linear-gradient(135deg,var(--saffron-dark),var(--saffron));padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="color:#fff;font-weight:700;font-size:1rem" id="menu-modal-title">Add Menu</div>
+        <div style="color:rgba(255,255,255,.75);font-size:.75rem;margin-top:2px" id="menu-modal-sub"></div>
+      </div>
+      <button onclick="closeMenuModal()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="padding:20px">
+      <label style="font-size:.78rem;font-weight:600;color:var(--text-mid);display:block;margin-bottom:6px">Menu Items</label>
+      <textarea id="menu-modal-input" rows="4" placeholder="e.g. Idli Sambar, Ven Pongal, Kesari…" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.9rem;font-family:Inter,sans-serif;resize:vertical;outline:none;box-sizing:border-box"></textarea>
+      <p style="font-size:.72rem;color:var(--text-light);margin-top:6px">This menu will be shown to devotees for this meal on the selected date.</p>
+    </div>
+    <div style="padding:14px 20px;border-top:1px solid #f0e6d3;display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="clearMealMenu()" style="background:#fdecea;color:#c0392b;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:.85rem">Clear</button>
+      <button onclick="saveMealMenu()" style="background:var(--saffron);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700;font-size:.88rem">Save Menu</button>
+    </div>
+  </div>
+</div>
 
 <!-- BIRTHDAY DETAIL MODAL -->
 <div class="modal-overlay" id="bdy-modal-overlay" onclick="if(event.target===this)closeBdyModal()" style="z-index:1100">
@@ -2244,9 +2319,42 @@ const fillData = {
 };
 
 const slots = [
-  { label: 'Lunch · Thiruvanmiyur', date: 'Apr 21',  status: 'open'   },
-  { label: 'Lunch · NLBR',          date: 'Apr 21',  status: 'closed' },
-  { label: 'Breakfast · NLBR',      date: 'Apr 22',  status: 'open'   },
+  { label: 'Lunch · Thiruvanmiyur',      date: 'Apr 21', rawDate: '2026-04-21', meal: 'Lunch',      status: 'open'   },
+  { label: 'Lunch · NLBR',               date: 'Apr 21', rawDate: '2026-04-21', meal: 'Lunch',      status: 'closed' },
+  { label: 'Breakfast · NLBR',           date: 'Apr 22', rawDate: '2026-04-22', meal: 'Breakfast',  status: 'open'   },
+  { label: 'Breakfast · Thiruvanmiyur',  date: 'May 2',  rawDate: '2026-05-02', meal: 'Breakfast',  status: 'open'   },
+  { label: 'Lunch · Thiruvanmiyur',      date: 'May 2',  rawDate: '2026-05-02', meal: 'Lunch',      status: 'open'   },
+  { label: 'Dinner · Thiruvanmiyur',     date: 'May 2',  rawDate: '2026-05-02', meal: 'Dinner',     status: 'open'   },
+  { label: 'Lunch · NLBR',               date: 'May 5',  rawDate: '2026-05-05', meal: 'Lunch',      status: 'open'   },
+  { label: 'Dinner · NLBR',              date: 'May 5',  rawDate: '2026-05-05', meal: 'Dinner',     status: 'open'   },
+  { label: 'Breakfast · Thiruvanmiyur',  date: 'May 7',  rawDate: '2026-05-07', meal: 'Breakfast',  status: 'open'   },
+  { label: 'Dinner · Thiruvanmiyur',     date: 'May 7',  rawDate: '2026-05-07', meal: 'Dinner',     status: 'open'   },
+  { label: 'Dinner · Thiruvanmiyur',     date: 'May 9',  rawDate: '2026-05-09', meal: 'Dinner',     status: 'open'   },
+  { label: 'Breakfast · NLBR',           date: 'May 11', rawDate: '2026-05-11', meal: 'Breakfast',  status: 'open'   },
+  { label: 'Lunch · Thiruvanmiyur',      date: 'May 11', rawDate: '2026-05-11', meal: 'Lunch',      status: 'open'   },
+  { label: 'Dinner · NLBR',              date: 'May 11', rawDate: '2026-05-11', meal: 'Dinner',     status: 'open'   },
+  { label: 'Dinner · NLBR',              date: 'May 13', rawDate: '2026-05-13', meal: 'Dinner',     status: 'open'   },
+  { label: 'Lunch · Thiruvanmiyur',      date: 'May 15', rawDate: '2026-05-15', meal: 'Lunch',      status: 'open'   },
+  { label: 'Dinner · Thiruvanmiyur',     date: 'May 15', rawDate: '2026-05-15', meal: 'Dinner',     status: 'open'   },
+  { label: 'Breakfast · Thiruvanmiyur',  date: 'May 16', rawDate: '2026-05-16', meal: 'Breakfast',  status: 'open'   },
+  { label: 'Dinner · Thiruvanmiyur',     date: 'May 16', rawDate: '2026-05-16', meal: 'Dinner',     status: 'open'   },
+  { label: 'Lunch · NLBR',               date: 'May 18', rawDate: '2026-05-18', meal: 'Lunch',      status: 'open'   },
+  { label: 'Dinner · NLBR',              date: 'May 18', rawDate: '2026-05-18', meal: 'Dinner',     status: 'open'   },
+  { label: 'Breakfast · NLBR',           date: 'May 20', rawDate: '2026-05-20', meal: 'Breakfast',  status: 'open'   },
+  { label: 'Dinner · NLBR',              date: 'May 20', rawDate: '2026-05-20', meal: 'Dinner',     status: 'open'   },
+  { label: 'Dinner · Thiruvanmiyur',     date: 'May 21', rawDate: '2026-05-21', meal: 'Dinner',     status: 'open'   },
+  { label: 'Breakfast · NLBR',           date: 'May 23', rawDate: '2026-05-23', meal: 'Breakfast',  status: 'open'   },
+  { label: 'Lunch · Thiruvanmiyur',      date: 'May 23', rawDate: '2026-05-23', meal: 'Lunch',      status: 'open'   },
+  { label: 'Dinner · Thiruvanmiyur',     date: 'May 23', rawDate: '2026-05-23', meal: 'Dinner',     status: 'open'   },
+  { label: 'Dinner · NLBR',              date: 'May 25', rawDate: '2026-05-25', meal: 'Dinner',     status: 'open'   },
+  { label: 'Lunch · Thiruvanmiyur',      date: 'May 26', rawDate: '2026-05-26', meal: 'Lunch',      status: 'open'   },
+  { label: 'Dinner · Thiruvanmiyur',     date: 'May 26', rawDate: '2026-05-26', meal: 'Dinner',     status: 'open'   },
+  { label: 'Breakfast · Thiruvanmiyur',  date: 'May 28', rawDate: '2026-05-28', meal: 'Breakfast',  status: 'open'   },
+  { label: 'Dinner · Thiruvanmiyur',     date: 'May 28', rawDate: '2026-05-28', meal: 'Dinner',     status: 'open'   },
+  { label: 'Lunch · NLBR',               date: 'May 29', rawDate: '2026-05-29', meal: 'Lunch',      status: 'open'   },
+  { label: 'Dinner · NLBR',              date: 'May 29', rawDate: '2026-05-29', meal: 'Dinner',     status: 'open'   },
+  { label: 'Breakfast · NLBR',           date: 'May 30', rawDate: '2026-05-30', meal: 'Breakfast',  status: 'open'   },
+  { label: 'Dinner · NLBR',              date: 'May 30', rawDate: '2026-05-30', meal: 'Dinner',     status: 'open'   },
 ];
 
 // last confirmed registration for coupon preview
@@ -2264,6 +2372,7 @@ const pageTitles = {
   payments:      ['Payments',                 'Review and verify UPI payment submissions'],
   payment:       ['Complete Payment',         'Scan QR & submit your UPI transaction details'],
   birthday:      ['Party Enquiries',           'Review and manage party door delivery orders'],
+  internal:      ['Internal Orders',           'Manage prasadam requests from temple departments'],
 };
 
 function showPage(id) {
@@ -2282,6 +2391,7 @@ function showPage(id) {
   if (id === 'pricing') renderCalendar();
   if (id === 'payments') renderPaymentsTable();
   if (id === 'birthday') renderBirthdayPage();
+  if (id === 'internal') renderInternalPage();
   if (id === 'payment' && !pendingEntry) showPage('register'); // guard: no direct nav
   // close mobile sidebar
   document.getElementById('main-sidebar').classList.remove('open');
@@ -2801,9 +2911,20 @@ function renderSlotOverrides() {
   `).join('');
 }
 
+function saveSlotDatesToStorage() {
+  var map = {};
+  slots.forEach(function(s) {
+    if (s.status !== 'open' || !s.rawDate || !s.meal) return;
+    if (!map[s.rawDate]) map[s.rawDate] = [];
+    if (map[s.rawDate].indexOf(s.meal) === -1) map[s.rawDate].push(s.meal);
+  });
+  try { localStorage.setItem('hkm_slot_dates', JSON.stringify(map)); } catch(e) {}
+}
+
 function toggleSlot(i) {
   slots[i].status = slots[i].status === 'open' ? 'closed' : 'open';
   renderSlotOverrides();
+  saveSlotDatesToStorage();
   showToast('Slot ' + (slots[i].status === 'open' ? 'reopened' : 'closed') + ': ' + slots[i].label);
 }
 
@@ -2811,6 +2932,7 @@ function removeSlot(i) {
   var label = slots[i].label;
   slots.splice(i, 1);
   renderSlotOverrides();
+  saveSlotDatesToStorage();
   showToast('Override removed: ' + label);
 }
 
@@ -2858,8 +2980,9 @@ function addSlotGeneral() {
   var meal = document.getElementById('new-slot-meal-gen').value;
   if (!raw || !meal) { alert('Please select a date and meal type.'); return; }
   var dateStr = new Date(raw + 'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
-  slots.push({ label: meal + '  ·  ' + dateStr, date: dateStr, status: 'open' });
+  slots.push({ label: meal + '  ·  ' + dateStr, date: dateStr, rawDate: raw, meal: meal, status: 'open' });
   renderSlotOverrides();
+  saveSlotDatesToStorage();
   document.getElementById('new-slot-date').value = '';
   document.getElementById('new-slot-meal-gen').value = '';
   document.getElementById('add-slot-form').style.display = 'none';
@@ -2870,9 +2993,11 @@ function addSlotFestival() {
   var meal = document.getElementById('new-slot-meal-fest').value;
   if (!val || !meal) { alert('Please select a festival and meal type.'); return; }
   var parts = val.split('|');
-  var dateStr = new Date(parts[0] + 'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
-  slots.push({ label: meal + '  ·  ' + parts[1], date: dateStr, status: 'open' });
+  var rawDate = parts[0];
+  var dateStr = new Date(rawDate + 'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+  slots.push({ label: meal + '  ·  ' + parts[1], date: dateStr, rawDate: rawDate, meal: meal, status: 'open' });
   renderSlotOverrides();
+  saveSlotDatesToStorage();
   document.getElementById('new-slot-festival').value = '';
   document.getElementById('new-slot-meal-fest').value = '';
   document.getElementById('add-slot-form').style.display = 'none';
@@ -3161,13 +3286,13 @@ function openPriceEditor(key) {
   var rmd = removedMeals[key] || {};
   MEALS.forEach(function(m) {
     var inp    = document.getElementById('price-' + m);
-    var defEl  = document.getElementById('def-' + m);
     var row    = document.getElementById('row-' + m);
     var rmBtn  = document.getElementById('rm-' + m);
     var isRmd  = !!rmd[m];
     inp.value  = override[m] !== undefined ? override[m] : defaultRates[m];
     inp.classList.remove('changed');
-    if (defEl) defEl.textContent = 'Default ₹' + defaultRates[m];
+    var menuText = (mealMenus[key] || {})[m] || '';
+    updateMenuBtn(m, menuText);
     if (row)   row.classList.toggle('removed', isRmd);
     if (rmBtn) { rmBtn.classList.toggle('is-removed', isRmd); rmBtn.textContent = isRmd ? '+' : '✕'; rmBtn.title = isRmd ? 'Add this meal back' : 'Remove this meal for this date'; }
     var limRow = document.getElementById('limrow-' + m);
@@ -3199,6 +3324,66 @@ function toggleMealRemoved(meal) {
 
 function markChanged(inp) {
   inp.classList.add('changed');
+}
+
+// ─── MEAL MENU MODAL ───
+var mealMenus = {};      // { 'YYYY-MM-DD': { Breakfast: '…', Lunch: '…', Dinner: '…' } }
+var menuModalMeal = null;
+var MEAL_ICONS = { Breakfast: '🌅', Lunch: '☀️', Dinner: '🌙' };
+
+function openMenuModal(meal) {
+  if (!selectedDate) return;
+  menuModalMeal = meal;
+  var existing = (mealMenus[selectedDate] || {})[meal] || '';
+  var d = new Date(selectedDate + 'T12:00:00');
+  var dateLabel = d.getDate() + ' ' + MONTH_NAMES[d.getMonth()];
+  document.getElementById('menu-modal-title').textContent = MEAL_ICONS[meal] + ' ' + meal + ' Menu';
+  document.getElementById('menu-modal-sub').textContent   = dateLabel;
+  document.getElementById('menu-modal-input').value       = existing;
+  document.getElementById('menu-modal-overlay').classList.add('show');
+  setTimeout(function() { document.getElementById('menu-modal-input').focus(); }, 100);
+}
+
+function closeMenuModal() {
+  document.getElementById('menu-modal-overlay').classList.remove('show');
+  menuModalMeal = null;
+}
+
+function saveMealMenu() {
+  if (!selectedDate || !menuModalMeal) return;
+  var text = document.getElementById('menu-modal-input').value.trim();
+  if (!mealMenus[selectedDate]) mealMenus[selectedDate] = {};
+  mealMenus[selectedDate][menuModalMeal] = text;
+  updateMenuBtn(menuModalMeal, text);
+  persistMealMenus();
+  closeMenuModal();
+  showToast('🍽 Menu saved for ' + menuModalMeal);
+}
+
+function clearMealMenu() {
+  if (!selectedDate || !menuModalMeal) return;
+  if (mealMenus[selectedDate]) delete mealMenus[selectedDate][menuModalMeal];
+  document.getElementById('menu-modal-input').value = '';
+  updateMenuBtn(menuModalMeal, '');
+  persistMealMenus();
+  closeMenuModal();
+  showToast('Menu cleared for ' + menuModalMeal);
+}
+
+function persistMealMenus() {
+  try { localStorage.setItem('hkm_meal_menus', JSON.stringify(mealMenus)); } catch(e) {}
+}
+
+function updateMenuBtn(meal, text) {
+  var btn = document.getElementById('menu-btn-' + meal);
+  if (!btn) return;
+  if (text) {
+    btn.textContent = '✏ Menu Set';
+    btn.classList.add('has-menu');
+  } else {
+    btn.textContent = '+ Add Menu';
+    btn.classList.remove('has-menu');
+  }
 }
 
 function saveDayPricing() {
@@ -3346,6 +3531,7 @@ function renderSpecialDaysList() {
 // ─── INIT ───
 window.addEventListener('load', function() {
   initDateDisplay();
+  saveSlotDatesToStorage();
   renderAllTable();
   updateDashboardStats();
   populateDateFilter();
@@ -3697,17 +3883,18 @@ var bdyAdminEnquiries = [
   { id: 'BDY-1001', name: 'Priya Ramachandran', mobile: '9876543210',
     eventDate: '2026-05-10', meals: { Breakfast: 0, Lunch: 30, Dinner: 0 },
     address: '12, Rose Garden, Anna Nagar, Chennai - 600040',
-    note: 'Birthday for my son turning 5',
+    preferredMenu: 'Puri Bhaji, Rice Dal Sabzi, Halwa', preferredPrice: '4500',
     submitted: '24 Apr 2026, 10:15 AM', status: 'pending' },
   { id: 'BDY-1002', name: 'Suresh Kumar', mobile: '9845012345',
     eventDate: '2026-05-15', meals: { Breakfast: 50, Lunch: 0, Dinner: 0 },
     address: '8/3, Venkatesa Agraharam, Mylapore, Chennai - 600004',
-    note: 'Silver jubilee wedding anniversary celebration',
-    submitted: '23 Apr 2026, 3:40 PM', status: 'accepted', price: 1000, paid: false },
+    preferredMenu: 'Idli Sambar, Ven Pongal, Kesari', preferredPrice: '8000',
+    mealPrices: { Breakfast: 160 },
+    submitted: '23 Apr 2026, 3:40 PM', status: 'accepted', paid: false },
   { id: 'BDY-1003', name: 'Meena Krishnan', mobile: '9790001122',
     eventDate: '2026-05-02', meals: { Breakfast: 0, Lunch: 0, Dinner: 20 },
     address: '45, Luz Avenue, Alwarpet, Chennai - 600018',
-    note: '',
+    preferredMenu: '', preferredPrice: '',
     submitted: '22 Apr 2026, 9:00 AM', status: 'declined' }
 ];
 
@@ -3785,9 +3972,9 @@ function renderBdyUpcomingStrip() {
       if (e.meals) {
         var parts = Object.keys(e.meals).filter(m => e.meals[m] > 0)
           .map(m => mealIconsUpcoming[m] + ' ' + e.meals[m]);
-        mealText = parts.join(' · ') + ' portions';
+        mealText = parts.join(' · ') + ' plates';
       } else {
-        mealText = e.meal + ' · ' + e.portions + ' portions';
+        mealText = e.meal + ' · ' + e.portions + ' plates';
       }
       return '<div style="background:rgba(255,255,255,.15);border-radius:8px;padding:8px 14px;min-width:180px">' +
         '<div style="font-weight:700;font-size:.82rem">' + e.name + '</div>' +
@@ -3820,8 +4007,14 @@ function renderBirthdayPage() {
     return;
   }
   tbody.innerHTML = list.map(function(e) {
-    var noteDisplay = e.note
-      ? '<span title="' + e.note.replace(/"/g,'&quot;') + '" style="cursor:default">' + (e.note.length > 40 ? e.note.slice(0,40) + '…' : e.note) + '</span>'
+    var noteDisplay = (e.confirmedMenu || e.confirmedPrice || e.preferredMenu || e.preferredPrice)
+      ? (e.confirmedMenu || e.confirmedPrice
+          ? '<div style="font-size:.78rem;font-weight:700;color:#1a7a5e;margin-bottom:2px">✅ Confirmed</div>'
+            + (e.confirmedMenu ? '<div style="font-size:.82rem" title="' + e.confirmedMenu.replace(/"/g,'&quot;') + '">' + (e.confirmedMenu.length > 28 ? e.confirmedMenu.slice(0,28) + '…' : e.confirmedMenu) + '</div>' : '')
+            + (e.confirmedPrice ? '<div style="font-size:.8rem;color:var(--primary);font-weight:700;margin-top:1px">₹' + e.confirmedPrice + '/-</div>' : '')
+          : '<div style="font-size:.82rem;color:#aaa">Preferred: '
+            + (e.preferredMenu ? (e.preferredMenu.length > 22 ? e.preferredMenu.slice(0,22) + '…' : e.preferredMenu) : '')
+            + (e.preferredPrice ? ' · ₹' + e.preferredPrice : '') + '</div>')
       : '<span style="color:#ccc">—</span>';
     var actions = '<div class="pay-action-group">' +
       '<button class="pay-action-btn view" title="View details" onclick="openBdyModal(\'' + e.id + '\');event.stopPropagation()">👁</button>' +
@@ -3842,8 +4035,10 @@ function renderBirthdayPage() {
     }
     var paymentCell;
     if (e.status === 'accepted') {
-      var priceDisplay = e.price != null
-        ? '<span style="font-weight:700;font-size:.9rem">₹' + e.price.toLocaleString('en-IN') + '</span>'
+      var mp = e.mealPrices || {};
+      var computedTotal = Object.keys(e.meals || {}).reduce(function(s,m){ return s + (mp[m]||0)*(e.meals[m]||0); }, 0);
+      var priceDisplay = computedTotal > 0
+        ? '<span style="font-weight:700;font-size:.9rem">₹' + computedTotal.toLocaleString('en-IN') + '</span>'
         : '<span style="color:#bbb;font-size:.78rem">Not set</span>';
       var paidBadge = e.paid
         ? '<span style="background:#d4edda;color:#155724;border:1px solid #28a74544;border-radius:20px;padding:2px 8px;font-size:.7rem;font-weight:700">✅ Paid</span>'
@@ -3902,7 +4097,7 @@ function openBdyModal(id) {
             totalPortions = e.portions;
           }
           return '<div><span style="color:#888;font-size:.8rem">Meal Preference</span><br><strong>' + mealDisplay + '</strong></div>' +
-            '<div><span style="color:#888;font-size:.8rem">Portions</span><br><strong style="font-size:1.2rem">' + totalPortions + '</strong></div>';
+            '<div><span style="color:#888;font-size:.8rem">Plates</span><br><strong style="font-size:1.2rem">' + totalPortions + '</strong></div>';
         })() +
       '</div>' +
     '</div>' +
@@ -3910,39 +4105,80 @@ function openBdyModal(id) {
       '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:6px">🚚 DELIVERY ADDRESS</div>' +
       '<div style="font-size:.9rem;line-height:1.5;color:#333">' + e.address + '</div>' +
     '</div>' +
-    (e.note ? '<div style="background:#f0f8f0;border:1px solid #b8dfc0;border-radius:8px;padding:14px">' +
-      '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:6px">📝 OCCASION NOTE</div>' +
-      '<div style="font-size:.9rem;color:#333;line-height:1.5">' + e.note + '</div>' +
+    ((e.preferredMenu || e.preferredPrice) ? '<div style="background:#f0f8f0;border:1px solid #b8dfc0;border-radius:8px;padding:14px">' +
+      '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:8px">🍽 PREFERRED MENU & PRICE</div>' +
+      '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">' +
+        (e.preferredMenu ? '<div style="flex:1;min-width:140px"><span style="font-size:.75rem;color:#888">Menu</span><div style="font-size:.9rem;color:#333;line-height:1.5;margin-top:2px">' + e.preferredMenu + '</div></div>' : '') +
+        (e.preferredPrice ? '<div><span style="font-size:.75rem;color:#888">Budget</span><div style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-top:2px">₹' + e.preferredPrice + '/-</div></div>' : '') +
+      '</div>' +
+      ((e.confirmedMenu || e.confirmedPrice) ?
+        '<div style="border-top:1px dashed #b8dfc0;margin-top:10px;padding-top:10px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">' +
+        '<div style="font-size:.72rem;color:#1a7a5e;font-weight:700;letter-spacing:.05em;width:100%">✅ CONFIRMED</div>' +
+        (e.confirmedMenu ? '<div style="flex:1;min-width:140px"><span style="font-size:.75rem;color:#888">Confirmed Menu</span><div style="font-size:.9rem;color:#222;font-weight:600;line-height:1.5;margin-top:2px">' + e.confirmedMenu + '</div></div>' : '') +
+        (e.confirmedPrice ? '<div><span style="font-size:.75rem;color:#888">Confirmed Price</span><div style="font-size:1.2rem;font-weight:700;color:#1a7a5e;margin-top:2px">₹' + e.confirmedPrice + '/-</div></div>' : '') +
+        '</div>' : '') +
     '</div>' : '') +
-    (e.status === 'accepted' ?
-      '<div style="background:#f0fff8;border:1.5px solid #a8d8c0;border-radius:8px;padding:14px">' +
-        '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em;margin-bottom:10px">💰 PAYMENT</div>' +
-        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
-          '<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:190px">' +
-            '<span style="font-size:.82rem;color:#555;white-space:nowrap">Total Amount:</span>' +
-            '<div style="position:relative;flex:1">' +
-              '<span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:.82rem;color:#888;pointer-events:none">₹</span>' +
-              '<input type="number" id="bdy-price-inp" value="' + (e.price != null ? e.price : '') + '" min="0" placeholder="Enter amount" ' +
-                'style="width:100%;padding:7px 10px 7px 22px;border:1.5px solid #a8d8c0;border-radius:7px;font-size:.9rem;outline:none;box-sizing:border-box">' +
-            '</div>' +
-            '<button onclick="saveBdyPrice(\'' + e.id + '\')" style="background:#1a7a5e;color:#fff;border:none;border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:.82rem;white-space:nowrap">Save</button>' +
-          '</div>' +
-          '<button id="bdy-paid-btn" onclick="toggleBdyPaid(\'' + e.id + '\')" style="' +
-            (e.paid
-              ? 'background:#d4edda;color:#155724;border:1.5px solid #28a74555'
-              : 'background:#fdecea;color:#721c24;border:1.5px solid #dc354555') +
-            ';border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:.82rem;white-space:nowrap">' +
-            (e.paid ? '✅ Paid — Mark Unpaid' : '💰 Unpaid — Mark Paid') +
-          '</button>' +
-        '</div>' +
-      '</div>'
-    : '');
+    (function() {
+      if (!e.meals) return '';
+      var mealIcons  = { Breakfast: '🌅', Lunch: '☀️', Dinner: '🌙' };
+      var mealBg     = { Breakfast: '#fffbee', Lunch: '#f0f8ff', Dinner: '#f5f0ff' };
+      var mealBorder = { Breakfast: '#f5d78e', Lunch: '#c0d8f0', Dinner: '#c8b8f0' };
+      var mealPrices = e.mealPrices || {};
+      var activeMeals = Object.keys(e.meals).filter(function(m) { return e.meals[m] > 0; });
+      if (!activeMeals.length) return '';
+      var grandTotal = activeMeals.reduce(function(s, m) { return s + (mealPrices[m] || 0) * e.meals[m]; }, 0);
+      var cards = activeMeals.map(function(m) {
+        var p = mealPrices[m] || 0;
+        var sub = p * e.meals[m];
+        return '<div style="background:' + mealBg[m] + ';border:1.5px solid ' + mealBorder[m] + ';border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px">'
+          + '<div style="font-size:1.4rem;line-height:1">' + mealIcons[m] + '</div>'
+          + '<div style="flex:1"><div style="font-weight:700;font-size:.92rem">' + m + '</div>'
+          + '<div style="display:flex;align-items:center;gap:5px;margin-top:4px">'
+          + '<input type="number" min="0" value="' + e.meals[m] + '" id="bdy-port-' + m + '" oninput="calcBdyTotal(\'' + e.id + '\')" style="width:52px;border:1.5px solid ' + mealBorder[m] + ';border-radius:6px;padding:4px 6px;font-size:.82rem;font-family:Inter,sans-serif;outline:none;text-align:center">'
+          + '<span style="font-size:.75rem;color:#999">plates</span>'
+          + '</div></div>'
+          + '<div style="display:flex;align-items:center;gap:8px">'
+          + '<div style="display:flex;align-items:center;border:1.5px solid #ddd;border-radius:8px;overflow:hidden;background:#fff">'
+          + '<span style="padding:0 9px;font-size:.8rem;color:#aaa;background:#f9f9f9;border-right:1px solid #eee;align-self:stretch;display:flex;align-items:center">₹</span>'
+          + '<input type="number" min="0" placeholder="0" value="' + (p || '') + '" id="bdy-mp-' + m + '" oninput="calcBdyTotal(\'' + e.id + '\')" style="width:68px;border:none;outline:none;padding:8px;font-size:.88rem;font-family:Inter,sans-serif">'
+          + '<span style="padding:0 7px;font-size:.68rem;color:#bbb;background:#f9f9f9;border-left:1px solid #eee;align-self:stretch;display:flex;align-items:center">/plate</span>'
+          + '</div>'
+          + '<div style="font-size:.9rem;font-weight:700;color:var(--primary);min-width:55px;text-align:right" id="bdy-sub-' + m + '">₹' + sub + '</div>'
+          + '</div></div>';
+      }).join('');
+      var paidHtml = e.status === 'accepted'
+        ? '<button id="bdy-paid-btn" onclick="toggleBdyPaid(\'' + e.id + '\')" style="'
+          + (e.paid ? 'background:#d4edda;color:#155724;border:1.5px solid #28a74555' : 'background:#fdecea;color:#721c24;border:1.5px solid #dc354555')
+          + ';border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:.82rem">'
+          + (e.paid ? '✅ Paid — Mark Unpaid' : '💰 Unpaid — Mark Paid') + '</button>'
+        : '';
+      var actionsHtml = e.status === 'pending'
+        ? '<button onclick="saveBdyMealPrices(\'' + e.id + '\');acceptBdy(\'' + e.id + '\');closeBdyModal()" style="background:#27ae60;color:#fff;border:none;border-radius:8px;padding:9px 20px;cursor:pointer;font-weight:700;font-size:.88rem">✅ Accept Order</button>'
+        + '<button onclick="declineBdy(\'' + e.id + '\');closeBdyModal()" style="background:#c0392b;color:#fff;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:700;font-size:.88rem">❌ Decline</button>'
+        : '';
+      var confirmedMenuHtml = '<div style="display:flex;flex-direction:column;gap:8px;border-top:1.5px dashed #b0ddd0;padding-top:10px">'
+        + '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em">✅ CONFIRMED MENU & PRICE</div>'
+        + '<textarea id="bdy-conf-menu" rows="2" placeholder="Enter confirmed menu items…" style="width:100%;border:1.5px solid #c0ddd0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:Inter,sans-serif;resize:vertical;outline:none;box-sizing:border-box">' + (e.confirmedMenu || '') + '</textarea>'
+        + '<div style="display:flex;align-items:center;border:1.5px solid #c0ddd0;border-radius:8px;overflow:hidden;background:#fff">'
+        +   '<span style="padding:0 10px;font-size:.82rem;color:#aaa;background:#f4fdf8;border-right:1px solid #c0ddd0;align-self:stretch;display:flex;align-items:center">₹</span>'
+        +   '<input type="number" min="0" id="bdy-conf-price" placeholder="Confirmed price" value="' + (e.confirmedPrice || '') + '" style="flex:1;border:none;outline:none;padding:9px 10px;font-size:.88rem;font-family:Inter,sans-serif">'
+        + '</div>'
+        + '</div>';
+      return '<div style="background:#f8fffe;border:1.5px solid #b0ddd0;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">'
+        + '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.05em">🧾 MEAL PRICING</div>'
+        + cards
+        + '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1.5px dashed #b0ddd0;padding-top:10px">'
+        + '<div style="font-weight:700;font-size:.92rem;color:#333">Grand Total</div>'
+        + '<div style="font-size:1.3rem;font-weight:800;color:var(--primary)" id="bdy-grand-total">₹' + grandTotal + '/-</div>'
+        + '</div>'
+        + confirmedMenuHtml
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+        + '<button onclick="saveBdyMealPrices(\'' + e.id + '\')" style="background:#1a7a5e;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:700;font-size:.82rem">💾 Save</button>'
+        + paidHtml + actionsHtml
+        + '</div></div>';
+    })();
   var footer = document.getElementById('bdy-modal-footer');
-  footer.innerHTML = e.status === 'pending'
-    ? '<button onclick="acceptBdy(\'' + e.id + '\');closeBdyModal()" style="background:#27ae60;color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-weight:700;font-size:.9rem">✅ Accept Order</button>' +
-      '<button onclick="declineBdy(\'' + e.id + '\');closeBdyModal()" style="background:#c0392b;color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-weight:700;font-size:.9rem">❌ Decline</button>' +
-      '<button onclick="closeBdyModal()" style="background:#eee;color:#555;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-size:.9rem">Close</button>'
-    : '<button onclick="closeBdyModal()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-weight:700;font-size:.9rem">Close</button>';
+  footer.innerHTML = '<button onclick="closeBdyModal()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-weight:700;font-size:.9rem">Close</button>';
   document.getElementById('bdy-modal-overlay').classList.add('show');
 }
 
@@ -3960,13 +4196,40 @@ function declineBdy(id) {
   if (e) { e.status = 'declined'; renderBirthdayPage(); }
 }
 
-function saveBdyPrice(id) {
+function calcBdyTotal(id) {
   var e = bdyAdminEnquiries.find(function(x){ return x.id === id; });
-  if (!e) return;
-  var val = parseInt(document.getElementById('bdy-price-inp').value);
-  e.price = isNaN(val) ? null : val;
+  if (!e || !e.meals) return;
+  var total = 0;
+  Object.keys(e.meals).filter(function(m){ return e.meals[m] > 0; }).forEach(function(m) {
+    var portInp  = document.getElementById('bdy-port-' + m);
+    var priceInp = document.getElementById('bdy-mp-' + m);
+    var portions = portInp  ? (parseInt(portInp.value)  || 0) : e.meals[m];
+    var price    = priceInp ? (parseInt(priceInp.value) || 0) : 0;
+    var sub = price * portions;
+    total += sub;
+    var subEl = document.getElementById('bdy-sub-' + m);
+    if (subEl) subEl.textContent = '₹' + sub;
+  });
+  var totalEl = document.getElementById('bdy-grand-total');
+  if (totalEl) totalEl.textContent = '₹' + total + '/-';
+}
+
+function saveBdyMealPrices(id) {
+  var e = bdyAdminEnquiries.find(function(x){ return x.id === id; });
+  if (!e || !e.meals) return;
+  if (!e.mealPrices) e.mealPrices = {};
+  Object.keys(e.meals).filter(function(m){ return e.meals[m] > 0; }).forEach(function(m) {
+    var portInp  = document.getElementById('bdy-port-' + m);
+    var priceInp = document.getElementById('bdy-mp-' + m);
+    if (portInp)  e.meals[m]      = parseInt(portInp.value)  || 0;
+    if (priceInp) e.mealPrices[m] = parseInt(priceInp.value) || 0;
+  });
+  var confMenu  = document.getElementById('bdy-conf-menu');
+  var confPrice = document.getElementById('bdy-conf-price');
+  if (confMenu)  e.confirmedMenu  = confMenu.value.trim();
+  if (confPrice) e.confirmedPrice = confPrice.value.trim();
   renderBirthdayPage();
-  showToast('💰 Price saved for ' + e.name);
+  showToast('💰 Saved for ' + e.name);
 }
 
 function toggleBdyPaid(id) {
@@ -3986,6 +4249,225 @@ function toggleBdyPaid(id) {
   }
   showToast(e.paid ? '✅ ' + e.name + ' marked as Paid' : '💰 ' + e.name + ' marked as Unpaid');
 }
+
+// ─── INTERNAL ORDERS ───
+var DEMO_INTERNAL_ORDERS = [
+  { id:'INT-0012', name:'Murali Das',        mobile:'9845012345', date:'2026-05-15', dept:'Security',              meal:'Lunch',      count:10, location:'Security Block, Gate 2',           submitted:'29 Apr 2026, 8:30 AM',  accepted:false, delivered:false },
+  { id:'INT-0011', name:'Krishnapriya R.',   mobile:'9876543210', date:'2026-05-11', dept:'Deity Department',      meal:'Breakfast',  count:25, location:'Deity Dept Room, 1st Floor',        submitted:'29 Apr 2026, 8:10 AM',  accepted:true,  delivered:false },
+  { id:'INT-0010', name:'Vishnu Prasad',     mobile:'9745123444', date:'2026-05-11', dept:'Education / Gurukul',   meal:'Lunch',      count:40, location:'Gurukul Dining Hall',               submitted:'29 Apr 2026, 9:00 AM',  accepted:true,  delivered:false },
+  { id:'INT-0009', name:'Murali Das',        mobile:'9845012345', date:'2026-05-07', dept:'Security',              meal:'Dinner',     count:8,  location:'Main Entrance, Security Cabin',     submitted:'28 Apr 2026, 5:00 PM',  accepted:true,  delivered:false },
+  { id:'INT-0008', name:'Krishnapriya R.',   mobile:'9876543210', date:'2026-05-07', dept:'Deity Department',      meal:'Lunch',      count:20, location:'Deity Dept Room, 1st Floor',        submitted:'29 Apr 2026, 8:00 AM',  accepted:true,  delivered:true  },
+  { id:'INT-0007', name:'Murali Das',        mobile:'9845012345', date:'2026-05-02', dept:'Security',              meal:'Lunch',      count:6,  location:'Security Block, Gate 2',            submitted:'27 Apr 2026, 3:00 PM',  accepted:true,  delivered:true  },
+  { id:'INT-0006', name:'Annapurna Devi',    mobile:'9790001122', date:'2026-05-07', dept:'Guest House',           meal:'Breakfast',  count:15, location:'Guest House Reception',             submitted:'29 Apr 2026, 9:40 AM',  accepted:false, delivered:false },
+  { id:'INT-0005', name:'Vishnu Prasad',     mobile:'9745123444', date:'2026-05-05', dept:'Education / Gurukul',   meal:'Dinner',     count:35, location:'Gurukul Dining Hall',               submitted:'28 Apr 2026, 11:20 AM', accepted:true,  delivered:true  },
+  { id:'INT-0004', name:'Radhika S.',        mobile:'8867452301', date:'2026-05-05', dept:'Outreach / Sankirtan',  meal:'Lunch',      count:10, location:'Sankirtan Office, Ground Floor',    submitted:'28 Apr 2026, 2:00 PM',  accepted:true,  delivered:false },
+  { id:'INT-0003', name:'Govinda Swami',     mobile:'9198765488', date:'2026-05-02', dept:'Temple Administration', meal:'Breakfast',  count:50, location:'Admin Block, Conference Room',      submitted:'27 Apr 2026, 10:05 AM', accepted:true,  delivered:true  },
+  { id:'INT-0002', name:'Tulasi Archana',    mobile:'7654321098', date:'2026-05-02', dept:'Accounts',              meal:'Lunch',      count:6,  location:'Accounts Office, 2nd Floor',       submitted:'27 Apr 2026, 3:30 PM',  accepted:false, delivered:false },
+  { id:'INT-0001', name:'Hari Bhakta',       mobile:'9876501234', date:'2026-04-30', dept:'IT / Media',            meal:'Dinner',     count:12, location:'IT Room, 3rd Floor',                submitted:'26 Apr 2026, 4:45 PM',  accepted:true,  delivered:true  },
+];
+
+function getInternalOrders() {
+  var real = [];
+  try {
+    var stored = localStorage.getItem('hkm_internal_orders');
+    if (stored) real = JSON.parse(stored) || [];
+  } catch(e) {}
+  real = real.map(function(o) {
+    return Object.assign({ meal: 'Not specified', location: 'Not specified' }, o);
+  });
+  var realIds = real.map(function(o) { return o.id; });
+  return real.concat(DEMO_INTERNAL_ORDERS.filter(function(o) { return realIds.indexOf(o.id) === -1; }));
+}
+
+function saveInternalOrders(orders) {
+  try { localStorage.setItem('hkm_internal_orders', JSON.stringify(orders)); } catch(e) {}
+}
+
+function toggleIntAccepted(id) {
+  var orders = getInternalOrders();
+  var o = orders.find(function(x){ return x.id === id; });
+  if (!o) return;
+  o.accepted = !o.accepted;
+  if (!o.accepted) o.delivered = false;
+  saveInternalOrders(orders);
+  renderInternalPage();
+  showToast(o.accepted ? '✅ ' + o.name + ' — Accepted' : '↩ ' + o.name + ' — Unmarked');
+}
+
+function toggleIntDelivered(id) {
+  var orders = getInternalOrders();
+  var o = orders.find(function(x){ return x.id === id; });
+  if (!o) return;
+  if (!o.accepted) { showToast('Accept the order first ⚠️'); return; }
+  o.delivered = !o.delivered;
+  saveInternalOrders(orders);
+  renderInternalPage();
+  showToast(o.delivered ? '🚚 ' + o.name + ' — Delivered' : '↩ ' + o.name + ' — Unmarked');
+}
+
+function renderInternalPage() {
+  var orders = getInternalOrders();
+  var statusFilter = (document.getElementById('int-filter-status') || {}).value || '';
+  var search = ((document.getElementById('int-search') || {}).value || '').toLowerCase();
+
+  // Stats
+  var statsEl = document.getElementById('int-stats-row');
+  if (statsEl) {
+    var total     = orders.length;
+    var pending   = orders.filter(function(o){ return !o.accepted; }).length;
+    var accepted  = orders.filter(function(o){ return o.accepted && !o.delivered; }).length;
+    var delivered = orders.filter(function(o){ return o.delivered; }).length;
+    var statStyle = 'background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 18px;min-width:110px;text-align:center';
+    statsEl.innerHTML =
+      '<div style="' + statStyle + '"><div style="font-size:1.4rem;font-weight:800">' + total + '</div><div style="font-size:.72rem;color:#888;margin-top:2px">Total</div></div>' +
+      '<div style="' + statStyle + ';border-color:#ffc107"><div style="font-size:1.4rem;font-weight:800;color:#856404">' + pending + '</div><div style="font-size:.72rem;color:#888;margin-top:2px">Pending</div></div>' +
+      '<div style="' + statStyle + ';border-color:#28a745"><div style="font-size:1.4rem;font-weight:800;color:#155724">' + accepted + '</div><div style="font-size:.72rem;color:#888;margin-top:2px">Accepted</div></div>' +
+      '<div style="' + statStyle + ';border-color:#6f42c1"><div style="font-size:1.4rem;font-weight:800;color:#6f42c1">' + delivered + '</div><div style="font-size:.72rem;color:#888;margin-top:2px">Delivered</div></div>';
+  }
+
+  var filtered = orders.filter(function(o) {
+    if (statusFilter === 'pending'   && (o.accepted || o.delivered))  return false;
+    if (statusFilter === 'accepted'  && (!o.accepted || o.delivered)) return false;
+    if (statusFilter === 'delivered' && !o.delivered)                 return false;
+    if (search && !(
+      o.name.toLowerCase().includes(search) ||
+      o.mobile.includes(search) ||
+      o.dept.toLowerCase().includes(search) ||
+      o.id.toLowerCase().includes(search)
+    )) return false;
+    return true;
+  });
+
+  filtered.sort(function(a, b) {
+    if (a.delivered !== b.delivered) return a.delivered ? 1 : -1;
+    if (a.accepted  !== b.accepted)  return a.accepted  ? 1 : -1;
+    return new Date(b.date) - new Date(a.date);
+  });
+
+  var tbody = document.getElementById('int-tbody');
+  if (!tbody) return;
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2.5rem 1rem"><div style="font-size:2rem;margin-bottom:8px">🏛</div><div style="color:#999;font-size:.9rem">' + (orders.length ? 'No orders match your filters' : 'No internal orders yet. <a href="internal-booking.html" target="_blank" style="color:var(--saffron)">Open booking form →</a>') + '</div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(function(o) {
+    var dateDisp = '';
+    try { dateDisp = new Date(o.date + 'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }); }
+    catch(ex) { dateDisp = o.date; }
+
+    var rowBg = o.delivered ? 'background:#f4f0ff' : o.accepted ? 'background:#f4fdf6' : 'background:#fffdf0';
+
+    var acceptBtn = '<button onclick="toggleIntAccepted(\'' + o.id + '\')" style="'
+      + (o.accepted
+          ? 'background:#d4edda;color:#155724;border:1.5px solid #28a74555'
+          : 'background:#fff3cd;color:#856404;border:1.5px solid #ffc10755')
+      + ';border-radius:7px;padding:5px 12px;cursor:pointer;font-size:.78rem;font-weight:700;white-space:nowrap">'
+      + (o.accepted ? '✅ Accepted' : '○ Accept')
+      + '</button>';
+
+    var deliverBtn = '<button onclick="toggleIntDelivered(\'' + o.id + '\')" style="'
+      + (o.delivered
+          ? 'background:#e8d5ff;color:#4b0082;border:1.5px solid #6f42c155'
+          : (o.accepted ? 'background:#f0f0f0;color:#555;border:1.5px solid #ccc' : 'background:#f0f0f0;color:#bbb;border:1.5px solid #ddd'))
+      + ';border-radius:7px;padding:5px 12px;cursor:pointer;font-size:.78rem;font-weight:700;white-space:nowrap'
+      + (o.accepted ? '' : ';cursor:not-allowed') + '">'
+      + (o.delivered ? '🚚 Delivered' : '○ Deliver')
+      + '</button>';
+
+    var mealIcon = o.meal === 'Breakfast' ? '🌅' : o.meal === 'Lunch' ? '☀️' : o.meal === 'Dinner' ? '🌙' : '';
+    return '<tr style="' + rowBg + '">'
+      + '<td style="font-weight:700;color:var(--primary);white-space:nowrap">' + o.id + '</td>'
+      + '<td style="font-weight:600">' + o.name + '</td>'
+      + '<td style="font-size:.85rem">' + o.mobile + '</td>'
+      + '<td style="white-space:nowrap;font-size:.85rem">' + dateDisp + '</td>'
+      + '<td style="font-size:.85rem">' + o.dept + '</td>'
+      + '<td style="font-size:.85rem;white-space:nowrap">' + (o.meal ? mealIcon + ' ' + o.meal : '—') + '</td>'
+      + '<td style="text-align:center;font-weight:700;font-size:1rem">' + o.count + '</td>'
+      + '<td style="text-align:center">' + acceptBtn + '</td>'
+      + '<td style="text-align:center">' + deliverBtn + '</td>'
+      + '<td style="text-align:center"><button onclick="showIntOrderDetail(\'' + o.id + '\')" title="View details" style="background:none;border:none;cursor:pointer;padding:3px 5px;border-radius:5px;transition:background .15s;display:inline-flex;align-items:center;justify-content:center" onmouseover="this.style.background=\'#f0f0f0\'" onmouseout="this.style.background=\'none\'"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>'
+      + '</tr>';
+  }).join('');
+}
+function showIntOrderDetail(id) {
+  var orders = getInternalOrders();
+  var o = orders.find(function(x){ return x.id === id; });
+  if (!o) return;
+  var mealIcon = o.meal === 'Breakfast' ? '🌅' : o.meal === 'Lunch' ? '☀️' : o.meal === 'Dinner' ? '🌙' : '🍽';
+  var dateDisp = '';
+  try { dateDisp = new Date(o.date + 'T12:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
+  catch(ex) { dateDisp = o.date; }
+  var statusLabel = o.delivered ? '🚚 Delivered' : o.accepted ? '✅ Accepted' : '⏳ Pending';
+  var statusColor = o.delivered ? '#6f42c1' : o.accepted ? '#155724' : '#856404';
+  var statusBg    = o.delivered ? '#f3e8ff' : o.accepted ? '#d4edda' : '#fff3cd';
+
+  document.getElementById('int-detail-body').innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'
+    + '<div>'
+    + '<div style="font-size:.72rem;color:#aaa;font-weight:700;letter-spacing:.06em">ORDER ID</div>'
+    + '<div style="font-size:1.1rem;font-weight:800;color:var(--primary)">' + o.id + '</div>'
+    + '</div>'
+    + '<span style="background:' + statusBg + ';color:' + statusColor + ';border-radius:20px;padding:5px 14px;font-size:.82rem;font-weight:700">' + statusLabel + '</span>'
+    + '</div>'
+
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">'
+    + '<div style="background:#f9f6f0;border-radius:10px;padding:12px 14px">'
+    + '<div style="font-size:.7rem;color:#aaa;font-weight:700;margin-bottom:3px">👤 NAME</div>'
+    + '<div style="font-weight:700;font-size:.95rem">' + o.name + '</div>'
+    + '</div>'
+    + '<div style="background:#f9f6f0;border-radius:10px;padding:12px 14px">'
+    + '<div style="font-size:.7rem;color:#aaa;font-weight:700;margin-bottom:3px">📞 MOBILE</div>'
+    + '<div style="font-weight:700;font-size:.95rem">' + o.mobile + '</div>'
+    + '</div>'
+    + '</div>'
+
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">'
+    + '<div style="background:#f9f6f0;border-radius:10px;padding:12px 14px">'
+    + '<div style="font-size:.7rem;color:#aaa;font-weight:700;margin-bottom:3px">📅 DATE</div>'
+    + '<div style="font-weight:600;font-size:.88rem">' + dateDisp + '</div>'
+    + '</div>'
+    + '<div style="background:#f9f6f0;border-radius:10px;padding:12px 14px">'
+    + '<div style="font-size:.7rem;color:#aaa;font-weight:700;margin-bottom:3px">🏛 DEPARTMENT</div>'
+    + '<div style="font-weight:600;font-size:.88rem">' + o.dept + '</div>'
+    + '</div>'
+    + '</div>'
+
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">'
+    + '<div style="background:#fff8ee;border:1px solid #f5d78e;border-radius:10px;padding:12px 14px">'
+    + '<div style="font-size:.7rem;color:#aaa;font-weight:700;margin-bottom:3px">MEAL TYPE</div>'
+    + '<div style="font-weight:700;font-size:1rem">' + (o.meal ? mealIcon + ' ' + o.meal : '—') + '</div>'
+    + '</div>'
+    + '<div style="background:#fff8ee;border:1px solid #f5d78e;border-radius:10px;padding:12px 14px">'
+    + '<div style="font-size:.7rem;color:#aaa;font-weight:700;margin-bottom:3px">🍽 PLATE COUNT</div>'
+    + '<div style="font-weight:800;font-size:1.4rem;color:var(--primary)">' + o.count + '</div>'
+    + '</div>'
+    + '</div>'
+
+    + '<div style="background:#f0f4ff;border:1px solid #c5d0f0;border-radius:10px;padding:12px 14px;margin-bottom:12px">'
+    + '<div style="font-size:.7rem;color:#aaa;font-weight:700;margin-bottom:4px">📍 DELIVERY LOCATION</div>'
+    + '<div style="font-size:.92rem;color:#333;line-height:1.5">' + (o.location || '—') + '</div>'
+    + '</div>'
+
+    + '<div style="font-size:.75rem;color:#aaa;text-align:right">Submitted: ' + o.submitted + '</div>';
+
+  document.getElementById('int-detail-overlay').style.display = 'flex';
+}
+
+function closeIntOrderDetail() {
+  document.getElementById('int-detail-overlay').style.display = 'none';
+}
 </script>
+
+<!-- Internal Order Detail Modal -->
+<div id="int-detail-overlay" onclick="if(event.target===this)closeIntOrderDetail()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1200;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f0ece4">
+      <div style="font-weight:800;font-size:1rem;color:var(--brown-dark)">🏛 Order Details</div>
+      <button onclick="closeIntOrderDetail()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#aaa;line-height:1;padding:2px 6px;border-radius:6px" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">✕</button>
+    </div>
+    <div id="int-detail-body" style="padding:20px"></div>
+  </div>
+</div>
 </body>
 </html>

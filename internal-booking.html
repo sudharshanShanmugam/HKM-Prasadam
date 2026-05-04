@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKM Internal Prasadam Booking</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --saffron:      #e07b2a;
+    --saffron-dark: #c0621a;
+    --brown-dark:   #4a2c0a;
+    --green:        #1a7a5e;
+    --red:          #c0392b;
+    --border:       #e8d5b5;
+    --bg:           #fdf8f0;
+    --text:         #2d1a05;
+    --text-mid:     #6b4c2a;
+    --text-light:   #9a7a55;
+  }
+  body { font-family: Inter, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #8e1a0e 0%, #c0392b 60%, #e07b2a 100%);
+    padding: 16px 20px;
+    color: #fff;
+    position: relative;
+    text-align: center;
+  }
+  .header-om { font-size: 1.3rem; opacity: .85; }
+  .header h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; letter-spacing: .03em; }
+  .header p  { font-size: .72rem; opacity: .75; margin-top: 2px; }
+
+  .mybk-btn {
+    position: absolute; top: 50%; right: 16px; transform: translateY(-50%);
+    background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.45);
+    color: #fff; border-radius: 8px; padding: 7px 13px;
+    font-size: .8rem; font-weight: 700; font-family: Inter, sans-serif;
+    cursor: pointer; white-space: nowrap; transition: background .2s;
+  }
+  .mybk-btn:hover { background: rgba(255,255,255,.28); }
+
+  /* ── Layout ── */
+  .container { max-width: 480px; margin: 0 auto; padding: 24px 16px 40px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── Card ── */
+  .card { background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(160,100,30,.1); padding: 24px 20px; }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem; font-weight: 700; color: var(--brown-dark);
+    margin-bottom: 20px; padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ── Form ── */
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .form-label { font-size: .82rem; font-weight: 600; color: var(--text-mid); }
+  .form-label .req { color: var(--saffron-dark); margin-left: 2px; }
+  .form-input {
+    border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 10px 13px; font-size: .92rem; font-family: Inter, sans-serif;
+    color: var(--text); outline: none; transition: border-color .2s;
+    width: 100%; background: #fff;
+  }
+  .form-input:focus { border-color: var(--saffron); }
+  select.form-input { cursor: pointer; }
+
+  .btn-submit {
+    width: 100%; padding: 13px; border: none; border-radius: 10px; cursor: pointer;
+    background: linear-gradient(135deg, #c0392b, #e07b2a);
+    color: #fff; font-size: 1rem; font-weight: 700; font-family: Inter, sans-serif;
+    margin-top: 8px; letter-spacing: .03em;
+  }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #222; color: #fff; padding: 10px 20px; border-radius: 20px;
+    font-size: .85rem; transition: transform .3s, opacity .3s; opacity: 0; z-index: 999;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* ── Success ── */
+  .success-card {
+    display: none; background: #fff; border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(160,100,30,.1); padding: 36px 24px; text-align: center;
+  }
+  .success-icon { font-size: 3rem; margin-bottom: 12px; }
+  .success-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: var(--green); }
+  .success-id { font-size: .82rem; color: var(--text-light); margin-top: 6px; }
+  .success-details { background: var(--bg); border-radius: 10px; padding: 14px 16px; margin: 16px 0; text-align: left; font-size: .85rem; line-height: 1.8; }
+  .success-details strong { color: var(--brown-dark); }
+  .btn-outline { background: none; border: 2px solid var(--saffron); color: var(--saffron-dark); border-radius: 10px; padding: 10px 24px; font-size: .9rem; font-weight: 700; cursor: pointer; font-family: Inter, sans-serif; }
+
+  /* ── Info strip ── */
+  .info-strip { background: #fff8ee; border: 1px solid #f5d78e; border-radius: 10px; padding: 10px 14px; margin-bottom: 20px; font-size: .8rem; color: var(--saffron-dark); display: flex; gap: 8px; align-items: flex-start; }
+
+  /* ── My Bookings ── */
+  .page-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .back-btn { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: .78rem; color: var(--text-mid); cursor: pointer; font-family: Inter, sans-serif; white-space: nowrap; }
+
+  .lookup-card { background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(160,100,30,.1); padding: 28px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .lookup-err { font-size: .78rem; color: var(--red); text-align: center; min-height: 18px; }
+
+  .order-item { background: #fff; border-radius: 12px; box-shadow: 0 1px 8px rgba(160,100,30,.08); padding: 16px; margin-bottom: 12px; }
+  .order-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+  .order-id { font-size: .72rem; font-weight: 700; color: var(--saffron-dark); background: #fff8ee; border: 1px solid #f5d78e; border-radius: 20px; padding: 2px 10px; }
+  .order-meta { font-size: .8rem; color: var(--text-mid); display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .status-pill { border-radius: 20px; padding: 3px 10px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+  .s-pending   { background: #fff3cd; color: #856404; border: 1px solid #ffc10755; }
+  .s-accepted  { background: #d4edda; color: #155724; border: 1px solid #28a74555; }
+  .s-delivered { background: #e8d5ff; color: #4b0082; border: 1px solid #6f42c155; }
+  .bk-empty { text-align: center; padding: 32px 16px; color: #aaa; }
+  .bk-empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-om">🕉</div>
+  <h1>Hare Krishna Movement</h1>
+  <p>Internal Prasadam Booking — Staff Only</p>
+  <button class="mybk-btn" onclick="showView('mybk')">📦 My Bookings</button>
+</div>
+
+<div class="container">
+
+  <!-- ── Booking View ── -->
+  <div class="view active" id="view-book">
+    <div class="info-strip">
+      <span>ℹ️</span>
+      <span>This form is for internal departments only. Orders will be reviewed and confirmed by the admin.</span>
+    </div>
+
+    <div class="card" id="form-card">
+      <div class="card-title">🏛 Internal Prasadam Request</div>
+
+      <div class="form-group">
+        <label class="form-label">Name <span class="req">*</span></label>
+        <input class="form-input" type="text" id="int-name" placeholder="Your full name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mobile Number <span class="req">*</span></label>
+        <input class="form-input" type="tel" id="int-mobile" maxlength="10" placeholder="10-digit mobile number"
+          oninput="this.value=this.value.replace(/\D/g,'')">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date Required <span class="req">*</span></label>
+        <input class="form-input" type="date" id="int-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Department <span class="req">*</span></label>
+        <select class="form-input" id="int-dept">
+          <option value="">— Select Department —</option>
+          <option>Temple Administration</option>
+          <option>Deity Department</option>
+          <option>Kitchen / Prasadam</option>
+          <option>Education / Gurukul</option>
+          <option>Guest House</option>
+          <option>Security</option>
+          <option>Accounts</option>
+          <option>Outreach / Sankirtan</option>
+          <option>IT / Media</option>
+          <option>Others</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Meal Type <span class="req">*</span></label>
+        <select class="form-input" id="int-meal" required>
+          <option value="">— Select Meal —</option>
+          <option>Breakfast</option>
+          <option>Lunch</option>
+          <option>Dinner</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Count Needed <span class="req">*</span></label>
+        <input class="form-input" type="number" id="int-count" min="1" placeholder="Number of plates">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Delivery Location <span class="req">*</span></label>
+        <textarea class="form-input" id="int-location" rows="3" placeholder="Room / hall / building name for delivery" style="resize:vertical;min-height:72px" required></textarea>
+      </div>
+
+      <button class="btn-submit" onclick="submitInternal()">📋 Submit Request</button>
+    </div>
+
+    <div class="success-card" id="success-card">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Request Submitted!</div>
+      <div class="success-id" id="success-id"></div>
+      <div class="success-details" id="success-details"></div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-outline" onclick="resetForm()">+ New Request</button>
+        <button class="btn-outline" onclick="showView('mybk')" style="border-color:var(--green);color:var(--green)">📦 My Bookings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── My Bookings View ── -->
+  <div class="view" id="view-mybk">
+    <div class="page-header" style="position:relative">
+      <button class="back-btn" onclick="showView('book')">← Back</button>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--brown-dark)">📦 My Bookings</div>
+      <div onclick="fillDemo('9845012345')" style="position:absolute;top:0;right:0;background:#fff7e6;border:1.5px dashed var(--saffron-dark);border-radius:8px;padding:5px 10px;cursor:pointer;text-align:right">
+        <div style="font-size:0.6rem;font-weight:700;color:var(--saffron-dark);letter-spacing:.05em">DEMO</div>
+        <div style="font-size:0.82rem;font-weight:700;color:var(--brown-dark);letter-spacing:.04em">9845012345</div>
+      </div>
+    </div>
+
+    <!-- Lookup -->
+    <div class="lookup-card" id="int-lookup-card">
+      <div style="font-size:2.2rem">📱</div>
+      <div style="text-align:center">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:var(--brown-dark)">Find Your Orders</div>
+        <div style="font-size:.78rem;color:#888;margin-top:3px">Enter your mobile number to view all requests</div>
+      </div>
+      <div style="width:100%;display:flex;flex-direction:column;gap:10px">
+        <input class="form-input" type="tel" id="int-bk-mobile" maxlength="10"
+          placeholder="10-digit mobile number"
+          style="text-align:center;font-size:1.05rem;letter-spacing:.08em"
+          oninput="this.value=this.value.replace(/\D/g,'')"
+          onkeydown="if(event.key==='Enter') lookupMyOrders()">
+        <div class="lookup-err" id="int-bk-err"></div>
+        <button class="btn-submit" onclick="lookupMyOrders()">🔍 Find My Orders</button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="int-bk-results" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:.82rem;color:var(--text-mid)">Showing orders for <strong id="int-bk-display"></strong></div>
+        <button class="back-btn" onclick="resetLookup()">← Change Number</button>
+      </div>
+      <div id="int-bk-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var intCounter      = parseInt(localStorage.getItem('hkm_int_counter') || '1');
+  var intLookupMobile = null;
+
+  var DEMO_ORDERS = [
+    { id:'INT-0012', name:'Murali Das',        mobile:'9845012345', date:'2026-05-15', dept:'Security',              meal:'Lunch',     count:10, location:'Security Block, Gate 2',           submitted:'29 Apr 2026, 8:30 AM',  accepted:false, delivered:false },
+    { id:'INT-0011', name:'Krishnapriya R.',   mobile:'9876543210', date:'2026-05-11', dept:'Deity Department',      meal:'Breakfast',  count:25, location:'Deity Dept Room, 1st Floor',        submitted:'29 Apr 2026, 8:10 AM',  accepted:true,  delivered:false },
+    { id:'INT-0010', name:'Vishnu Prasad',     mobile:'9745123444', date:'2026-05-11', dept:'Education / Gurukul',   meal:'Lunch',     count:40, location:'Gurukul Dining Hall',               submitted:'29 Apr 2026, 9:00 AM',  accepted:true,  delivered:false },
+    { id:'INT-0009', name:'Murali Das',        mobile:'9845012345', date:'2026-05-07', dept:'Security',              meal:'Dinner',    count:8,  location:'Main Entrance, Security Cabin',     submitted:'28 Apr 2026, 5:00 PM',  accepted:true,  delivered:false },
+    { id:'INT-0008', name:'Krishnapriya R.',   mobile:'9876543210', date:'2026-05-07', dept:'Deity Department',      meal:'Lunch',     count:20, location:'Deity Dept Room, 1st Floor',        submitted:'29 Apr 2026, 8:00 AM',  accepted:true,  delivered:true  },
+    { id:'INT-0007', name:'Murali Das',        mobile:'9845012345', date:'2026-05-02', dept:'Security',              meal:'Lunch',     count:6,  location:'Security Block, Gate 2',           submitted:'27 Apr 2026, 3:00 PM',  accepted:true,  delivered:true  },
+    { id:'INT-0006', name:'Annapurna Devi',    mobile:'9790001122', date:'2026-05-07', dept:'Guest House',           meal:'Breakfast',  count:15, location:'Guest House Reception',            submitted:'29 Apr 2026, 9:40 AM',  accepted:false, delivered:false },
+    { id:'INT-0005', name:'Vishnu Prasad',     mobile:'9745123444', date:'2026-05-05', dept:'Education / Gurukul',   meal:'Dinner',    count:35, location:'Gurukul Dining Hall',               submitted:'28 Apr 2026, 11:20 AM', accepted:true,  delivered:true  },
+    { id:'INT-0004', name:'Radhika S.',        mobile:'8867452301', date:'2026-05-05', dept:'Outreach / Sankirtan',  meal:'Lunch',     count:10, location:'Sankirtan Office, Ground Floor',    submitted:'28 Apr 2026, 2:00 PM',  accepted:true,  delivered:false },
+    { id:'INT-0003', name:'Govinda Swami',     mobile:'9198765488', date:'2026-05-02', dept:'Temple Administration', meal:'Breakfast',  count:50, location:'Admin Block, Conference Room',      submitted:'27 Apr 2026, 10:05 AM', accepted:true,  delivered:true  },
+    { id:'INT-0002', name:'Vishnu Prasad',     mobile:'9745123444', date:'2026-04-30', dept:'Education / Gurukul',   meal:'Lunch',     count:30, location:'Gurukul Dining Hall',               submitted:'26 Apr 2026, 2:00 PM',  accepted:true,  delivered:true  },
+    { id:'INT-0001', name:'Krishnapriya R.',   mobile:'9876543210', date:'2026-04-30', dept:'Deity Department',      meal:'Dinner',    count:15, location:'Deity Dept Room, 1st Floor',        submitted:'26 Apr 2026, 4:45 PM',  accepted:true,  delivered:true  },
+  ];
+
+  function getAllOrders() {
+    var real = [];
+    try {
+      var s = localStorage.getItem('hkm_internal_orders');
+      if (s) real = JSON.parse(s) || [];
+    } catch(e) {}
+    real = real.map(function(o) {
+      return Object.assign({ meal: 'Not specified', location: 'Not specified' }, o);
+    });
+    var realIds = real.map(function(o) { return o.id; });
+    return real.concat(DEMO_ORDERS.filter(function(o) { return realIds.indexOf(o.id) === -1; }));
+  }
+
+  (function() {
+    var d = new Date().toISOString().slice(0, 10);
+    document.getElementById('int-date').min   = d;
+    document.getElementById('int-date').value = d;
+  })();
+
+  function showView(name) {
+    document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+    document.getElementById('view-' + name).classList.add('active');
+  }
+
+  function fillDemo(num) {
+    document.getElementById('int-bk-mobile').value = num;
+    document.getElementById('int-bk-err').textContent = '';
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  function submitInternal() {
+    var name     = document.getElementById('int-name').value.trim();
+    var mobile   = document.getElementById('int-mobile').value.trim();
+    var date     = document.getElementById('int-date').value;
+    var dept     = document.getElementById('int-dept').value;
+    var meal     = document.getElementById('int-meal').value;
+    var count    = parseInt(document.getElementById('int-count').value) || 0;
+    var location = document.getElementById('int-location').value.trim();
+
+    if (!name)                           { showToast('Please enter your name ⚠️'); return; }
+    if (!mobile || mobile.length !== 10) { showToast('Enter a valid 10-digit mobile ⚠️'); return; }
+    if (!date)                           { showToast('Please select a date ⚠️'); return; }
+    if (!dept)                           { showToast('Please select your department ⚠️'); return; }
+    if (!meal)                           { showToast('Please select a meal type ⚠️'); return; }
+    if (!count || count < 1)             { showToast('Count must be at least 1 ⚠️'); return; }
+    if (!location)                       { showToast('Please enter a delivery location ⚠️'); return; }
+
+    var id  = 'INT-' + String(intCounter).padStart(4, '0');
+    var now = new Date().toLocaleString('en-IN', { day:'numeric', month:'short', hour:'numeric', minute:'2-digit' });
+    var order = { id:id, name:name, mobile:mobile, date:date, dept:dept, meal:meal, count:count, location:location, submitted:now, accepted:false, delivered:false };
+
+    var existing = [];
+    try { existing = JSON.parse(localStorage.getItem('hkm_internal_orders') || '[]'); } catch(e) {}
+    existing.unshift(order);
+    localStorage.setItem('hkm_internal_orders', JSON.stringify(existing));
+    intCounter++;
+    localStorage.setItem('hkm_int_counter', intCounter);
+
+    document.getElementById('form-card').style.display   = 'none';
+    document.getElementById('success-id').textContent    = id + ' · Submitted ' + now;
+    var dateDisp = '';
+    try { dateDisp = new Date(date + 'T12:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
+    catch(ex) { dateDisp = date; }
+    document.getElementById('success-details').innerHTML =
+      '<strong>Name:</strong> ' + name + '<br>' +
+      '<strong>Mobile:</strong> ' + mobile + '<br>' +
+      '<strong>Date:</strong> ' + dateDisp + '<br>' +
+      '<strong>Department:</strong> ' + dept + '<br>' +
+      '<strong>Meal:</strong> ' + meal + '<br>' +
+      '<strong>Count:</strong> ' + count + ' plates<br>' +
+      '<strong>Delivery Location:</strong> ' + location;
+    document.getElementById('success-card').style.display = 'block';
+  }
+
+  function resetForm() {
+    document.getElementById('int-name').value     = '';
+    document.getElementById('int-mobile').value   = '';
+    document.getElementById('int-dept').value     = '';
+    document.getElementById('int-meal').value     = '';
+    document.getElementById('int-count').value    = '';
+    document.getElementById('int-location').value = '';
+    document.getElementById('int-date').value     = new Date().toISOString().slice(0, 10);
+    document.getElementById('success-card').style.display = 'none';
+    document.getElementById('form-card').style.display    = 'block';
+  }
+
+  function lookupMyOrders() {
+    var val = document.getElementById('int-bk-mobile').value.trim();
+    var err = document.getElementById('int-bk-err');
+    if (!/^\d{10}$/.test(val)) { err.textContent = 'Please enter a valid 10-digit mobile number.'; return; }
+    err.textContent     = '';
+    intLookupMobile     = val;
+    document.getElementById('int-bk-display').textContent          = val;
+    document.getElementById('int-lookup-card').style.display       = 'none';
+    document.getElementById('int-bk-results').style.display        = 'block';
+    renderMyOrders();
+  }
+
+  function resetLookup() {
+    intLookupMobile = null;
+    document.getElementById('int-bk-mobile').value                 = '';
+    document.getElementById('int-bk-err').textContent              = '';
+    document.getElementById('int-lookup-card').style.display       = 'flex';
+    document.getElementById('int-bk-results').style.display        = 'none';
+  }
+
+  function renderMyOrders() {
+    var list   = document.getElementById('int-bk-list');
+    var orders = getAllOrders().filter(function(o) { return o.mobile === intLookupMobile; });
+    if (!orders.length) {
+      list.innerHTML = '<div class="bk-empty"><div class="bk-empty-icon">📦</div><p style="font-size:.88rem">No orders found for this number.</p><button class="btn-submit" style="width:auto;padding:9px 20px;font-size:.85rem;margin-top:14px" onclick="showView(\'book\')">+ New Booking</button></div>';
+      return;
+    }
+    list.innerHTML = orders.map(function(o) {
+      var dateDisp = '';
+      try { dateDisp = new Date(o.date + 'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }); }
+      catch(ex) { dateDisp = o.date; }
+      var sc, sl;
+      if (o.delivered)     { sc = 's-delivered'; sl = '🚚 Delivered'; }
+      else if (o.accepted) { sc = 's-accepted';  sl = '✅ Accepted';  }
+      else                 { sc = 's-pending';   sl = '⏳ Pending';   }
+      return '<div class="order-item">'
+        + '<div class="order-top"><span class="order-id">' + o.id + '</span><span class="status-pill ' + sc + '">' + sl + '</span></div>'
+        + '<div style="font-weight:600;font-size:.92rem;margin-bottom:4px">' + o.name + '</div>'
+        + '<div class="order-meta">'
+        +   '<span>📅 ' + dateDisp + '</span>'
+        +   '<span>🏛 ' + o.dept + '</span>'
+        +   (o.meal ? '<span>' + (o.meal==='Breakfast'?'🌅':o.meal==='Lunch'?'☀️':'🌙') + ' ' + o.meal + '</span>' : '')
+        +   '<span>🍽 ' + o.count + ' plates</span>'
+        + '</div>'
+        + (o.location ? '<div style="font-size:.78rem;color:var(--text-mid);margin-top:4px">📍 ' + o.location + '</div>' : '')
+        + '<div style="font-size:.72rem;color:var(--text-light);margin-top:6px">Submitted: ' + o.submitted + '</div>'
+        + '</div>';
+    }).join('');
+  }
+</script>
+</body>
+</html>
