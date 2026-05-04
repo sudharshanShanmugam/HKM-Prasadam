@@ -22,6 +22,10 @@ export interface ISlotDate extends Document {
     Lunch?: number;
     Dinner?: number;
   };
+  slotLimits?: {
+    Thiruvanmiyur?: { Breakfast?: number; Lunch?: number; Dinner?: number };
+    NLBR?: { Breakfast?: number; Lunch?: number; Dinner?: number };
+  };
 }
 
 const mealStatusSchema = new Schema<IMealStatus>(
@@ -45,6 +49,10 @@ const slotDateSchema = new Schema<ISlotDate>(
       Breakfast: { type: Number },
       Lunch:     { type: Number },
       Dinner:    { type: Number },
+    },
+    slotLimits: {
+      Thiruvanmiyur: { Breakfast: { type: Number }, Lunch: { type: Number }, Dinner: { type: Number } },
+      NLBR:          { Breakfast: { type: Number }, Lunch: { type: Number }, Dinner: { type: Number } },
     },
   },
   { timestamps: true }

@@ -17,7 +17,7 @@ const mealIcon = (m: MealType) => m === 'Breakfast' ? '🌅' : m === 'Lunch' ? '
 const pad = (n: number) => String(n).padStart(2, '0');
 const toStr = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
 
-export default function SlotManagementPage() {
+export default function SlotManagementPage({ onNav }: { onNav?: (page: string) => void }) {
   const now = new Date();
   const [calYear, setCalYear] = useState(now.getFullYear());
   const [calMonth, setCalMonth] = useState(now.getMonth());
@@ -31,6 +31,16 @@ export default function SlotManagementPage() {
   const [removed, setRemoved] = useState<MealType[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showAllSlots, setShowAllSlots] = useState(false);
+  const SLOTS_PREVIEW = 3;
+
+  type LimitMap = Record<string, Record<MealType, string>>;
+  const LOCS = ['Thiruvanmiyur', 'NLBR'] as const;
+  const emptyLimits = (): LimitMap => ({
+    Thiruvanmiyur: { Breakfast: '', Lunch: '', Dinner: '' },
+    NLBR:          { Breakfast: '', Lunch: '', Dinner: '' },
+  });
+  const [limits, setLimits] = useState<LimitMap>(emptyLimits());
 
   const { data: slots = [] } = useGetSlotDatesAdminQuery();
   const { data: bookings = [] } = useGetPrasadamBookingsQuery({});
@@ -75,15 +85,41 @@ export default function SlotManagementPage() {
     const ds = toStr(calYear, calMonth, d);
     setSelectedDate(ds);
     setSaved(false);
+
+    // Read fresh from localStorage so changes in Settings are picked up immediately
+    const fallbackRates: Record<MealType, number> = { Breakfast: 20, Lunch: 40, Dinner: 35 };
+    const fallbackLimits: Record<string, Record<MealType, number>> = {
+      Thiruvanmiyur: { Breakfast: 100, Lunch: 100, Dinner: 100 },
+      NLBR:          { Breakfast: 80,  Lunch: 80,  Dinner: 80  },
+    };
+    try {
+      const r = localStorage.getItem('hkm_default_rates');
+      if (r) Object.assign(fallbackRates, JSON.parse(r));
+      const l = localStorage.getItem('hkm_slot_limits');
+      if (l) Object.assign(fallbackLimits, JSON.parse(l));
+    } catch {}
+
     const slot = slotMap[ds];
     if (slot) {
       setDayLabel(slot.festivalName ?? '');
       setEditMeals(slot.meals.length > 0 ? slot.meals : [...ALL_MEALS]);
       setStopped(slot.stopped ?? false);
       setPrices({
-        Breakfast: slot.priceOverrides?.Breakfast != null ? String(slot.priceOverrides.Breakfast) : '',
-        Lunch:     slot.priceOverrides?.Lunch     != null ? String(slot.priceOverrides.Lunch)     : '',
-        Dinner:    slot.priceOverrides?.Dinner    != null ? String(slot.priceOverrides.Dinner)    : '',
+        Breakfast: String(slot.priceOverrides?.Breakfast ?? fallbackRates.Breakfast),
+        Lunch:     String(slot.priceOverrides?.Lunch     ?? fallbackRates.Lunch),
+        Dinner:    String(slot.priceOverrides?.Dinner    ?? fallbackRates.Dinner),
+      });
+      setLimits({
+        Thiruvanmiyur: {
+          Breakfast: String(slot.slotLimits?.Thiruvanmiyur?.Breakfast ?? fallbackLimits.Thiruvanmiyur.Breakfast),
+          Lunch:     String(slot.slotLimits?.Thiruvanmiyur?.Lunch     ?? fallbackLimits.Thiruvanmiyur.Lunch),
+          Dinner:    String(slot.slotLimits?.Thiruvanmiyur?.Dinner    ?? fallbackLimits.Thiruvanmiyur.Dinner),
+        },
+        NLBR: {
+          Breakfast: String(slot.slotLimits?.NLBR?.Breakfast ?? fallbackLimits.NLBR.Breakfast),
+          Lunch:     String(slot.slotLimits?.NLBR?.Lunch     ?? fallbackLimits.NLBR.Lunch),
+          Dinner:    String(slot.slotLimits?.NLBR?.Dinner    ?? fallbackLimits.NLBR.Dinner),
+        },
       });
       const removedMls: MealType[] = [];
       ALL_MEALS.forEach(m => {
@@ -94,7 +130,23 @@ export default function SlotManagementPage() {
       setDayLabel('');
       setEditMeals([...ALL_MEALS]);
       setStopped(false);
-      setPrices({ Breakfast: '', Lunch: '', Dinner: '' });
+      setPrices({
+        Breakfast: String(fallbackRates.Breakfast),
+        Lunch:     String(fallbackRates.Lunch),
+        Dinner:    String(fallbackRates.Dinner),
+      });
+      setLimits({
+        Thiruvanmiyur: {
+          Breakfast: String(fallbackLimits.Thiruvanmiyur.Breakfast),
+          Lunch:     String(fallbackLimits.Thiruvanmiyur.Lunch),
+          Dinner:    String(fallbackLimits.Thiruvanmiyur.Dinner),
+        },
+        NLBR: {
+          Breakfast: String(fallbackLimits.NLBR.Breakfast),
+          Lunch:     String(fallbackLimits.NLBR.Lunch),
+          Dinner:    String(fallbackLimits.NLBR.Dinner),
+        },
+      });
       setRemoved([]);
     }
   };
@@ -114,6 +166,14 @@ export default function SlotManagementPage() {
     ALL_MEALS.forEach(m => {
       mealStatus[m] = { stopped: false, removed: removed.includes(m) };
     });
+    const slotLimits: SlotDate['slotLimits'] = {};
+    LOCS.forEach(loc => {
+      slotLimits[loc] = {} as Record<MealType, number>;
+      ALL_MEALS.forEach(m => {
+        if (limits[loc][m] !== '') (slotLimits[loc] as Record<MealType, number>)[m] = Number(limits[loc][m]);
+      });
+    });
+
     await upsert({
       date: selectedDate,
       data: {
@@ -122,6 +182,7 @@ export default function SlotManagementPage() {
         isFestival: !!dayLabel,
         festivalName: dayLabel || undefined,
         priceOverrides,
+        slotLimits,
         mealStatus: mealStatus as SlotDate['mealStatus'],
       },
     });
@@ -137,10 +198,6 @@ export default function SlotManagementPage() {
       setSelectedDate(null);
     }
   };
-
-  const specialDays = slots
-    .filter(s => s.priceOverrides && Object.values(s.priceOverrides).some(v => v != null))
-    .sort((a, b) => a.date.localeCompare(b.date));
 
   const monthLabel = `${MONTHS[calMonth]} ${calYear}`;
 
@@ -225,7 +282,7 @@ export default function SlotManagementPage() {
 
         .sm-limit-section-head { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#5A3A1A; margin:16px 0 6px; display:flex; align-items:center; gap:6px; font-family:'Inter',sans-serif; }
         .sm-limit-section-head::after { content:''; flex:1; height:1px; background:#E8D8C0; }
-        .sm-limit-loc-row { display:grid; grid-template-columns:90px 1fr 1fr; gap:8px; align-items:center; padding:7px 0; border-bottom:1px solid #F2E8D8; }
+        .sm-limit-loc-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; align-items:center; padding:7px 0; border-bottom:1px solid #F2E8D8; }
         .sm-limit-loc-row:last-child { border-bottom:none; }
         .sm-limit-loc-label { font-size:0.72rem; font-weight:600; color:#5A3A1A; font-family:'Inter',sans-serif; }
         .sm-limit-col-head { font-size:0.6rem; font-weight:700; color:#9A7A5A; text-align:center; letter-spacing:0.06em; text-transform:uppercase; font-family:'Inter',sans-serif; }
@@ -269,16 +326,18 @@ export default function SlotManagementPage() {
         .sm-bk-day.empty { background:#FBF6EE; cursor:default; }
         .sm-bk-day.bk-today { background:#FFF9E6; }
         .sm-bk-day.has-bookings { border-left:3px solid #E8621A; }
-        .sm-bk-day.is-slot { border-top:3px solid #E8621A; }
+        .sm-bk-day.bk-has-stopped { border-top:3px solid #C0392B; }
+        .sm-bk-day.bk-all-stopped { background:#fff4f4 !important; border-left:3px solid #C0392B !important; }
         .sm-bk-day-num { font-size:0.78rem; font-weight:700; color:#1E0F00; margin-bottom:5px; font-family:'Inter',sans-serif; }
         .sm-bk-day.bk-today .sm-bk-day-num { color:#C44D0D; }
+        .sm-bk-day.bk-all-stopped .sm-bk-day-num { color:#C0392B; text-decoration:line-through; }
         .sm-bk-meal-row { display:flex; gap:3px; flex-wrap:wrap; }
         .sm-bk-chip { font-size:0.6rem; font-weight:700; padding:2px 5px; border-radius:4px; white-space:nowrap; display:inline-flex; align-items:center; gap:2px; font-family:'Inter',sans-serif; }
         .sm-bk-chip.bfast  { background:#FEF0E6; color:#C44D0D; }
         .sm-bk-chip.lunch  { background:#FFF8E1; color:#e65100; }
         .sm-bk-chip.dinner { background:#EDE7F6; color:#512da8; }
-        .sm-bk-chip.slot-open   { background:#EBF7ED; color:#2D7A3A; }
-        .sm-bk-chip.slot-closed { background:#FDECEA; color:#C0392B; }
+        .sm-bk-chip.bk-stopped-chip { opacity:0.6; text-decoration:line-through; }
+        .sm-bk-stopped-badge { font-size:0.55rem; font-weight:800; color:#C0392B; text-transform:uppercase; letter-spacing:0.08em; padding:1px 5px; background:#fdecea; border-radius:3px; display:inline-block; margin-top:3px; }
 
         /* stopped toggle */
         .sm-toggle-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #F2E8D8; }
@@ -366,35 +425,52 @@ export default function SlotManagementPage() {
               <div style={{ padding: 32, textAlign: 'center', color: '#9A7A5A', fontSize: '0.82rem', fontFamily: 'Inter, sans-serif' }}>
                 No slots configured yet. Click a date on the calendar above.
               </div>
-            ) : (
-              slots.sort((a, b) => a.date.localeCompare(b.date)).map(s => {
-                const hasCustom = Object.values(s.priceOverrides ?? {}).some(v => v != null);
-                return (
-                  <div key={s.date} className="sm-special-day-row"
-                    onClick={() => {
-                      const d = new Date(s.date + 'T00:00:00');
-                      setCalYear(d.getFullYear());
-                      setCalMonth(d.getMonth());
-                      selectDay(d.getDate());
-                    }}>
-                    <div className="sm-special-day-date">{s.date}</div>
-                    <div className="sm-special-day-name">
-                      {s.isFestival && s.festivalName ? `🎉 ${s.festivalName}` : s.meals.join(' · ')}
-                    </div>
-                    <div className="sm-special-day-prices">
-                      {hasCustom && ALL_MEALS.map(m =>
-                        s.priceOverrides?.[m] != null
-                          ? <span key={m} className="sm-price-chip">{mealIcon(m)} ₹{s.priceOverrides[m]}</span>
-                          : null
-                      )}
-                      <span className={`sm-status-badge ${s.stopped ? 'sm-stopped-badge' : 'sm-active-badge'}`}>
-                        {s.stopped ? 'Stopped' : 'Active'}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
+            ) : (() => {
+              const sorted = [...slots].sort((a, b) => a.date.localeCompare(b.date));
+              const visible = showAllSlots ? sorted : sorted.slice(0, SLOTS_PREVIEW);
+              return (
+                <>
+                  {visible.map(s => {
+                    const hasCustom = Object.values(s.priceOverrides ?? {}).some(v => v != null);
+                    return (
+                      <div key={s.date} className="sm-special-day-row"
+                        onClick={() => {
+                          const d = new Date(s.date + 'T00:00:00');
+                          setCalYear(d.getFullYear());
+                          setCalMonth(d.getMonth());
+                          selectDay(d.getDate());
+                        }}>
+                        <div className="sm-special-day-date">{s.date}</div>
+                        <div className="sm-special-day-name">
+                          {s.isFestival && s.festivalName ? `🎉 ${s.festivalName}` : s.meals.join(' · ')}
+                        </div>
+                        <div className="sm-special-day-prices">
+                          {hasCustom && ALL_MEALS.map(m =>
+                            s.priceOverrides?.[m] != null
+                              ? <span key={m} className="sm-price-chip">{mealIcon(m)} ₹{s.priceOverrides[m]}</span>
+                              : null
+                          )}
+                          <span className={`sm-status-badge ${s.stopped ? 'sm-stopped-badge' : 'sm-active-badge'}`}>
+                            {s.stopped ? 'Stopped' : 'Active'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {sorted.length > SLOTS_PREVIEW && (
+                    <button
+                      onClick={() => setShowAllSlots(v => !v)}
+                      style={{
+                        width: '100%', padding: '10px 0', border: 'none', borderTop: '1px solid rgba(232,98,26,0.1)',
+                        background: '#FEF0E6', color: '#C44D0D', fontSize: '0.78rem', fontWeight: 600,
+                        cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                      }}>
+                      {showAllSlots ? `▲ Show less` : `▼ Show ${sorted.length - SLOTS_PREVIEW} more`}
+                    </button>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
 
@@ -428,33 +504,10 @@ export default function SlotManagementPage() {
                   />
                 </div>
 
-                {/* Meals active toggle */}
-                <div style={{ marginBottom: 6 }}>
-                  <div style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5A3A1A', marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>
-                    Active Meals
-                  </div>
-                  <div className="sm-meals-row">
-                    {ALL_MEALS.map(m => (
-                      <label key={m} className="sm-meal-cb">
-                        <input type="checkbox"
-                          checked={editMeals.includes(m)}
-                          onChange={e => setEditMeals(p => e.target.checked ? [...p, m] : p.filter(x => x !== m))} />
-                        {mealIcon(m)} {m}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Stop slot toggle */}
-                <div className="sm-toggle-row">
-                  <button className={`sm-toggle-sw ${stopped ? 'on' : 'off'}`} onClick={() => setStopped(s => !s)} />
-                  <span className="sm-toggle-label">Bookings stopped for this date</span>
-                </div>
-
                 {/* Meal rates */}
-                <div style={{ marginTop: 16, marginBottom: 4 }}>
+                <div style={{ marginBottom: 4 }}>
                   <div style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5A3A1A', marginBottom: 10, fontFamily: 'Inter, sans-serif' }}>
-                    Custom Meal Rates for This Day
+                    Meal Rates for This Day
                   </div>
                   {ALL_MEALS.map(m => {
                     const isRemoved = removed.includes(m);
@@ -485,13 +538,52 @@ export default function SlotManagementPage() {
                 </div>
 
                 <p style={{ fontSize: '0.72rem', color: '#9A7A5A', marginTop: 8, fontFamily: 'Inter, sans-serif', lineHeight: 1.5 }}>
-                  Leave price blank to use global default rates.
+                  Leave price blank to use global default rates. Use ✕ to mark a meal unavailable.
+                </p>
+
+                {/* Slot Limits */}
+                <div className="sm-limit-section-head">🎟️ Slot Limits for This Date</div>
+
+                {/* Column headers: meal | Thiruvanmiyur | NLBR */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 4, paddingLeft: 0 }}>
+                  <div />
+                  {LOCS.map(loc => (
+                    <div key={loc} className="sm-limit-col-head">{loc}</div>
+                  ))}
+                </div>
+
+                {ALL_MEALS.map(m => (
+                  <div key={m} className="sm-limit-loc-row">
+                    <div className="sm-limit-loc-label">{mealIcon(m)} {m}</div>
+                    {LOCS.map(loc => (
+                      <input
+                        key={loc}
+                        type="number"
+                        min={0}
+                        className="sm-limit-loc-input"
+                        value={limits[loc][m]}
+                        onChange={e => setLimits(prev => ({
+                          ...prev,
+                          [loc]: { ...prev[loc], [m]: e.target.value },
+                        }))}
+                      />
+                    ))}
+                  </div>
+                ))}
+
+                <p style={{ fontSize: '0.72rem', color: '#9A7A5A', marginTop: 8, fontFamily: 'Inter, sans-serif', lineHeight: 1.5 }}>
+                  Leave blank to use global defaults.{' '}
+                  <span
+                    onClick={() => onNav?.('settings')}
+                    style={{ color: '#C44D0D', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
+                    Edit global defaults in Default Settings ↗
+                  </span>
                 </p>
               </div>
 
               <div className="sm-price-panel-footer">
-                <button className="sm-btn-primary" onClick={saveDay} disabled={saving}>
-                  {saving ? 'Saving…' : saved ? '✓ Saved!' : '💾 Save Slot & Rates'}
+                <button className="sm-btn-primary" style={{ flex: 1, justifyContent: 'center' }} onClick={saveDay} disabled={saving}>
+                  {saving ? 'Saving…' : saved ? '✓ Saved!' : '💾 Save Rates & Limits'}
                 </button>
                 {slotMap[selectedDate] && (
                   <button className="sm-btn-danger" onClick={clearDay} title="Delete this slot">🗑️</button>
@@ -507,7 +599,7 @@ export default function SlotManagementPage() {
         <div className="sm-booking-header">
           <div>
             <h3>Monthly Booking Summary</h3>
-            <p>Total coupons booked per meal for each date</p>
+            <p>Total coupons booked per meal for each date — from all registrations</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -532,23 +624,39 @@ export default function SlotManagementPage() {
             const bk = bookingMap[ds];
             const slot = slotMap[ds];
             const hasBk = bk && (bk.Breakfast + bk.Lunch + bk.Dinner) > 0;
+            const allStopped = slot?.stopped ?? false;
+            const hasSomeStopped = !allStopped && slot && ALL_MEALS.some(
+              m => slot.mealStatus?.[m]?.stopped || slot.mealStatus?.[m]?.removed
+            );
             let cls = 'sm-bk-day';
             if (ds === todayStr) cls += ' bk-today';
-            if (hasBk) cls += ' has-bookings';
-            if (slot) cls += ' is-slot';
+            if (hasBk && !allStopped) cls += ' has-bookings';
+            if (allStopped) cls += ' bk-all-stopped';
+            else if (hasSomeStopped) cls += ' bk-has-stopped';
             return (
               <div key={ds} className={cls} onClick={() => selectDay(d)}>
                 <div className="sm-bk-day-num">{d}</div>
-                <div className="sm-bk-meal-row">
-                  {bk?.Breakfast ? <span className="sm-bk-chip bfast">🌅{bk.Breakfast}</span> : null}
-                  {bk?.Lunch    ? <span className="sm-bk-chip lunch">☀️{bk.Lunch}</span>    : null}
-                  {bk?.Dinner   ? <span className="sm-bk-chip dinner">🌙{bk.Dinner}</span>  : null}
-                  {slot && !hasBk && (
-                    <span className={`sm-bk-chip ${slot.stopped ? 'slot-closed' : 'slot-open'}`}>
-                      {slot.stopped ? '🔴 closed' : '🟢 open'}
-                    </span>
-                  )}
-                </div>
+                {allStopped ? (
+                  <div className="sm-bk-stopped-badge">⛔ Stopped</div>
+                ) : (
+                  <div className="sm-bk-meal-row">
+                    {bk?.Breakfast ? (
+                      <span className={`sm-bk-chip bfast${slot?.mealStatus?.Breakfast?.stopped || slot?.mealStatus?.Breakfast?.removed ? ' bk-stopped-chip' : ''}`}>
+                        🌅{bk.Breakfast}
+                      </span>
+                    ) : null}
+                    {bk?.Lunch ? (
+                      <span className={`sm-bk-chip lunch${slot?.mealStatus?.Lunch?.stopped || slot?.mealStatus?.Lunch?.removed ? ' bk-stopped-chip' : ''}`}>
+                        ☀️{bk.Lunch}
+                      </span>
+                    ) : null}
+                    {bk?.Dinner ? (
+                      <span className={`sm-bk-chip dinner${slot?.mealStatus?.Dinner?.stopped || slot?.mealStatus?.Dinner?.removed ? ' bk-stopped-chip' : ''}`}>
+                        🌙{bk.Dinner}
+                      </span>
+                    ) : null}
+                  </div>
+                )}
               </div>
             );
           })}

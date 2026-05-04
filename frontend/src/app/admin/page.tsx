@@ -157,7 +157,7 @@ function AdminShell({ onLogout }: { onLogout: () => void }) {
         <div style={{ flex: 1, padding: 28, overflowY: 'auto' }}>
           {page === 'dashboard'     && <DashboardPage onNav={nav} />}
           {page === 'registrations' && <RegistrationsPage />}
-          {page === 'slots'         && <SlotManagementPage />}
+          {page === 'slots'         && <SlotManagementPage onNav={nav} />}
           {page === 'menus'         && <MenusPage />}
           {page === 'birthday'      && <PartyEnquiriesPage />}
           {page === 'internal'      && <InternalOrdersPage />}

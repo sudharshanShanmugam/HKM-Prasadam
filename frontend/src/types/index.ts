@@ -154,6 +154,10 @@ export interface SlotDate {
     Lunch?: number;
     Dinner?: number;
   };
+  slotLimits?: {
+    Thiruvanmiyur?: { Breakfast?: number; Lunch?: number; Dinner?: number };
+    NLBR?: { Breakfast?: number; Lunch?: number; Dinner?: number };
+  };
   createdAt: string;
   updatedAt: string;
 }
