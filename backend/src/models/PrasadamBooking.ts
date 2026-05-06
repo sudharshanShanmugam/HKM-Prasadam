@@ -1,4 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
+import { nextSeq } from './Counter';
 
 export interface IMeals {
   Breakfast: number;
@@ -17,6 +18,8 @@ export interface IPrasadamBooking extends Document {
   total: number;
   status: 'pending' | 'approved' | 'declined';
   submitted?: string;
+  paymentProof?: string;
+  mismatchNote?: string;
 }
 
 const prasadamBookingSchema = new Schema<IPrasadamBooking>(
@@ -32,9 +35,11 @@ const prasadamBookingSchema = new Schema<IPrasadamBooking>(
       Lunch:     { type: Number, default: 0, min: 0 },
       Dinner:    { type: Number, default: 0, min: 0 },
     },
-    total:     { type: Number, default: 0 },
-    status:    { type: String, enum: ['pending', 'approved', 'declined'], default: 'pending' },
-    submitted: { type: String },
+    total:        { type: Number, default: 0 },
+    status:       { type: String, enum: ['pending', 'approved', 'declined'], default: 'pending' },
+    submitted:    { type: String },
+    paymentProof: { type: String },
+    mismatchNote: { type: String },
   },
   { timestamps: true }
 );
@@ -43,10 +48,12 @@ prasadamBookingSchema.index({ mobile: 1 });
 prasadamBookingSchema.index({ date: 1 });
 prasadamBookingSchema.index({ status: 1 });
 
-prasadamBookingSchema.pre('save', function (next) {
-  if (!this.id)        this.id = 'HKM-' + String(Date.now()).slice(-5);
+prasadamBookingSchema.pre('save', async function () {
+  if (!this.id) {
+    const seq = await nextSeq('booking');
+    this.id = 'ISKC-' + seq.toString().padStart(4, '0');
+  }
   if (!this.submitted) this.submitted = new Date().toLocaleString('en-IN');
-  next();
 });
 
 export default model<IPrasadamBooking>('PrasadamBooking', prasadamBookingSchema);

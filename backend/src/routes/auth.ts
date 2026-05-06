@@ -1,3 +1,44 @@
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Admin authentication
+ *
+ * /api/auth/login:
+ *   post:
+ *     summary: Admin login — returns a JWT token
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:    { type: string, example: admin@hkm.org }
+ *               password: { type: string, example: secret123 }
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token: { type: string }
+ *                     email: { type: string }
+ *       400:
+ *         description: Missing email or password
+ *       401:
+ *         description: Invalid credentials
+ */
+
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';

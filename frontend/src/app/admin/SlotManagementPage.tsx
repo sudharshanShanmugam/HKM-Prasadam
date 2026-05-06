@@ -1,51 +1,133 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useToast } from '@/context/toast';
+import { z } from 'zod';
 import {
-  useGetSlotDatesAdminQuery,
-  useUpsertSlotDateMutation,
-  useDeleteSlotDateMutation,
-} from '@/services/slotDatesApi';
-import { useGetPrasadamBookingsQuery } from '@/services/prasadamBookingsApi';
-import type { MealType, SlotDate } from '@/types';
+  useGetSlotManagementSlotsQuery,
+  useGetMonthlySummaryQuery,
+  useUpsertSlotManagementMutation,
+  useDeleteSlotManagementMutation,
+} from '@/services/slotManagementApi';
+import { useGetSettingsQuery } from '@/services/settingsApi';
+import { useGetMealMenuByDateQuery, useSaveMealMenuMutation } from '@/services/mealMenusApi';
+import type { MealType, SlotDate, MealMenuMap } from '@/types';
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'];
+// MUI
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
+import InputAdornment from '@mui/material/InputAdornment';
+import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+
+// MUI Icons
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import SaveIcon from '@mui/icons-material/Save';
+import CheckIcon from '@mui/icons-material/Check';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
+import FreeBreakfastIcon from '@mui/icons-material/FreeBreakfast';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import NightlightIcon from '@mui/icons-material/Nightlight';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import BlockIcon from '@mui/icons-material/Block';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircle';
+import LinearProgress from '@mui/material/LinearProgress';
+
+// ─── constants ────────────────────────────────────────────────────────────────
+const DAYS   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const ALL_MEALS: MealType[] = ['Breakfast', 'Lunch', 'Dinner'];
-const mealIcon = (m: MealType) => m === 'Breakfast' ? '🌅' : m === 'Lunch' ? '☀️' : '🌙';
-const pad = (n: number) => String(n).padStart(2, '0');
-const toStr = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
+const LOCS = ['Thiruvanmiyur', 'NLBR'] as const;
 
-export default function SlotManagementPage({ onNav }: { onNav?: (page: string) => void }) {
+const pad    = (n: number) => String(n).padStart(2, '0');
+const toStr  = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
+
+const S = '#E8621A'; const SD = '#C44D0D'; const SP = '#FEF0E6';
+const GOLD = '#C9920A'; const GP = '#FFF9E6';
+const GREEN = '#2D7A3A'; const GRP = '#EBF7ED';
+const RED = '#C0392B'; const RP = '#FDECEA';
+
+function MealIcon({ meal, size = 16 }: { meal: MealType; size?: number }) {
+  if (meal === 'Breakfast') return <FreeBreakfastIcon sx={{ fontSize: size }} />;
+  if (meal === 'Lunch')     return <WbSunnyIcon       sx={{ fontSize: size }} />;
+  return                           <NightlightIcon    sx={{ fontSize: size }} />;
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+export default function SlotManagementPage({ onNav }: { onNav?: (p: string) => void }) {
   const now = new Date();
-  const [calYear, setCalYear] = useState(now.getFullYear());
+  const [calYear,  setCalYear]  = useState(now.getFullYear());
   const [calMonth, setCalMonth] = useState(now.getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  // price-editor state
-  const [dayLabel, setDayLabel] = useState('');
-  const [editMeals, setEditMeals] = useState<MealType[]>([...ALL_MEALS]);
-  const [stopped, setStopped] = useState(false);
-  const [prices, setPrices] = useState<Record<MealType, string>>({ Breakfast: '', Lunch: '', Dinner: '' });
-  const [removed, setRemoved] = useState<MealType[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [showAllSlots, setShowAllSlots] = useState(false);
-  const SLOTS_PREVIEW = 3;
+  const [dayLabel,   setDayLabel]   = useState('');
+  const [editMeals,  setEditMeals]  = useState<MealType[]>([...ALL_MEALS]);
+  const [stopped,    setStopped]    = useState(false);
+  const [prices,     setPrices]     = useState<Record<MealType, string>>({ Breakfast: '', Lunch: '', Dinner: '' });
+  const [removed,    setRemoved]    = useState<MealType[]>([]);
+  const [saving,     setSaving]     = useState(false);
+  const [saved,      setSaved]      = useState(false);
+  const [saveError,  setSaveError]  = useState('');
+  const [showAll,    setShowAll]    = useState(false);
+  const PREVIEW = 4;
+
+  // Per-date menus (populated from API when selectedDate changes)
+  const emptyMenus = (): Record<MealType, string> => ({ Breakfast: '', Lunch: '', Dinner: '' });
+  const [menus,     setMenus]     = useState<Record<MealType, string>>(emptyMenus());
+
+  // Menu dialog state
+  const [menuMeal,   setMenuMeal]   = useState<MealType | null>(null);
+  const [menuText,   setMenuText]   = useState('');
+  const [menuSaving, setMenuSaving] = useState(false);
+
+  // Summary day modal
+  const [summaryDate,    setSummaryDate]    = useState<string | null>(null);
+  const [togglingStop,   setTogglingStop]   = useState(false);
+  const [togglingMeal,   setTogglingMeal]   = useState<MealType | null>(null);
 
   type LimitMap = Record<string, Record<MealType, string>>;
-  const LOCS = ['Thiruvanmiyur', 'NLBR'] as const;
   const emptyLimits = (): LimitMap => ({
     Thiruvanmiyur: { Breakfast: '', Lunch: '', Dinner: '' },
     NLBR:          { Breakfast: '', Lunch: '', Dinner: '' },
   });
   const [limits, setLimits] = useState<LimitMap>(emptyLimits());
 
-  const { data: slots = [] } = useGetSlotDatesAdminQuery();
-  const { data: bookings = [] } = useGetPrasadamBookingsQuery({});
-  const [upsert] = useUpsertSlotDateMutation();
-  const [del] = useDeleteSlotDateMutation();
+  const currentMonthStr = `${calYear}-${pad(calMonth + 1)}`;
+
+  const { data: slots          = [] } = useGetSlotManagementSlotsQuery();
+  const { data: monthlySummary = {} } = useGetMonthlySummaryQuery(currentMonthStr);
+  const { data: settingsData        } = useGetSettingsQuery();
+  const { data: menuData            } = useGetMealMenuByDateQuery(selectedDate ?? '', { skip: !selectedDate });
+
+  // Sync local menus ONLY when the API response is for the currently selected date.
+  // This prevents stale cached data for the previous date from leaking in.
+  useEffect(() => {
+    if (menuData?.date === selectedDate && menuData.meals) {
+      setMenus({ Breakfast: menuData.meals.Breakfast ?? '', Lunch: menuData.meals.Lunch ?? '', Dinner: menuData.meals.Dinner ?? '' });
+    }
+  }, [menuData, selectedDate]);
+
+  const [upsert]    = useUpsertSlotManagementMutation();
+  const [del]       = useDeleteSlotManagementMutation();
+  const [saveMenu]  = useSaveMealMenuMutation();
+  const { showToast } = useToast();
 
   const slotMap = useMemo(() => {
     const m: Record<string, SlotDate> = {};
@@ -55,16 +137,15 @@ export default function SlotManagementPage({ onNav }: { onNav?: (page: string) =
 
   const bookingMap = useMemo(() => {
     const m: Record<string, Record<MealType, number>> = {};
-    bookings.forEach(b => {
-      if (!m[b.date]) m[b.date] = { Breakfast: 0, Lunch: 0, Dinner: 0 };
-      ALL_MEALS.forEach(meal => { m[b.date][meal] = (m[b.date][meal] ?? 0) + (b.meals[meal] ?? 0); });
+    Object.entries(monthlySummary).forEach(([date, data]) => {
+      m[date] = { Breakfast: data.Breakfast, Lunch: data.Lunch, Dinner: data.Dinner };
     });
     return m;
-  }, [bookings]);
+  }, [monthlySummary]);
 
   const calDays = useMemo(() => {
     const firstDow = new Date(calYear, calMonth, 1).getDay();
-    const total = new Date(calYear, calMonth + 1, 0).getDate();
+    const total    = new Date(calYear, calMonth + 1, 0).getDate();
     const cells: (number | null)[] = Array(firstDow).fill(null);
     for (let d = 1; d <= total; d++) cells.push(d);
     return cells;
@@ -73,8 +154,8 @@ export default function SlotManagementPage({ onNav }: { onNav?: (page: string) =
   const shiftMonth = (dir: -1 | 1) => {
     setCalMonth(m => {
       const nm = m + dir;
-      if (nm < 0) { setCalYear(y => y - 1); return 11; }
-      if (nm > 11) { setCalYear(y => y + 1); return 0; }
+      if (nm < 0)  { setCalYear(y => y - 1); return 11; }
+      if (nm > 11) { setCalYear(y => y + 1); return 0;  }
       return nm;
     });
   };
@@ -83,89 +164,90 @@ export default function SlotManagementPage({ onNav }: { onNav?: (page: string) =
 
   const selectDay = (d: number) => {
     const ds = toStr(calYear, calMonth, d);
-    setSelectedDate(ds);
-    setSaved(false);
-
-    // Read fresh from localStorage so changes in Settings are picked up immediately
-    const fallbackRates: Record<MealType, number> = { Breakfast: 20, Lunch: 40, Dinner: 35 };
-    const fallbackLimits: Record<string, Record<MealType, number>> = {
-      Thiruvanmiyur: { Breakfast: 100, Lunch: 100, Dinner: 100 },
-      NLBR:          { Breakfast: 80,  Lunch: 80,  Dinner: 80  },
-    };
-    try {
-      const r = localStorage.getItem('hkm_default_rates');
-      if (r) Object.assign(fallbackRates, JSON.parse(r));
-      const l = localStorage.getItem('hkm_slot_limits');
-      if (l) Object.assign(fallbackLimits, JSON.parse(l));
-    } catch {}
-
+    setSelectedDate(ds); setSaved(false);
+    const fr: Record<MealType, number> = settingsData
+      ? { ...settingsData.defaultMealRates }
+      : { Breakfast: 20, Lunch: 40, Dinner: 35 };
+    const fl: Record<string, Record<MealType, number>> = settingsData
+      ? {
+          Thiruvanmiyur: { ...settingsData.defaultSlotLimits.Thiruvanmiyur },
+          NLBR:          { ...settingsData.defaultSlotLimits.NLBR },
+        }
+      : {
+          Thiruvanmiyur: { Breakfast: 100, Lunch: 100, Dinner: 100 },
+          NLBR:          { Breakfast: 80,  Lunch: 80,  Dinner: 80  },
+        };
     const slot = slotMap[ds];
     if (slot) {
       setDayLabel(slot.festivalName ?? '');
       setEditMeals(slot.meals.length > 0 ? slot.meals : [...ALL_MEALS]);
       setStopped(slot.stopped ?? false);
       setPrices({
-        Breakfast: String(slot.priceOverrides?.Breakfast ?? fallbackRates.Breakfast),
-        Lunch:     String(slot.priceOverrides?.Lunch     ?? fallbackRates.Lunch),
-        Dinner:    String(slot.priceOverrides?.Dinner    ?? fallbackRates.Dinner),
+        Breakfast: String(slot.priceOverrides?.Breakfast ?? fr.Breakfast),
+        Lunch:     String(slot.priceOverrides?.Lunch     ?? fr.Lunch),
+        Dinner:    String(slot.priceOverrides?.Dinner    ?? fr.Dinner),
       });
       setLimits({
         Thiruvanmiyur: {
-          Breakfast: String(slot.slotLimits?.Thiruvanmiyur?.Breakfast ?? fallbackLimits.Thiruvanmiyur.Breakfast),
-          Lunch:     String(slot.slotLimits?.Thiruvanmiyur?.Lunch     ?? fallbackLimits.Thiruvanmiyur.Lunch),
-          Dinner:    String(slot.slotLimits?.Thiruvanmiyur?.Dinner    ?? fallbackLimits.Thiruvanmiyur.Dinner),
+          Breakfast: String(slot.slotLimits?.Thiruvanmiyur?.Breakfast ?? fl.Thiruvanmiyur.Breakfast),
+          Lunch:     String(slot.slotLimits?.Thiruvanmiyur?.Lunch     ?? fl.Thiruvanmiyur.Lunch),
+          Dinner:    String(slot.slotLimits?.Thiruvanmiyur?.Dinner    ?? fl.Thiruvanmiyur.Dinner),
         },
         NLBR: {
-          Breakfast: String(slot.slotLimits?.NLBR?.Breakfast ?? fallbackLimits.NLBR.Breakfast),
-          Lunch:     String(slot.slotLimits?.NLBR?.Lunch     ?? fallbackLimits.NLBR.Lunch),
-          Dinner:    String(slot.slotLimits?.NLBR?.Dinner    ?? fallbackLimits.NLBR.Dinner),
+          Breakfast: String(slot.slotLimits?.NLBR?.Breakfast ?? fl.NLBR.Breakfast),
+          Lunch:     String(slot.slotLimits?.NLBR?.Lunch     ?? fl.NLBR.Lunch),
+          Dinner:    String(slot.slotLimits?.NLBR?.Dinner    ?? fl.NLBR.Dinner),
         },
       });
-      const removedMls: MealType[] = [];
-      ALL_MEALS.forEach(m => {
-        if (slot.mealStatus?.[m]?.removed) removedMls.push(m);
-      });
-      setRemoved(removedMls);
+      setRemoved(ALL_MEALS.filter(m => slot.mealStatus?.[m]?.removed));
     } else {
-      setDayLabel('');
-      setEditMeals([...ALL_MEALS]);
-      setStopped(false);
-      setPrices({
-        Breakfast: String(fallbackRates.Breakfast),
-        Lunch:     String(fallbackRates.Lunch),
-        Dinner:    String(fallbackRates.Dinner),
-      });
+      setDayLabel(''); setEditMeals([...ALL_MEALS]); setStopped(false);
+      setPrices({ Breakfast: String(fr.Breakfast), Lunch: String(fr.Lunch), Dinner: String(fr.Dinner) });
       setLimits({
-        Thiruvanmiyur: {
-          Breakfast: String(fallbackLimits.Thiruvanmiyur.Breakfast),
-          Lunch:     String(fallbackLimits.Thiruvanmiyur.Lunch),
-          Dinner:    String(fallbackLimits.Thiruvanmiyur.Dinner),
-        },
-        NLBR: {
-          Breakfast: String(fallbackLimits.NLBR.Breakfast),
-          Lunch:     String(fallbackLimits.NLBR.Lunch),
-          Dinner:    String(fallbackLimits.NLBR.Dinner),
-        },
+        Thiruvanmiyur: { Breakfast: String(fl.Thiruvanmiyur.Breakfast), Lunch: String(fl.Thiruvanmiyur.Lunch), Dinner: String(fl.Thiruvanmiyur.Dinner) },
+        NLBR:          { Breakfast: String(fl.NLBR.Breakfast),          Lunch: String(fl.NLBR.Lunch),          Dinner: String(fl.NLBR.Dinner) },
       });
       setRemoved([]);
     }
+    // Always clear menus immediately — useEffect will fill them in once the
+    // API response for the new date arrives (and only if the date matches).
+    setMenus(emptyMenus());
   };
 
   const toggleRemove = (m: MealType) => {
-    setRemoved(prev => prev.includes(m) ? prev.filter(x => x !== m) : [...prev, m]);
+    setRemoved(prev => {
+      const next = prev.includes(m) ? prev.filter(x => x !== m) : [...prev, m];
+      if (next.length < ALL_MEALS.length) setSaveError('');
+      return next;
+    });
   };
+
+  const slotSchema = z.object({
+    removed: z.array(z.string()).refine(
+      r => r.length < ALL_MEALS.length,
+      { message: 'At least one meal must be available.' }
+    ),
+    prices: z.record(
+      z.string(),
+      z.string().refine(v => v === '' || (!isNaN(Number(v)) && Number(v) >= 0), {
+        message: 'Price must be a positive number.',
+      })
+    ),
+  });
 
   const saveDay = async () => {
     if (!selectedDate) return;
+    const result = slotSchema.safeParse({ removed, prices });
+    if (!result.success) {
+      setSaveError(result.error.issues[0]?.message ?? 'Validation failed.');
+      return;
+    }
+    setSaveError('');
     setSaving(true);
     const priceOverrides: Partial<Record<MealType, number>> = {};
-    ALL_MEALS.forEach(m => {
-      if (prices[m] !== '') priceOverrides[m] = Number(prices[m]);
-    });
+    ALL_MEALS.forEach(m => { if (prices[m] !== '') priceOverrides[m] = Number(prices[m]); });
     const mealStatus: Record<string, { stopped: boolean; removed: boolean }> = {};
-    ALL_MEALS.forEach(m => {
-      mealStatus[m] = { stopped: false, removed: removed.includes(m) };
-    });
+    ALL_MEALS.forEach(m => { mealStatus[m] = { stopped: false, removed: removed.includes(m) }; });
     const slotLimits: SlotDate['slotLimits'] = {};
     LOCS.forEach(loc => {
       slotLimits[loc] = {} as Record<MealType, number>;
@@ -173,23 +255,69 @@ export default function SlotManagementPage({ onNav }: { onNav?: (page: string) =
         if (limits[loc][m] !== '') (slotLimits[loc] as Record<MealType, number>)[m] = Number(limits[loc][m]);
       });
     });
-
-    await upsert({
-      date: selectedDate,
-      data: {
-        meals: editMeals,
-        stopped,
-        isFestival: !!dayLabel,
-        festivalName: dayLabel || undefined,
-        priceOverrides,
-        slotLimits,
-        mealStatus: mealStatus as SlotDate['mealStatus'],
-      },
-    });
-    setSaving(false);
-    setSaved(true);
+    await upsert({ date: selectedDate, data: { meals: editMeals, stopped, isFestival: !!dayLabel, festivalName: dayLabel || undefined, priceOverrides, slotLimits, mealStatus: mealStatus as SlotDate['mealStatus'] } });
+    setSaving(false); setSaved(true);
+    showToast(`Slot saved for ${selectedDate}`, 'success');
     setTimeout(() => setSaved(false), 2000);
   };
+
+  async function toggleStop(ds: string) {
+    const slot = slotMap[ds];
+    const nowStopped = slot?.stopped ?? false;
+    setTogglingStop(true);
+    await upsert({
+      date: ds,
+      data: {
+        meals:         slot?.meals         ?? [...ALL_MEALS],
+        stopped:       !nowStopped,
+        isFestival:    slot?.isFestival    ?? false,
+        festivalName:  slot?.festivalName,
+        priceOverrides: slot?.priceOverrides ?? {},
+        slotLimits:    slot?.slotLimits    ?? {},
+        mealStatus:    (slot?.mealStatus   ?? {}) as SlotDate['mealStatus'],
+      },
+    });
+    setTogglingStop(false);
+  }
+
+  async function toggleMealStop(ds: string, meal: MealType) {
+    const slot = slotMap[ds];
+    const cur  = slot?.mealStatus ?? {};
+    const isRemoved = cur[meal]?.removed ?? false;
+    setTogglingMeal(meal);
+    await upsert({
+      date: ds,
+      data: {
+        meals:         slot?.meals         ?? [...ALL_MEALS],
+        stopped:       slot?.stopped       ?? false,
+        isFestival:    slot?.isFestival    ?? false,
+        festivalName:  slot?.festivalName,
+        priceOverrides: slot?.priceOverrides ?? {},
+        slotLimits:    slot?.slotLimits    ?? {},
+        mealStatus: {
+          ...cur,
+          [meal]: { stopped: false, removed: !isRemoved },
+        } as SlotDate['mealStatus'],
+      },
+    });
+    setTogglingMeal(null);
+  }
+
+  function openMenuDialog(meal: MealType) {
+    setMenuMeal(meal);
+    setMenuText(menus[meal]);
+    setMenuSaving(false);
+  }
+
+  async function handleSaveMenu() {
+    if (!selectedDate || !menuMeal) return;
+    setMenuSaving(true);
+    const updated: MealMenuMap = { ...menus, [menuMeal]: menuText };
+    await saveMenu({ date: selectedDate, meals: updated });
+    setMenus(updated);
+    setMenuSaving(false);
+    setMenuMeal(null);
+  }
 
   const clearDay = async () => {
     if (!selectedDate || !slotMap[selectedDate]) return;
@@ -200,468 +328,697 @@ export default function SlotManagementPage({ onNav }: { onNav?: (page: string) =
   };
 
   const monthLabel = `${MONTHS[calMonth]} ${calYear}`;
+  const fmtDate = (ds: string) => new Date(ds + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-  // format date nicely for label pill
-  const fmtDate = (ds: string) => {
-    const d = new Date(ds + 'T00:00:00');
-    return d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  };
-
+  // ─── render ────────────────────────────────────────────────────────────────
   return (
-    <>
-      <style>{`
-        .sm-pricing-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
-        @media(max-width:900px){ .sm-pricing-layout{ grid-template-columns:1fr; } .sm-price-panel{position:static!important;} }
+    <Box>
+      {/* PAGE HEADER */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+        <CalendarMonthIcon sx={{ color: SD, fontSize: 28 }} />
+        <Box>
+          <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.9rem', fontWeight: 700, color: SD, lineHeight: 1.15 }}>
+            Slot Management
+          </Typography>
+          <Typography sx={{ fontSize: '0.85rem', color: '#9A7A5A' }}>
+            Configure slot dates, meal rates and booking limits
+          </Typography>
+        </Box>
+      </Box>
 
-        /* ── Calendar card ── */
-        .sm-cal-card { background:#fff; border:1.5px solid #FEF0E6; border-radius:14px; overflow:hidden; box-shadow:0 2px 14px rgba(232,98,26,0.08); }
-        .sm-cal-nav { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; background:linear-gradient(135deg,#C44D0D 0%,#E8621A 60%,#F4893A 100%); }
-        .sm-cal-nav h3 { font-family:'Cormorant Garamond',serif; font-size:1.25rem; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); margin:0; }
-        .sm-cal-nav-btn { background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); color:#fff; width:32px; height:32px; border-radius:50px; font-size:1.05rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.18s; }
-        .sm-cal-nav-btn:hover { background:rgba(255,255,255,0.35); transform:scale(1.05); }
-        .sm-cal-grid { padding:16px 20px 20px; }
-        .sm-cal-dow-row { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:8px; }
-        .sm-cal-dow { text-align:center; font-size:0.62rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9A7A5A; padding:4px 0; }
-        .sm-cal-days-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
-        .sm-cal-day { aspect-ratio:1; border-radius:8px; border:1.5px solid transparent; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s; font-size:0.85rem; font-weight:500; color:#1E0F00; background:#FBF6EE; position:relative; gap:2px; font-family:'Inter',sans-serif; }
-        .sm-cal-day:hover { border-color:#E8621A; background:#FEF0E6; }
-        .sm-cal-day.empty { background:transparent; border-color:transparent; cursor:default; pointer-events:none; }
-        .sm-cal-day.today { border-color:#C9920A; background:#FFF9E6; font-weight:700; }
-        .sm-cal-day.selected { background:linear-gradient(135deg,#E8621A,#C9920A); color:#fff; border-color:transparent; }
-        .sm-cal-day.selected:hover { background:linear-gradient(135deg,#C44D0D,#B07800); }
-        .sm-cal-day.has-slot { border-color:#E8621A; }
-        .sm-cal-day.has-slot::after { content:'●'; font-size:0.38rem; font-weight:700; color:#E8621A; position:absolute; bottom:4px; right:5px; }
-        .sm-cal-day.has-slot.selected::after { color:rgba(255,255,255,0.8); }
-        .sm-cal-day.has-price-override { border-color:#E8621A; border-width:2px; }
-        .sm-cal-day.has-price-override::before { content:'₹'; font-size:0.45rem; font-weight:700; color:#E8621A; position:absolute; bottom:3px; left:4px; }
-        .sm-cal-day.has-price-override.selected::before { color:rgba(255,255,255,0.8); }
-        .sm-cal-day.sunday { color:#7B1D1D; }
-        .sm-cal-day.sunday.selected { color:#fff; }
-        .sm-cal-day.stopped-day { background:#FFF4F4; border-color:#C0392B; }
-        .sm-cal-day.stopped-day .sm-cal-day-num { text-decoration:line-through; color:#C0392B; }
-        .sm-cal-day-num { font-size:0.85rem; line-height:1; }
-        .sm-cal-day-dot { width:4px; height:4px; border-radius:50%; background:#E8621A; flex-shrink:0; }
-        .sm-cal-day.selected .sm-cal-day-dot { background:rgba(255,255,255,0.75); }
+      {/* ── TWO COLUMN LAYOUT ── */}
+      <Grid container spacing={3} sx={{ alignItems: 'flex-start' }}>
 
-        .sm-cal-legend { display:flex; gap:16px; padding:12px 20px; border-top:1.5px solid rgba(232,98,26,0.1); flex-wrap:wrap; background:#FEF0E6; }
-        .sm-cal-legend-item { display:flex; align-items:center; gap:6px; font-size:0.72rem; color:#5A3A1A; font-family:'Inter',sans-serif; }
-        .sm-cal-legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+        {/* LEFT */}
+        <Grid size={{ xs: 12, md: 8 }}>
 
-        /* ── Price panel ── */
-        .sm-price-panel { background:#fff; border:1.5px solid #FEF0E6; border-radius:14px; overflow:hidden; position:sticky; top:76px; box-shadow:0 2px 14px rgba(232,98,26,0.08); }
-        .sm-price-panel-header { padding:18px 20px; background:linear-gradient(135deg,#C44D0D 0%,#E8621A 100%); }
-        .sm-price-panel-header h4 { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:#fff; margin:0 0 2px; }
-        .sm-price-panel-header p { font-size:0.75rem; color:rgba(255,255,255,0.72); margin:0; }
-        .sm-price-panel-empty { padding:40px 24px; text-align:center; color:#9A7A5A; font-size:0.82rem; line-height:1.6; font-family:'Inter',sans-serif; }
-        .sm-price-panel-empty .sm-empty-icon { font-size:2.4rem; margin-bottom:10px; }
-        .sm-price-panel-body { padding:20px; }
+          {/* CALENDAR CARD */}
+          <Card elevation={0} sx={{ border: '1.5px solid #FEF0E6', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 2px 14px rgba(232,98,26,0.08)', mb: 3 }}>
 
-        .sm-price-day-label { background:linear-gradient(135deg,#C44D0D,#E8621A); color:#fff; border-radius:50px; padding:10px 18px; font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-weight:600; text-align:center; margin-bottom:16px; box-shadow:0 3px 12px rgba(232,98,26,0.28); }
-        .sm-special-label-row { margin-bottom:16px; }
-        .sm-special-label-row label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#5A3A1A; display:block; margin-bottom:6px; font-family:'Inter',sans-serif; }
-        .sm-special-label-row input { width:100%; padding:9px 12px; border:1.5px solid #E8D8C0; border-radius:8px; font-size:0.85rem; color:#1E0F00; outline:none; background:#FBF6EE; font-family:'Inter',sans-serif; transition:all 0.2s; }
-        .sm-special-label-row input:focus { border-color:#E8621A; background:#fff; box-shadow:0 0 0 2px rgba(232,98,26,0.1); }
+            {/* Month nav header */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, py: 2.25, background: `linear-gradient(135deg, ${SD}, ${S}, #F4893A)` }}>
+              <IconButton onClick={() => shiftMonth(-1)} size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' } }}>
+                <ChevronLeftIcon />
+              </IconButton>
+              <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.25rem', fontWeight: 700, color: '#fff' }}>
+                {monthLabel}
+              </Typography>
+              <IconButton onClick={() => shiftMonth(1)} size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' } }}>
+                <ChevronRightIcon />
+              </IconButton>
+            </Box>
 
-        .sm-meal-price-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #F2E8D8; transition:opacity 0.2s; }
-        .sm-meal-price-row:last-child { border-bottom:none; }
-        .sm-meal-price-row.removed { opacity:0.38; }
-        .sm-meal-price-row.removed .sm-price-input { pointer-events:none; }
-        .sm-meal-price-icon { font-size:1rem; width:22px; text-align:center; flex-shrink:0; }
-        .sm-meal-price-name { font-size:0.82rem; font-weight:500; color:#5A3A1A; flex:1; font-family:'Inter',sans-serif; }
-        .sm-meal-price-row.removed .sm-meal-price-name::after { content:' — not available'; font-size:0.68rem; color:#C0392B; font-weight:400; }
-        .sm-price-input-wrap { position:relative; }
-        .sm-price-input-wrap::before { content:'₹'; position:absolute; left:9px; top:50%; transform:translateY(-50%); font-size:0.8rem; color:#9A7A5A; pointer-events:none; }
-        .sm-price-input { width:80px; padding:7px 8px 7px 20px; border:1.5px solid #E8D8C0; border-radius:7px; font-size:0.88rem; font-weight:600; color:#1E0F00; text-align:right; outline:none; background:#FBF6EE; font-family:'Inter',sans-serif; transition:all 0.2s; }
-        .sm-price-input:focus { border-color:#E8621A; background:#fff; box-shadow:0 0 0 2px rgba(232,98,26,0.1); }
-        .sm-price-input.changed { border-color:#E8621A; background:#FEF0E6; }
+            {/* Day-of-week labels */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', px: 2, pt: 2, pb: 0.5 }}>
+              {DAYS.map(d => (
+                <Typography key={d} sx={{ textAlign: 'center', fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9A7A5A', py: 0.5 }}>
+                  {d}
+                </Typography>
+              ))}
+            </Box>
 
-        .sm-meal-remove-btn { flex-shrink:0; width:24px; height:24px; border-radius:50%; border:1.5px solid #E8D8C0; background:#FBF6EE; color:#9A7A5A; font-size:0.75rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; line-height:1; font-family:'Inter',sans-serif; }
-        .sm-meal-remove-btn:hover { border-color:#C0392B; color:#C0392B; background:#FDECEA; }
-        .sm-meal-remove-btn.is-removed { border-color:#2D7A3A; color:#2D7A3A; background:#EBF7ED; }
-        .sm-meal-remove-btn.is-removed:hover { background:#c8e6c9; }
+            {/* Calendar grid */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', px: 2, pb: 2 }}>
+              {calDays.map((d, i) => {
+                if (d === null) return <Box key={`e${i}`} />;
+                const ds        = toStr(calYear, calMonth, d);
+                const slot      = slotMap[ds];
+                const bk        = bookingMap[ds];
+                const isSun     = new Date(ds + 'T00:00:00').getDay() === 0;
+                const hasPrice  = slot && Object.values(slot.priceOverrides ?? {}).some(v => v != null);
+                const hasBk     = bk && (bk.Breakfast + bk.Lunch + bk.Dinner) > 0;
+                const isToday   = ds === todayStr;
+                const isSel     = ds === selectedDate;
+                const isStopped = slot?.stopped;
 
-        .sm-limit-section-head { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#5A3A1A; margin:16px 0 6px; display:flex; align-items:center; gap:6px; font-family:'Inter',sans-serif; }
-        .sm-limit-section-head::after { content:''; flex:1; height:1px; background:#E8D8C0; }
-        .sm-limit-loc-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; align-items:center; padding:7px 0; border-bottom:1px solid #F2E8D8; }
-        .sm-limit-loc-row:last-child { border-bottom:none; }
-        .sm-limit-loc-label { font-size:0.72rem; font-weight:600; color:#5A3A1A; font-family:'Inter',sans-serif; }
-        .sm-limit-col-head { font-size:0.6rem; font-weight:700; color:#9A7A5A; text-align:center; letter-spacing:0.06em; text-transform:uppercase; font-family:'Inter',sans-serif; }
-        .sm-limit-loc-input { width:100%; padding:6px 8px; border:1.5px solid #E8D8C0; border-radius:7px; font-size:0.85rem; font-weight:600; text-align:center; color:#1E0F00; outline:none; background:#FBF6EE; font-family:'Inter',sans-serif; }
-        .sm-limit-loc-input:focus { border-color:#E8621A; background:#fff; }
+                let bg = '#FBF6EE'; let border = 'transparent'; let color = '#3B1F0A'; let bw = '1.5px';
+                if (isSun)     { color = '#7B1D1D'; }
+                if (isToday)   { bg = GP; border = GOLD; }
+                if (slot && !hasPrice) { border = S; }
+                if (hasPrice)  { border = S; bw = '2px'; }
+                if (isStopped) { bg = '#FFF4F4'; border = RED; color = RED; }
+                if (isSel)     { bg = `linear-gradient(135deg, ${S}, ${GOLD})`; border = 'transparent'; color = '#fff'; }
 
-        .sm-price-panel-footer { padding:16px 20px; border-top:1.5px solid #FEF0E6; display:flex; gap:8px; background:#FEF0E6; }
-        .sm-btn-primary { background:#E8621A; color:#fff; border:none; padding:9px 18px; border-radius:8px; font-size:0.82rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:7px; font-family:'Inter',sans-serif; box-shadow:0 2px 10px rgba(232,98,26,0.3); transition:all 0.18s; flex:1; justify-content:center; }
-        .sm-btn-primary:hover { background:#C44D0D; }
-        .sm-btn-primary:disabled { opacity:0.6; cursor:not-allowed; }
-        .sm-btn-danger { background:#fff; color:#C0392B; border:1.5px solid #f5c6c2; padding:9px 14px; border-radius:8px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.18s; }
-        .sm-btn-danger:hover { background:#FDECEA; }
-        .sm-btn-ghost { background:#fff; color:#C44D0D; border:1.5px solid #E8D8C0; padding:9px 18px; border-radius:8px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.18s; }
-        .sm-btn-ghost:hover { background:#FEF0E6; }
-
-        /* ── Special days list ── */
-        .sm-special-section { background:#fff; border:1.5px solid #FEF0E6; border-radius:14px; margin-top:24px; overflow:hidden; box-shadow:0 2px 14px rgba(232,98,26,0.08); }
-        .sm-special-header { padding:14px 20px; border-bottom:1.5px solid #FEF0E6; background:linear-gradient(to right,#FEF0E6,#FFF9E6); display:flex; align-items:center; justify-content:space-between; }
-        .sm-special-header h3 { font-family:'Cormorant Garamond',serif; font-size:1rem; color:#C44D0D; margin:0; }
-        .sm-special-day-row { display:flex; align-items:center; gap:14px; padding:12px 20px; border-bottom:1px solid rgba(232,98,26,0.08); transition:background 0.15s; cursor:pointer; }
-        .sm-special-day-row:last-child { border-bottom:none; }
-        .sm-special-day-row:hover { background:#FEF0E6; }
-        .sm-special-day-date { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:700; color:#C44D0D; min-width:110px; }
-        .sm-special-day-name { font-size:0.82rem; font-weight:600; color:#1E0F00; flex:1; font-family:'Inter',sans-serif; }
-        .sm-special-day-prices { display:flex; gap:6px; flex-wrap:wrap; }
-        .sm-price-chip { font-size:0.68rem; font-weight:600; padding:3px 8px; border-radius:50px; background:#FEF0E6; color:#C44D0D; font-family:'Inter',sans-serif; }
-        .sm-status-badge { font-size:0.65rem; font-weight:700; padding:3px 8px; border-radius:50px; font-family:'Inter',sans-serif; }
-        .sm-stopped-badge { background:#FDECEA; color:#C0392B; }
-        .sm-active-badge { background:#EBF7ED; color:#2D7A3A; }
-
-        /* ── Booking summary calendar ── */
-        .sm-booking-section { background:#fff; border:1.5px solid #FEF0E6; border-radius:14px; overflow:hidden; margin-top:28px; box-shadow:0 2px 14px rgba(232,98,26,0.08); }
-        .sm-booking-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:16px 22px; background:linear-gradient(135deg,#C44D0D,#E8621A); }
-        .sm-booking-header h3 { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:#fff; margin:0; }
-        .sm-booking-header p { font-size:0.72rem; color:rgba(255,255,255,0.72); margin:2px 0 0; }
-        .sm-bk-dow-row { display:grid; grid-template-columns:repeat(7,1fr); background:#FBF6EE; border-bottom:1px solid #F2E8D8; }
-        .sm-bk-cal-dow { text-align:center; font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9A7A5A; padding:8px 4px; font-family:'Inter',sans-serif; }
-        .sm-bk-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:#F2E8D8; }
-        .sm-bk-day { background:#fff; padding:8px 7px; min-height:76px; cursor:pointer; transition:background 0.15s; position:relative; }
-        .sm-bk-day:hover { background:#FEF0E6; }
-        .sm-bk-day.empty { background:#FBF6EE; cursor:default; }
-        .sm-bk-day.bk-today { background:#FFF9E6; }
-        .sm-bk-day.has-bookings { border-left:3px solid #E8621A; }
-        .sm-bk-day.bk-has-stopped { border-top:3px solid #C0392B; }
-        .sm-bk-day.bk-all-stopped { background:#fff4f4 !important; border-left:3px solid #C0392B !important; }
-        .sm-bk-day-num { font-size:0.78rem; font-weight:700; color:#1E0F00; margin-bottom:5px; font-family:'Inter',sans-serif; }
-        .sm-bk-day.bk-today .sm-bk-day-num { color:#C44D0D; }
-        .sm-bk-day.bk-all-stopped .sm-bk-day-num { color:#C0392B; text-decoration:line-through; }
-        .sm-bk-meal-row { display:flex; gap:3px; flex-wrap:wrap; }
-        .sm-bk-chip { font-size:0.6rem; font-weight:700; padding:2px 5px; border-radius:4px; white-space:nowrap; display:inline-flex; align-items:center; gap:2px; font-family:'Inter',sans-serif; }
-        .sm-bk-chip.bfast  { background:#FEF0E6; color:#C44D0D; }
-        .sm-bk-chip.lunch  { background:#FFF8E1; color:#e65100; }
-        .sm-bk-chip.dinner { background:#EDE7F6; color:#512da8; }
-        .sm-bk-chip.bk-stopped-chip { opacity:0.6; text-decoration:line-through; }
-        .sm-bk-stopped-badge { font-size:0.55rem; font-weight:800; color:#C0392B; text-transform:uppercase; letter-spacing:0.08em; padding:1px 5px; background:#fdecea; border-radius:3px; display:inline-block; margin-top:3px; }
-
-        /* stopped toggle */
-        .sm-toggle-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #F2E8D8; }
-        .sm-toggle-sw { width:40px; height:22px; border-radius:50px; position:relative; cursor:pointer; transition:background 0.2s; border:none; flex-shrink:0; }
-        .sm-toggle-sw.on { background:#E8621A; }
-        .sm-toggle-sw.off { background:#E8D8C0; }
-        .sm-toggle-sw::after { content:''; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.2); transition:left 0.2s; }
-        .sm-toggle-sw.on::after { left:21px; }
-        .sm-toggle-label { font-size:0.82rem; font-weight:500; color:#5A3A1A; font-family:'Inter',sans-serif; flex:1; }
-
-        /* meals checkboxes */
-        .sm-meals-row { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #F2E8D8; flex-wrap:wrap; }
-        .sm-meal-cb { display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#5A3A1A; cursor:pointer; font-family:'Inter',sans-serif; }
-      `}</style>
-
-      <div className="sm-pricing-layout">
-
-        {/* ── LEFT: Calendar + Special days ── */}
-        <div>
-          <div className="sm-cal-card">
-            {/* Month nav */}
-            <div className="sm-cal-nav">
-              <button className="sm-cal-nav-btn" onClick={() => shiftMonth(-1)}>←</button>
-              <h3>{monthLabel}</h3>
-              <button className="sm-cal-nav-btn" onClick={() => shiftMonth(1)}>→</button>
-            </div>
-
-            {/* Days grid */}
-            <div className="sm-cal-grid">
-              <div className="sm-cal-dow-row">
-                {DAYS.map(d => <div key={d} className="sm-cal-dow">{d}</div>)}
-              </div>
-              <div className="sm-cal-days-grid">
-                {calDays.map((d, i) => {
-                  if (d === null) return <div key={`e${i}`} className="sm-cal-day empty" />;
-                  const ds = toStr(calYear, calMonth, d);
-                  const slot = slotMap[ds];
-                  const bk = bookingMap[ds];
-                  const isSunday = new Date(ds + 'T00:00:00').getDay() === 0;
-                  const hasPrice = slot && Object.values(slot.priceOverrides ?? {}).some(v => v != null);
-                  const hasBk = bk && (bk.Breakfast + bk.Lunch + bk.Dinner) > 0;
-                  let cls = 'sm-cal-day';
-                  if (isSunday) cls += ' sunday';
-                  if (ds === todayStr) cls += ' today';
-                  if (ds === selectedDate) cls += ' selected';
-                  if (slot && !hasPrice) cls += ' has-slot';
-                  if (hasPrice) cls += ' has-price-override';
-                  if (slot?.stopped) cls += ' stopped-day';
-                  return (
-                    <div key={ds} className={cls} onClick={() => selectDay(d)}>
-                      <span className="sm-cal-day-num">{d}</span>
-                      {(slot || hasBk) && <span className="sm-cal-day-dot" />}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+                return (
+                  <Box
+                    key={ds}
+                    onClick={() => selectDay(d)}
+                    sx={{
+                      aspectRatio: '1', borderRadius: '8px',
+                      border: `${bw} solid ${border}`,
+                      background: bg, color,
+                      display: 'flex', flexDirection: 'column',
+                      alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', position: 'relative',
+                      transition: 'all 0.15s',
+                      '&:hover': { borderColor: S, bgcolor: isSel ? undefined : SP },
+                    }}
+                  >
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: isSel || isToday ? 700 : 500, color: 'inherit', lineHeight: 1, textDecoration: isStopped && !isSel ? 'line-through' : 'none' }}>
+                      {d}
+                    </Typography>
+                    {(slot || hasBk) && (
+                      <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: isSel ? 'rgba(255,255,255,0.8)' : S, mt: 0.4, flexShrink: 0 }} />
+                    )}
+                  </Box>
+                );
+              })}
+            </Box>
 
             {/* Legend */}
-            <div className="sm-cal-legend">
+            <Box sx={{ display: 'flex', gap: 2.5, px: 2.5, py: 1.5, bgcolor: SP, borderTop: `1px solid rgba(232,98,26,0.12)`, flexWrap: 'wrap' }}>
               {[
-                { dot: { background: '#FFF9E6', border: '1.5px solid #C9920A' }, label: 'Today' },
-                { dot: { background: 'linear-gradient(135deg,#E8621A,#C9920A)' }, label: 'Selected' },
-                { dot: { background: '#FEF0E6', border: '1.5px solid #E8621A' }, label: 'Slot Configured' },
-                { dot: { background: '#FEF0E6', border: '2px solid #E8621A' }, label: 'Custom Price' },
-                { dot: { background: '#FFF4F4', border: '1.5px solid #C0392B' }, label: 'Stopped' },
-              ].map(({ dot, label }) => (
-                <div key={label} className="sm-cal-legend-item">
-                  <div className="sm-cal-legend-dot" style={dot as React.CSSProperties} />
-                  {label}
-                </div>
+                { bg: GP, border: GOLD, label: 'Today' },
+                { bg: `linear-gradient(135deg,${S},${GOLD})`, label: 'Selected' },
+                { bg: SP, border: S, label: 'Slot Configured' },
+                { bg: SP, border: S, bw: '2px', label: 'Custom Price' },
+                { bg: '#FFF4F4', border: RED, label: 'Stopped' },
+              ].map(({ bg, border, bw, label }) => (
+                <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                  <Box sx={{ width: 10, height: 10, borderRadius: '3px', background: bg, border: border ? `${bw ?? '1.5px'} solid ${border}` : 'none', flexShrink: 0 }} />
+                  <Typography sx={{ fontSize: '0.7rem', color: '#5A3A1A' }}>{label}</Typography>
+                </Box>
               ))}
-            </div>
-          </div>
+            </Box>
+          </Card>
 
-          {/* Special days list */}
-          <div className="sm-special-section">
-            <div className="sm-special-header">
-              <h3>📅 Configured Slots</h3>
-              <span style={{ fontSize: '0.75rem', color: '#9A7A5A', fontFamily: 'Inter, sans-serif' }}>
-                {slots.length} slot{slots.length !== 1 ? 's' : ''}
-              </span>
-            </div>
+          {/* CONFIGURED SLOTS LIST */}
+          <Card elevation={0} sx={{ border: '1.5px solid #FEF0E6', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 2px 14px rgba(232,98,26,0.08)' }}>
+            <Box sx={{ px: 2.5, py: 1.75, borderBottom: '1.5px solid #FEF0E6', background: `linear-gradient(to right, ${SP}, ${GP})`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CalendarMonthIcon sx={{ color: SD, fontSize: 18 }} />
+                <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: SD, fontWeight: 600 }}>Configured Slots</Typography>
+              </Box>
+              <Chip label={`${slots.length} slot${slots.length !== 1 ? 's' : ''}`} size="small" sx={{ bgcolor: SP, color: SD, fontWeight: 600, fontSize: '0.72rem', borderRadius: '50px' }} />
+            </Box>
+
             {slots.length === 0 ? (
-              <div style={{ padding: 32, textAlign: 'center', color: '#9A7A5A', fontSize: '0.82rem', fontFamily: 'Inter, sans-serif' }}>
+              <Box sx={{ py: 5, textAlign: 'center', color: '#9A7A5A', fontSize: '0.82rem' }}>
                 No slots configured yet. Click a date on the calendar above.
-              </div>
+              </Box>
             ) : (() => {
-              const sorted = [...slots].sort((a, b) => a.date.localeCompare(b.date));
-              const visible = showAllSlots ? sorted : sorted.slice(0, SLOTS_PREVIEW);
+              const sorted  = [...slots].sort((a, b) => a.date.localeCompare(b.date));
+              const visible = showAll ? sorted : sorted.slice(0, PREVIEW);
               return (
                 <>
-                  {visible.map(s => {
+                  {visible.map((s, idx) => {
                     const hasCustom = Object.values(s.priceOverrides ?? {}).some(v => v != null);
                     return (
-                      <div key={s.date} className="sm-special-day-row"
-                        onClick={() => {
-                          const d = new Date(s.date + 'T00:00:00');
-                          setCalYear(d.getFullYear());
-                          setCalMonth(d.getMonth());
-                          selectDay(d.getDate());
-                        }}>
-                        <div className="sm-special-day-date">{s.date}</div>
-                        <div className="sm-special-day-name">
-                          {s.isFestival && s.festivalName ? `🎉 ${s.festivalName}` : s.meals.join(' · ')}
-                        </div>
-                        <div className="sm-special-day-prices">
-                          {hasCustom && ALL_MEALS.map(m =>
-                            s.priceOverrides?.[m] != null
-                              ? <span key={m} className="sm-price-chip">{mealIcon(m)} ₹{s.priceOverrides[m]}</span>
-                              : null
+                      <Box
+                        key={s.date}
+                        onClick={() => { const d = new Date(s.date + 'T00:00:00'); setCalYear(d.getFullYear()); setCalMonth(d.getMonth()); selectDay(d.getDate()); }}
+                        sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1.5, borderTop: idx > 0 ? '1px solid #F2E8D8' : 'none', cursor: 'pointer', transition: 'bg 0.15s', '&:hover': { bgcolor: SP } }}
+                      >
+                        <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', fontWeight: 700, color: SD, minWidth: 100 }}>{s.date}</Typography>
+                        <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, color: '#3B1F0A', flex: 1 }}>
+                          {s.isFestival && s.festivalName ? s.festivalName : s.meals.join(' · ')}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+                          {hasCustom && ALL_MEALS.map(m => s.priceOverrides?.[m] != null
+                            ? <Chip key={m} label={`₹${s.priceOverrides[m]}`} size="small" icon={<MealIcon meal={m} size={12} />} sx={{ bgcolor: SP, color: SD, fontWeight: 600, fontSize: '0.68rem', height: 22, borderRadius: '50px' }} />
+                            : null
                           )}
-                          <span className={`sm-status-badge ${s.stopped ? 'sm-stopped-badge' : 'sm-active-badge'}`}>
-                            {s.stopped ? 'Stopped' : 'Active'}
-                          </span>
-                        </div>
-                      </div>
+                          <Chip label={s.stopped ? 'Stopped' : 'Active'} size="small" sx={{ bgcolor: s.stopped ? RP : GRP, color: s.stopped ? RED : GREEN, fontWeight: 700, fontSize: '0.65rem', height: 22, borderRadius: '50px' }} />
+                        </Box>
+                      </Box>
                     );
                   })}
-                  {sorted.length > SLOTS_PREVIEW && (
-                    <button
-                      onClick={() => setShowAllSlots(v => !v)}
-                      style={{
-                        width: '100%', padding: '10px 0', border: 'none', borderTop: '1px solid rgba(232,98,26,0.1)',
-                        background: '#FEF0E6', color: '#C44D0D', fontSize: '0.78rem', fontWeight: 600,
-                        cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                      }}>
-                      {showAllSlots ? `▲ Show less` : `▼ Show ${sorted.length - SLOTS_PREVIEW} more`}
-                    </button>
+                  {sorted.length > PREVIEW && (
+                    <Button
+                      fullWidth size="small"
+                      onClick={() => setShowAll(v => !v)}
+                      sx={{ py: 1.25, borderTop: '1px solid #F2E8D8', borderRadius: 0, color: SD, bgcolor: SP, textTransform: 'none', fontSize: '0.78rem', fontWeight: 600, '&:hover': { bgcolor: '#FEE8D4' } }}
+                    >
+                      {showAll ? '▲ Show less' : `▼ Show ${sorted.length - PREVIEW} more`}
+                    </Button>
                   )}
                 </>
               );
             })()}
-          </div>
-        </div>
+          </Card>
+        </Grid>
 
-        {/* ── RIGHT: Price editor panel ── */}
-        <div className="sm-price-panel">
-          <div className="sm-price-panel-header">
-            <h4>💰 Slot Rate Editor</h4>
-            <p>{selectedDate ? fmtDate(selectedDate) : 'Select a date on the calendar to edit'}</p>
-          </div>
+        {/* RIGHT — RATE EDITOR */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card elevation={0} sx={{ border: '1.5px solid #FEF0E6', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 2px 14px rgba(232,98,26,0.08)', position: 'sticky', top: 76 }}>
 
-          {!selectedDate ? (
-            <div className="sm-price-panel-empty">
-              <div className="sm-empty-icon">📅</div>
-              <div>Click any date on the calendar<br />to configure a slot or set custom rates.</div>
-            </div>
-          ) : (
-            <>
-              <div className="sm-price-panel-body">
-                {/* Date pill */}
-                <div className="sm-price-day-label">
-                  {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
-                </div>
+            {/* Panel header */}
+            <Box sx={{ px: 2.5, py: 2.25, background: `linear-gradient(135deg, ${SD}, ${S})` }}>
+              <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 700, color: '#fff', mb: 0.25 }}>
+                Slot Rate Editor
+              </Typography>
+              <Typography sx={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.72)' }}>
+                {selectedDate ? fmtDate(selectedDate) : 'Select a date on the calendar to edit'}
+              </Typography>
+            </Box>
 
-                {/* Occasion label */}
-                <div className="sm-special-label-row">
-                  <label>Day Label / Occasion</label>
-                  <input
+            {!selectedDate ? (
+              <Box sx={{ py: 6, textAlign: 'center', color: '#9A7A5A' }}>
+                <CalendarMonthIcon sx={{ fontSize: 40, color: '#D8C0A8', mb: 1.5 }} />
+                <Typography sx={{ fontSize: '0.85rem', lineHeight: 1.7 }}>
+                  Click any date on the calendar<br />to configure rates and limits.
+                </Typography>
+              </Box>
+            ) : (
+              <>
+                <CardContent sx={{ px: 2.5, py: 2.5 }}>
+
+                  {/* Date pill */}
+                  <Box sx={{ textAlign: 'center', background: `linear-gradient(135deg, ${SD}, ${S})`, borderRadius: '50px', py: 1.25, mb: 2.5, boxShadow: '0 3px 12px rgba(232,98,26,0.28)' }}>
+                    <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', fontWeight: 600, color: '#fff' }}>
+                      {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    </Typography>
+                  </Box>
+
+                  {/* Occasion label */}
+                  <TextField
+                    fullWidth size="small" label="Day Label / Occasion"
+                    placeholder="e.g. Janmashtami, Ekadashi…"
                     value={dayLabel}
                     onChange={e => setDayLabel(e.target.value)}
-                    placeholder="e.g. Janmashtami, Ekadashi…"
+                    sx={{
+                      mb: 2,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '9px', fontSize: '0.85rem',
+                        '& fieldset': { borderColor: '#E8D8C0' },
+                        '&:hover fieldset': { borderColor: S },
+                        '&.Mui-focused fieldset': { borderColor: S },
+                      },
+                      '& .MuiInputLabel-root': { fontSize: '0.83rem', color: '#9A7A5A' },
+                      '& .MuiInputLabel-root.Mui-focused': { color: SD },
+                    }}
                   />
-                </div>
 
-                {/* Meal rates */}
-                <div style={{ marginBottom: 4 }}>
-                  <div style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5A3A1A', marginBottom: 10, fontFamily: 'Inter, sans-serif' }}>
+                  {/* Meal Rates */}
+                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5A3A1A', mb: 1, mt: 1.5 }}>
                     Meal Rates for This Day
-                  </div>
-                  {ALL_MEALS.map(m => {
-                    const isRemoved = removed.includes(m);
-                    const isChanged = prices[m] !== '';
+                  </Typography>
+
+                  {ALL_MEALS.map((m, idx) => {
+                    const isRm = removed.includes(m);
                     return (
-                      <div key={m} className={`sm-meal-price-row${isRemoved ? ' removed' : ''}`}>
-                        <span className="sm-meal-price-icon">{mealIcon(m)}</span>
-                        <span className="sm-meal-price-name">{m}</span>
-                        <div className="sm-price-input-wrap">
-                          <input
-                            className={`sm-price-input${isChanged ? ' changed' : ''}`}
-                            type="number" min="0"
-                            placeholder="0"
-                            value={prices[m]}
-                            onChange={e => setPrices(p => ({ ...p, [m]: e.target.value }))}
-                            disabled={isRemoved}
-                          />
-                        </div>
-                        <button
-                          className={`sm-meal-remove-btn${isRemoved ? ' is-removed' : ''}`}
-                          title={isRemoved ? 'Restore this meal' : 'Mark meal unavailable for this date'}
-                          onClick={() => toggleRemove(m)}>
-                          {isRemoved ? '+' : '✕'}
-                        </button>
-                      </div>
+                      <Box key={m} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1.25, borderBottom: idx < ALL_MEALS.length - 1 ? '1px solid #F2E8D8' : 'none', opacity: isRm ? 0.45 : 1 }}>
+                        <Box sx={{ color: SD, flexShrink: 0 }}><MealIcon meal={m} size={18} /></Box>
+                        <Typography sx={{ fontSize: '0.82rem', fontWeight: 500, color: '#5A3A1A', flex: 1 }}>
+                          {m}
+                        </Typography>
+                        <TextField
+                          size="small" type="number"
+                          placeholder="0"
+                          value={prices[m]}
+                          onChange={e => setPrices(p => ({ ...p, [m]: e.target.value }))}
+                          disabled={isRm}
+                          slotProps={{ input: { startAdornment: <InputAdornment position="start"><Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: SD }}>₹</Typography></InputAdornment> } }}
+                          sx={{ width: 100, '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '0.88rem', bgcolor: prices[m] ? SP : '#FBF6EE', '& fieldset': { borderColor: prices[m] ? S : '#E8D8C0' }, '&:hover fieldset': { borderColor: S } } }}
+                        />
+                        <Tooltip title={menus[m] ? 'Edit menu' : 'Add menu'}>
+                          <Button
+                            size="small"
+                            disabled={isRm}
+                            onClick={() => openMenuDialog(m)}
+                            startIcon={<MenuBookIcon sx={{ fontSize: '14px !important' }} />}
+                            sx={{
+                              minWidth: 0, px: 1.25, py: 0.5, fontSize: '0.7rem', fontWeight: 700,
+                              borderRadius: '8px', textTransform: 'none',
+                              border: `1.5px solid ${menus[m] ? GOLD : '#E8D8C0'}`,
+                              color: menus[m] ? GOLD : '#9A7A5A',
+                              bgcolor: menus[m] ? GP : 'transparent',
+                              '&:hover': { bgcolor: GP, borderColor: GOLD, color: GOLD },
+                              '&.Mui-disabled': { opacity: 0.4 },
+                            }}
+                          >
+                            {menus[m] ? 'Menu' : 'Menu'}
+                          </Button>
+                        </Tooltip>
+                        <Tooltip title={isRm ? 'Restore meal' : 'Mark unavailable'}>
+                          <IconButton size="small" onClick={() => toggleRemove(m)} sx={{ border: `1.5px solid ${isRm ? '#b2dfbc' : '#E8D8C0'}`, borderRadius: '8px', color: isRm ? GREEN : '#9A7A5A', '&:hover': { bgcolor: isRm ? GRP : RP, borderColor: isRm ? GREEN : RED, color: isRm ? GREEN : RED }, width: 28, height: 28 }}>
+                            {isRm ? <AddIcon sx={{ fontSize: 14 }} /> : <CloseIcon sx={{ fontSize: 14 }} />}
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     );
                   })}
-                </div>
 
-                <p style={{ fontSize: '0.72rem', color: '#9A7A5A', marginTop: 8, fontFamily: 'Inter, sans-serif', lineHeight: 1.5 }}>
-                  Leave price blank to use global default rates. Use ✕ to mark a meal unavailable.
-                </p>
+                  <Typography sx={{ fontSize: '0.72rem', color: '#9A7A5A', mt: 1, lineHeight: 1.6 }}>
+                    Leave price blank to use global default rates.
+                  </Typography>
 
-                {/* Slot Limits */}
-                <div className="sm-limit-section-head">🎟️ Slot Limits for This Date</div>
+                  {/* Slot Limits */}
+                  <Divider sx={{ my: 2, borderColor: '#F2E8D8' }} />
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                    <ConfirmationNumberIcon sx={{ fontSize: 16, color: SD }} />
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#5A3A1A' }}>
+                      Slot Limits for This Date
+                    </Typography>
+                  </Box>
 
-                {/* Column headers: meal | Thiruvanmiyur | NLBR */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 4, paddingLeft: 0 }}>
-                  <div />
-                  {LOCS.map(loc => (
-                    <div key={loc} className="sm-limit-col-head">{loc}</div>
-                  ))}
-                </div>
-
-                {ALL_MEALS.map(m => (
-                  <div key={m} className="sm-limit-loc-row">
-                    <div className="sm-limit-loc-label">{mealIcon(m)} {m}</div>
+                  {/* Limits grid header */}
+                  <Box sx={{ display: 'grid', gridTemplateColumns: '80px 1fr 1fr', gap: 1, mb: 0.75 }}>
+                    <Box />
                     {LOCS.map(loc => (
-                      <input
-                        key={loc}
-                        type="number"
-                        min={0}
-                        className="sm-limit-loc-input"
-                        value={limits[loc][m]}
-                        onChange={e => setLimits(prev => ({
-                          ...prev,
-                          [loc]: { ...prev[loc], [m]: e.target.value },
-                        }))}
-                      />
+                      <Typography key={loc} sx={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#9A7A5A', textAlign: 'center' }}>{loc}</Typography>
                     ))}
-                  </div>
-                ))}
+                  </Box>
 
-                <p style={{ fontSize: '0.72rem', color: '#9A7A5A', marginTop: 8, fontFamily: 'Inter, sans-serif', lineHeight: 1.5 }}>
-                  Leave blank to use global defaults.{' '}
-                  <span
-                    onClick={() => onNav?.('settings')}
-                    style={{ color: '#C44D0D', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
-                    Edit global defaults in Default Settings ↗
-                  </span>
-                </p>
-              </div>
+                  {ALL_MEALS.filter(m => !removed.includes(m)).map((m, idx, arr) => (
+                    <Box key={m} sx={{ display: 'grid', gridTemplateColumns: '80px 1fr 1fr', gap: 1, alignItems: 'center', py: 0.875, borderBottom: idx < arr.length - 1 ? '1px solid #F2E8D8' : 'none' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#5A3A1A' }}>
+                        <MealIcon meal={m} size={13} />
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 500 }}>{m}</Typography>
+                      </Box>
+                      {LOCS.map(loc => (
+                        <TextField
+                          key={loc} size="small" type="number"
+                          value={limits[loc][m]}
+                          onChange={e => setLimits(prev => ({ ...prev, [loc]: { ...prev[loc], [m]: e.target.value } }))}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '7px', fontSize: '0.85rem', '& input': { textAlign: 'center', py: 0.75 }, '& fieldset': { borderColor: '#E8D8C0' }, '&:hover fieldset': { borderColor: S }, '&.Mui-focused fieldset': { borderColor: S } } }}
+                        />
+                      ))}
+                    </Box>
+                  ))}
 
-              <div className="sm-price-panel-footer">
-                <button className="sm-btn-primary" style={{ flex: 1, justifyContent: 'center' }} onClick={saveDay} disabled={saving}>
-                  {saving ? 'Saving…' : saved ? '✓ Saved!' : '💾 Save Rates & Limits'}
-                </button>
-                {slotMap[selectedDate] && (
-                  <button className="sm-btn-danger" onClick={clearDay} title="Delete this slot">🗑️</button>
+                  <Typography sx={{ fontSize: '0.72rem', color: '#9A7A5A', mt: 1, lineHeight: 1.6 }}>
+                    Leave blank for global defaults.{' '}
+                    <Box component="span" onClick={() => onNav?.('settings')} sx={{ color: SD, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
+                      Edit in Default Settings ↗
+                    </Box>
+                  </Typography>
+                </CardContent>
+
+                {/* Action footer */}
+                {saveError && (
+                  <Box sx={{ mx: 2.5, mb: 1.5, mt: 1, px: 1.5, py: 0.875, bgcolor: RP, border: `1px solid #f5c6c2`, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                    <BlockIcon sx={{ fontSize: 14, color: RED, flexShrink: 0 }} />
+                    <Typography sx={{ fontSize: '0.75rem', color: RED, fontWeight: 600 }}>{saveError}</Typography>
+                  </Box>
                 )}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+                <Box sx={{ px: 2.5, py: 2, borderTop: '1.5px solid #FEF0E6', bgcolor: SP, display: 'flex', gap: 1 }}>
+                  <Button
+                    fullWidth variant="contained"
+                    startIcon={saving ? <CircularProgress size={14} sx={{ color: '#fff' }} /> : saved ? <CheckIcon sx={{ fontSize: 16 }} /> : <SaveIcon sx={{ fontSize: 16 }} />}
+                    disabled={saving}
+                    onClick={saveDay}
+                    sx={{ borderRadius: '50px', textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', bgcolor: saved ? GREEN : S, boxShadow: 'none', '&:hover': { bgcolor: saved ? GREEN : SD }, '&:disabled': { bgcolor: '#C0B090', color: '#fff' } }}
+                  >
+                    {saving ? 'Saving…' : saved ? 'Saved!' : 'Save Rates & Limits'}
+                  </Button>
+                  {slotMap[selectedDate] && (
+                    <Tooltip title="Delete this slot configuration">
+                      <IconButton onClick={clearDay} sx={{ border: '1.5px solid #f5c6c2', color: RED, borderRadius: '50px', px: 1.5, '&:hover': { bgcolor: RP } }}>
+                        <DeleteOutlineIcon sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+              </>
+            )}
+          </Card>
+        </Grid>
+      </Grid>
 
-      {/* ── Booking Summary Calendar ── */}
-      <div className="sm-booking-section">
-        <div className="sm-booking-header">
-          <div>
-            <h3>Monthly Booking Summary</h3>
-            <p>Total coupons booked per meal for each date — from all registrations</p>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-              <span className="sm-bk-chip bfast">🌅 Breakfast</span>
-              <span className="sm-bk-chip lunch">☀️ Lunch</span>
-              <span className="sm-bk-chip dinner">🌙 Dinner</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '4px 10px' }}>
-              <button className="sm-cal-nav-btn" onClick={() => shiftMonth(-1)}>←</button>
-              <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff', minWidth: 110, textAlign: 'center', fontFamily: 'Inter, sans-serif' }}>{monthLabel}</span>
-              <button className="sm-cal-nav-btn" onClick={() => shiftMonth(1)}>→</button>
-            </div>
-          </div>
-        </div>
-        <div className="sm-bk-dow-row">
-          {DAYS.map(d => <div key={d} className="sm-bk-cal-dow">{d}</div>)}
-        </div>
-        <div className="sm-bk-cal-grid">
+      {/* ── BOOKING SUMMARY CALENDAR ── */}
+      <Card elevation={0} sx={{ border: '1.5px solid #FEF0E6', borderRadius: '14px', overflow: 'hidden', mt: 4, boxShadow: '0 2px 14px rgba(232,98,26,0.08)' }}>
+
+        {/* Summary header */}
+        <Box sx={{ px: 3, py: 2.25, background: `linear-gradient(135deg, ${SD}, ${S})`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+          <Box>
+            <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>Monthly Booking Summary</Typography>
+            <Typography sx={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.7)', mt: 0.25 }}>Total coupons booked per meal per date</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+            {/* Meal legend */}
+            {([
+              { label: 'Breakfast', bg: SP,         color: SD,        icon: <FreeBreakfastIcon sx={{ fontSize: '12px !important', ml: '6px !important' }} /> },
+              { label: 'Lunch',     bg: '#FFF8E1',  color: '#e65100', icon: <WbSunnyIcon       sx={{ fontSize: '12px !important', ml: '6px !important' }} /> },
+              { label: 'Dinner',    bg: '#EDE7F6',  color: '#512da8', icon: <NightlightIcon    sx={{ fontSize: '12px !important', ml: '6px !important' }} /> },
+            ] as const).map(({ label, bg, color, icon }) => (
+              <Chip key={label} icon={icon} label={label} size="small" sx={{ bgcolor: bg, color, fontWeight: 700, fontSize: '0.65rem', height: 22, borderRadius: '50px', '& .MuiChip-icon': { color } }} />
+            ))}
+            {/* Month nav */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.15)', borderRadius: '8px', px: 1.5, py: 0.5 }}>
+              <IconButton size="small" onClick={() => shiftMonth(-1)} sx={{ color: '#fff', p: 0.25, '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}><ChevronLeftIcon /></IconButton>
+              <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff', minWidth: 110, textAlign: 'center' }}>{monthLabel}</Typography>
+              <IconButton size="small" onClick={() => shiftMonth(1)}  sx={{ color: '#fff', p: 0.25, '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}><ChevronRightIcon /></IconButton>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Day-of-week header */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', bgcolor: '#FBF6EE', borderBottom: '1px solid #F2E8D8' }}>
+          {DAYS.map(d => (
+            <Typography key={d} sx={{ textAlign: 'center', fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9A7A5A', py: 1 }}>{d}</Typography>
+          ))}
+        </Box>
+
+        {/* Summary grid */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', bgcolor: '#F2E8D8' }}>
           {calDays.map((d, i) => {
-            if (d === null) return <div key={`be${i}`} className="sm-bk-day empty" />;
-            const ds = toStr(calYear, calMonth, d);
-            const bk = bookingMap[ds];
-            const slot = slotMap[ds];
-            const hasBk = bk && (bk.Breakfast + bk.Lunch + bk.Dinner) > 0;
-            const allStopped = slot?.stopped ?? false;
-            const hasSomeStopped = !allStopped && slot && ALL_MEALS.some(
-              m => slot.mealStatus?.[m]?.stopped || slot.mealStatus?.[m]?.removed
-            );
-            let cls = 'sm-bk-day';
-            if (ds === todayStr) cls += ' bk-today';
-            if (hasBk && !allStopped) cls += ' has-bookings';
-            if (allStopped) cls += ' bk-all-stopped';
-            else if (hasSomeStopped) cls += ' bk-has-stopped';
+            if (d === null) return <Box key={`be${i}`} sx={{ bgcolor: '#FBF6EE', minHeight: 76 }} />;
+            const ds         = toStr(calYear, calMonth, d);
+            const bk         = bookingMap[ds];
+            const slot       = slotMap[ds];
+            const hasBk       = bk && (bk.Breakfast + bk.Lunch + bk.Dinner) > 0;
+            const allStopped  = slot?.stopped ?? false;
+            const isRegistered = !!slot;
+            const isToday     = ds === todayStr;
+            const showCell    = hasBk || isRegistered;
+
             return (
-              <div key={ds} className={cls} onClick={() => selectDay(d)}>
-                <div className="sm-bk-day-num">{d}</div>
-                {allStopped ? (
-                  <div className="sm-bk-stopped-badge">⛔ Stopped</div>
-                ) : (
-                  <div className="sm-bk-meal-row">
+              <Box
+                key={ds}
+                onClick={() => setSummaryDate(ds)}
+                sx={{
+                  bgcolor: showCell && allStopped ? '#fff4f4' : isToday ? GP : '#fff',
+                  minHeight: 76, p: '8px 7px', cursor: 'pointer',
+                  borderLeft: showCell
+                    ? allStopped ? `3px solid ${RED}` : hasBk ? `3px solid ${S}` : `3px solid rgba(232,98,26,0.25)`
+                    : '3px solid transparent',
+                  transition: 'bg 0.15s',
+                  '&:hover': { bgcolor: SP },
+                }}
+              >
+                <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: isToday ? SD : allStopped && showCell ? RED : '#3B1F0A', textDecoration: allStopped && showCell ? 'line-through' : 'none', mb: 0.75 }}>
+                  {d}
+                </Typography>
+                {showCell && allStopped ? (
+                  <Chip label="⛔ Stopped" size="small" sx={{ bgcolor: RP, color: RED, fontWeight: 700, fontSize: '0.55rem', height: 18, borderRadius: '3px' }} />
+                ) : hasBk ? (
+                  <Box sx={{ display: 'flex', gap: 0.4, flexWrap: 'wrap' }}>
                     {bk?.Breakfast ? (
-                      <span className={`sm-bk-chip bfast${slot?.mealStatus?.Breakfast?.stopped || slot?.mealStatus?.Breakfast?.removed ? ' bk-stopped-chip' : ''}`}>
-                        🌅{bk.Breakfast}
-                      </span>
+                      <Chip icon={<FreeBreakfastIcon sx={{ fontSize: '11px !important', ml: '5px !important' }} />} label={bk.Breakfast} size="small" sx={{ bgcolor: SP, color: SD, fontWeight: 700, fontSize: '0.6rem', height: 20, borderRadius: '4px', opacity: slot?.mealStatus?.Breakfast?.removed ? 0.5 : 1, textDecoration: slot?.mealStatus?.Breakfast?.removed ? 'line-through' : 'none', '& .MuiChip-icon': { color: SD } }} />
                     ) : null}
                     {bk?.Lunch ? (
-                      <span className={`sm-bk-chip lunch${slot?.mealStatus?.Lunch?.stopped || slot?.mealStatus?.Lunch?.removed ? ' bk-stopped-chip' : ''}`}>
-                        ☀️{bk.Lunch}
-                      </span>
+                      <Chip icon={<WbSunnyIcon sx={{ fontSize: '11px !important', ml: '5px !important' }} />} label={bk.Lunch} size="small" sx={{ bgcolor: '#FFF8E1', color: '#e65100', fontWeight: 700, fontSize: '0.6rem', height: 20, borderRadius: '4px', opacity: slot?.mealStatus?.Lunch?.removed ? 0.5 : 1, '& .MuiChip-icon': { color: '#e65100' } }} />
                     ) : null}
                     {bk?.Dinner ? (
-                      <span className={`sm-bk-chip dinner${slot?.mealStatus?.Dinner?.stopped || slot?.mealStatus?.Dinner?.removed ? ' bk-stopped-chip' : ''}`}>
-                        🌙{bk.Dinner}
-                      </span>
+                      <Chip icon={<NightlightIcon sx={{ fontSize: '11px !important', ml: '5px !important' }} />} label={bk.Dinner} size="small" sx={{ bgcolor: '#EDE7F6', color: '#512da8', fontWeight: 700, fontSize: '0.6rem', height: 20, borderRadius: '4px', opacity: slot?.mealStatus?.Dinner?.removed ? 0.5 : 1, '& .MuiChip-icon': { color: '#512da8' } }} />
                     ) : null}
-                  </div>
-                )}
-              </div>
+                  </Box>
+                ) : isRegistered ? (
+                  <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'rgba(232,98,26,0.35)', mt: 0.5 }} />
+                ) : null}
+              </Box>
             );
           })}
-        </div>
-      </div>
-    </>
+        </Box>
+      </Card>
+
+      {/* ── SUMMARY DAY MODAL ── */}
+      {(() => {
+        if (!summaryDate) return null;
+        const sd   = summaryDate;
+        const bk   = bookingMap[sd];
+        const slot = slotMap[sd];
+        const isStopped = slot?.stopped ?? false;
+        const dateLabel = new Date(sd + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+        const mealConfig: { meal: MealType; icon: React.ReactNode; color: string; bg: string }[] = [
+          { meal: 'Breakfast', icon: <FreeBreakfastIcon sx={{ fontSize: 15 }} />, color: '#92400E', bg: '#FEF3C7' },
+          { meal: 'Lunch',     icon: <WbSunnyIcon       sx={{ fontSize: 15 }} />, color: '#78350F', bg: '#FFF9E6' },
+          { meal: 'Dinner',    icon: <NightlightIcon    sx={{ fontSize: 15 }} />, color: '#4C1D95', bg: '#EDE9FE' },
+        ];
+
+        return (
+          <Dialog open onClose={() => setSummaryDate(null)} maxWidth="sm" fullWidth
+            slotProps={{ paper: { sx: { borderRadius: '18px', overflow: 'hidden' } } }}>
+
+            {/* Dialog header */}
+            <Box sx={{ px: 2.5, py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #F2E8D8', bgcolor: '#fff' }}>
+              <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', fontWeight: 700, color: SD }}>
+                {dateLabel}
+              </Typography>
+              <IconButton size="small" onClick={() => setSummaryDate(null)} sx={{ color: '#9A7A5A', '&:hover': { color: '#3B1F0A' } }}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
+
+            {/* ── 3 MEAL CARDS ── */}
+            <DialogContent sx={{ p: 2.5, bgcolor: '#FBF6EE' }}>
+
+              {/* ── STATUS BAR ── */}
+              <Box sx={{
+                bgcolor: '#fff',
+                border: `1.5px solid ${isStopped ? '#fecaca' : '#F2E8D8'}`,
+                borderRadius: '12px',
+                p: '14px 16px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                gap: 2, mb: 2,
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  {/* Mini calendar widget */}
+                  <Box sx={{ width: 40, borderRadius: '8px', overflow: 'hidden', border: '1.5px solid #E8D8C0', flexShrink: 0 }}>
+                    <Box sx={{ bgcolor: isStopped ? RED : SD, py: '3px', textAlign: 'center' }}>
+                      <Typography sx={{ fontSize: '0.5rem', fontWeight: 700, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        {MONTHS[new Date(sd + 'T00:00:00').getMonth()].slice(0, 3)}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ bgcolor: '#fff', py: '5px', textAlign: 'center' }}>
+                      <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', fontWeight: 700, color: '#3B1F0A', lineHeight: 1 }}>
+                        {new Date(sd + 'T00:00:00').getDate()}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: isStopped ? RED : '#1A1A1A' }}>
+                      {isStopped ? 'Bookings stopped' : 'Bookings open'}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.72rem', color: '#9A7A5A', mt: 0.2 }}>
+                      {isStopped ? 'All meals are paused for this date' : 'Use per-meal buttons below to stop individual meals'}
+                    </Typography>
+                    {slot?.isFestival && slot.festivalName && (
+                      <Typography sx={{ fontSize: '0.68rem', color: SD, mt: 0.25, fontWeight: 600 }}>{slot.festivalName}</Typography>
+                    )}
+                  </Box>
+                </Box>
+                <Button
+                  variant="outlined" size="small"
+                  disabled={togglingStop}
+                  onClick={() => toggleStop(sd)}
+                  sx={{
+                    borderRadius: '50px', textTransform: 'none', fontWeight: 700, fontSize: '0.78rem',
+                    flexShrink: 0, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px',
+                    color: isStopped ? GREEN : RED,
+                    borderColor: isStopped ? '#b2dfbc' : '#fecaca',
+                    bgcolor: 'transparent',
+                    '&:hover': { bgcolor: isStopped ? GRP : RP, borderColor: isStopped ? GREEN : RED },
+                    '&.Mui-disabled': { opacity: 0.5 },
+                  }}
+                >
+                  {togglingStop
+                    ? <><CircularProgress size={13} color="inherit" />{isStopped ? 'Resuming…' : 'Stopping…'}</>
+                    : isStopped
+                    ? <><PlayCircleOutlineIcon sx={{ fontSize: 16 }} />Resume Entire Date</>
+                    : <><Box component="span" sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: RED, display: 'inline-block', flexShrink: 0 }} />Stop Entire Date</>}
+                </Button>
+              </Box>
+              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
+                {mealConfig.map(({ meal, icon, color, bg }) => {
+                  const count      = bk?.[meal] ?? 0;
+                  const limTV      = slot?.slotLimits?.Thiruvanmiyur?.[meal] ?? 0;
+                  const limNL      = slot?.slotLimits?.NLBR?.[meal] ?? 0;
+                  const totalLimit = limTV + limNL;
+                  const pct        = totalLimit > 0 ? Math.min(Math.round((count / totalLimit) * 100), 100) : null;
+                  const isRemoved  = slot?.mealStatus?.[meal]?.removed ?? false;
+                  const barColor   = pct != null && pct >= 90 ? RED : pct != null && pct >= 75 ? '#e67e22' : color;
+
+                  return (
+                    <Box key={meal} sx={{
+                      bgcolor: '#fff',
+                      border: `1.5px solid ${isRemoved ? RED : '#F2E8D8'}`,
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      opacity: isStopped ? 0.6 : 1,
+                      transition: 'opacity 0.2s',
+                    }}>
+                      {/* Card header */}
+                      <Box sx={{ px: 1.5, py: 1, bgcolor: bg, display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                        <Box sx={{ color }}>{icon}</Box>
+                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color }}>{meal}</Typography>
+                      </Box>
+
+                      {/* Count */}
+                      <Box sx={{ px: 1.5, pt: 1.25, pb: 0.75, textAlign: 'center' }}>
+                        <Typography sx={{
+                          fontFamily: 'Cormorant Garamond, serif',
+                          fontSize: '1.6rem', fontWeight: 700, lineHeight: 1,
+                          color: isRemoved ? '#C0B090' : '#3B1F0A',
+                          textDecoration: isRemoved ? 'line-through' : 'none',
+                        }}>
+                          {count}
+                          {totalLimit > 0 && (
+                            <Box component="span" sx={{ fontSize: '0.85rem', fontWeight: 500, color: '#9A7A5A' }}>
+                              /{totalLimit}
+                            </Box>
+                          )}
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.6rem', color: '#9A7A5A', mt: 0.25 }}>coupons</Typography>
+
+                        {/* Fill bar */}
+                        {pct !== null && (
+                          <LinearProgress variant="determinate" value={pct}
+                            sx={{ mt: 0.875, height: 5, borderRadius: '50px', bgcolor: '#F2E8D8',
+                              '& .MuiLinearProgress-bar': { bgcolor: barColor, borderRadius: '50px' } }} />
+                        )}
+                        {pct !== null && (
+                          <Typography sx={{ fontSize: '0.6rem', color: barColor, mt: 0.4, fontWeight: 600 }}>{pct}%</Typography>
+                        )}
+                      </Box>
+
+                      {/* Per-meal stop button */}
+                      <Box sx={{ px: 1, pb: 1 }}>
+                        <Button
+                          fullWidth size="small"
+                          disabled={isStopped || togglingMeal === meal}
+                          onClick={() => toggleMealStop(sd, meal)}
+                          sx={{
+                            borderRadius: '7px', textTransform: 'none', fontWeight: 700,
+                            fontSize: '0.62rem', py: 0.5,
+                            display: 'inline-flex', alignItems: 'center', gap: '5px',
+                            bgcolor: isRemoved ? GRP : RP,
+                            color:   isRemoved ? GREEN : RED,
+                            border: `1px solid ${isRemoved ? '#b2dfbc' : '#f5c6c2'}`,
+                            '&:hover': { bgcolor: isRemoved ? '#c8e6c9' : '#fcdede' },
+                            '&.Mui-disabled': { opacity: 0.4 },
+                          }}
+                        >
+                          {togglingMeal === meal
+                            ? <><CircularProgress size={11} color="inherit" /> …</>
+                            : isRemoved
+                            ? <><PlayCircleOutlineIcon sx={{ fontSize: 13 }} /> Resume</>
+                            : <><BlockIcon sx={{ fontSize: 13 }} /> Stop</>}
+                        </Button>
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </Box>
+
+              {/* Total row */}
+              <Box sx={{ mt: 1.5, px: 2, py: 1.25, bgcolor: '#fff', borderRadius: '10px', border: '1px solid #F2E8D8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography sx={{ fontSize: '0.75rem', color: '#9A7A5A' }}>Total coupons booked</Typography>
+                <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 700, color: SD }}>
+                  {(bk?.Breakfast ?? 0) + (bk?.Lunch ?? 0) + (bk?.Dinner ?? 0)}
+                </Typography>
+              </Box>
+            </DialogContent>
+
+            <DialogActions sx={{ px: 2.5, py: 1.5, borderTop: '1px solid #F2E8D8', justifyContent: 'flex-end' }}>
+              <Button size="small" onClick={() => setSummaryDate(null)}
+                sx={{ color: '#9A7A5A', textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}>
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        );
+      })()}
+
+      {/* ── MENU DIALOG ── */}
+      <Dialog
+        open={!!menuMeal}
+        onClose={() => setMenuMeal(null)}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{ paper: { sx: { borderRadius: '16px', overflow: 'hidden' } } }}
+      >
+        <DialogTitle sx={{ background: `linear-gradient(135deg, ${SD}, ${S})`, color: '#fff', py: 2, px: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <MenuBookIcon sx={{ fontSize: 20 }} />
+            <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>
+              {menuMeal} Menu — {selectedDate}
+            </Typography>
+          </Box>
+          <IconButton size="small" onClick={() => setMenuMeal(null)} sx={{ color: 'rgba(255,255,255,0.7)', '&:hover': { color: '#fff' } }}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ px: 3, py: 2.5 }}>
+          <Typography sx={{ fontSize: '0.75rem', color: '#9A7A5A', mb: 1.25 }}>
+            Enter the menu items for this meal (one item per line). This will be visible to users on the booking page.
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={5}
+            size="small"
+            placeholder={`e.g.\nPuri Bhaji\nRice Dal\nPayasam`}
+            value={menuText}
+            onChange={e => setMenuText(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '10px', fontSize: '0.85rem',
+                '& fieldset': { borderColor: '#E8D8C0' },
+                '&:hover fieldset': { borderColor: S },
+                '&.Mui-focused fieldset': { borderColor: S },
+              },
+            }}
+          />
+          {menuText && (
+            <Box sx={{ mt: 1.5, p: 1.25, bgcolor: SP, borderRadius: '8px', border: `1px solid rgba(232,98,26,0.15)` }}>
+              <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: SD, mb: 0.5 }}>Preview</Typography>
+              {menuText.split('\n').filter(Boolean).map((line, i) => (
+                <Typography key={i} sx={{ fontSize: '0.8rem', color: '#5A3A1A' }}>• {line}</Typography>
+              ))}
+            </Box>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #F2E8D8', gap: 1 }}>
+          <Button size="small" onClick={() => setMenuMeal(null)} sx={{ color: '#9A7A5A', textTransform: 'none', fontWeight: 600, fontSize: '0.82rem' }}>
+            Cancel
+          </Button>
+          <Button
+            size="small"
+            variant="contained"
+            disabled={menuSaving}
+            startIcon={menuSaving ? <CircularProgress size={13} sx={{ color: '#fff' }} /> : <CheckIcon sx={{ fontSize: 16 }} />}
+            onClick={handleSaveMenu}
+            sx={{ bgcolor: S, borderRadius: '8px', textTransform: 'none', fontWeight: 700, fontSize: '0.82rem', '&:hover': { bgcolor: SD } }}
+          >
+            {menuSaving ? 'Saving…' : 'Save Menu'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }

@@ -42,6 +42,8 @@ export interface PrasadamBooking {
   total: number;
   status: BookingStatus;
   submitted?: string;
+  paymentProof?: string;
+  mismatchNote?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -54,6 +56,7 @@ export interface CreatePrasadamBookingDto {
   date: string;
   meals: MealMap;
   total: number;
+  paymentProof?: string;
 }
 
 // ─── Party Enquiries ──────────────────────────────────────────────────────────
@@ -188,6 +191,101 @@ export interface Festival {
   icon: string;
   createdAt: string;
   updatedAt: string;
+}
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+
+export interface Settings {
+  _id?: string;
+  defaultMealRates: MealMap;
+  defaultSlotLimits: {
+    Thiruvanmiyur: MealMap;
+    NLBR: MealMap;
+  };
+  bookingWindowOpen:  boolean;
+  bookingWindowClose: boolean;
+  bookingOpenDays:    number;
+  bookingCloseDays:   number;
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
+
+export interface DashboardStats {
+  totalBookings:    number;
+  todayBookings:    number;
+  totalCoupons:     number;
+  pendingPayments:  number;
+  pendingEnquiries: number;
+  pendingOrders:    number;
+}
+
+export interface LocationMealCounts extends MealMap { total: number; }
+
+export interface TodaySlotsData {
+  date:          string;
+  slot:          SlotDate | null;
+  totalBookings: number;
+  bookings: {
+    Thiruvanmiyur: LocationMealCounts;
+    NLBR:          LocationMealCounts;
+  };
+}
+
+// ─── Slot Management ──────────────────────────────────────────────────────────
+
+export interface SlotRateEditorData {
+  slot:          SlotDate | null;
+  totalBookings: number;
+  bookingCounts: {
+    Thiruvanmiyur: LocationMealCounts;
+    NLBR:          LocationMealCounts;
+  };
+}
+
+export type MonthlySummaryData = Record<string, {
+  Breakfast: number;
+  Lunch:     number;
+  Dinner:    number;
+  total:     number;
+  count:     number;
+}>;
+
+// ─── Registrations ────────────────────────────────────────────────────────────
+
+export interface Registration {
+  _id: string;
+  id: string;        // coupon ID (CPN-XXXXXX)
+  bookingId: string; // original booking ID (BKG-XXXXXX)
+  name: string;
+  mobile: string;
+  email?: string;
+  location: 'Thiruvanmiyur' | 'NLBR';
+  date: string;
+  meals: MealMap;
+  total: number;
+  submitted?: string;
+  approvedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RegistrationsResponse {
+  data: Registration[];
+  meta: { count: number; totalCoupons: number };
+}
+
+// ─── Payments ─────────────────────────────────────────────────────────────────
+
+export interface PaymentSummary {
+  total:    number;
+  pending:  number;
+  approved: number;
+  declined: number;
+}
+
+export interface PaymentsResponse {
+  data:    PrasadamBooking[];
+  summary: PaymentSummary;
 }
 
 // ─── API Response wrapper ─────────────────────────────────────────────────────

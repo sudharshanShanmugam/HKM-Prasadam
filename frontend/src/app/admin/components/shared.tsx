@@ -5,8 +5,9 @@ import type { MealType } from '@/types';
 // ─── Constants ─────────────────────────────────────────────────────────────────
 export const ALL_MEALS: MealType[] = ['Breakfast', 'Lunch', 'Dinner'];
 export const mealIcon = (m: MealType) => m === 'Breakfast' ? '🌅' : m === 'Lunch' ? '☀️' : '🌙';
-export const SIDEBAR_W = 240;
+export const SIDEBAR_W = 260;
 
+// CLR kept as reference for dynamic/inline uses (e.g. StatusPill, StatCard color prop)
 export const CLR = {
   saffron: '#E8621A',
   saffronDark: '#C44D0D',
@@ -24,15 +25,15 @@ export const CLR = {
   greenPale: '#EBF7ED',
   redPale: '#FDECEA',
   red: '#C0392B',
-  sidebar: '#1a1a2e',
-  sidebarHover: 'rgba(255,255,255,0.07)',
-  sidebarActive: 'rgba(232,98,26,0.18)',
+  sidebar: '#D86A32',
+  sidebarHover: 'rgba(255,255,255,0.14)',
+  sidebarActive: 'rgba(255,255,255,0.22)',
 };
 
-// ─── Shared inline style helpers ───────────────────────────────────────────────
+// ─── Shared style helpers (kept for backward compat, Tailwind preferred in components) ──
 export const card: React.CSSProperties = {
   background: '#fff',
-  border: `1.5px solid ${CLR.borderLight}`,
+  border: '1.5px solid #F2E8D8',
   borderRadius: 12,
   overflow: 'hidden',
   boxShadow: '0 2px 12px rgba(60,20,0,0.06)',
@@ -47,24 +48,24 @@ export const pill = (color: string, bg: string): React.CSSProperties => ({
 
 export const inputSt: React.CSSProperties = {
   width: '100%', padding: '9px 12px',
-  border: `1.5px solid ${CLR.border}`, borderRadius: 8,
-  fontSize: 13, outline: 'none', background: CLR.cream,
-  fontFamily: 'Inter, sans-serif', color: CLR.brown,
+  border: '1.5px solid #E8D8C0', borderRadius: 8,
+  fontSize: 13, outline: 'none', background: '#FBF6EE',
+  fontFamily: 'Inter, sans-serif', color: '#3B1F0A',
 };
 
 // ─── StatusPill ────────────────────────────────────────────────────────────────
 export function StatusPill({ s }: { s: string }) {
   const map: Record<string, [string, string]> = {
-    approved:  [CLR.green,     CLR.greenPale],
-    accepted:  [CLR.green,     CLR.greenPale],
-    delivered: [CLR.green,     CLR.greenPale],
-    paid:      [CLR.green,     CLR.greenPale],
-    declined:  [CLR.red,       CLR.redPale],
-    pending:   [CLR.gold,      CLR.goldPale],
-    review:    [CLR.gold,      CLR.goldPale],
-    active:    [CLR.green,     CLR.greenPale],
-    stopped:   [CLR.red,       CLR.redPale],
-    'in-transit': ['#6B3A1F', '#FFF0E0'],
+    approved:     [CLR.green,    CLR.greenPale],
+    accepted:     [CLR.green,    CLR.greenPale],
+    delivered:    [CLR.green,    CLR.greenPale],
+    paid:         [CLR.green,    CLR.greenPale],
+    declined:     [CLR.red,      CLR.redPale],
+    pending:      [CLR.gold,     CLR.goldPale],
+    review:       [CLR.gold,     CLR.goldPale],
+    active:       [CLR.green,    CLR.greenPale],
+    stopped:      [CLR.red,      CLR.redPale],
+    'in-transit': ['#6B3A1F',   '#FFF0E0'],
   };
   const [color, bg] = map[s] ?? [CLR.textMid, CLR.cream];
   const labels: Record<string, string> = { 'in-transit': 'In Transit' };
@@ -77,23 +78,27 @@ export function Btn({ children, onClick, variant = 'primary', sm, disabled, styl
   variant?: 'primary' | 'ghost' | 'danger' | 'success' | 'outline';
   sm?: boolean; disabled?: boolean; style?: React.CSSProperties;
 }) {
-  const base: React.CSSProperties = {
-    display: 'inline-flex', alignItems: 'center', gap: 6,
-    border: 'none', borderRadius: 8, cursor: disabled ? 'not-allowed' : 'pointer',
-    fontFamily: 'Inter, sans-serif', fontWeight: 600, transition: 'all 0.18s',
-    padding: sm ? '6px 14px' : '9px 18px',
-    fontSize: sm ? 12 : 13,
-    opacity: disabled ? 0.6 : 1,
+  const variantClasses: Record<string, string> = {
+    primary: 'bg-saffron text-white border-none shadow-[0_3px_14px_rgba(232,98,26,0.35)] hover:bg-saffron-dark',
+    ghost:   'bg-white text-saffron-dark border-[1.5px] border-[rgba(232,98,26,0.25)] hover:bg-saffron-pale hover:border-saffron',
+    danger:  'bg-white text-hkm-red border-[1.5px] border-[#f5c6c2] hover:bg-red-pale',
+    success: 'bg-white text-hkm-green border-[1.5px] border-[#b2dfbc] hover:bg-green-pale',
+    outline: 'bg-transparent text-saffron border-[1.5px] border-saffron hover:bg-saffron-pale',
   };
-  const variants: Record<string, React.CSSProperties> = {
-    primary: { background: CLR.saffron, color: '#fff', boxShadow: '0 2px 10px rgba(232,98,26,0.3)' },
-    ghost:   { background: '#fff', color: CLR.saffronDark, border: `1.5px solid ${CLR.border}` },
-    danger:  { background: '#fff', color: CLR.red, border: '1.5px solid #f5c6c2' },
-    success: { background: '#fff', color: CLR.green, border: '1.5px solid #b2dfbc' },
-    outline: { background: 'transparent', color: CLR.saffron, border: `1.5px solid ${CLR.saffron}` },
-  };
+
   return (
-    <button onClick={onClick} disabled={disabled} style={{ ...base, ...variants[variant], ...style }}>
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      style={style}
+      className={[
+        'inline-flex items-center gap-1.5 rounded-[50px] transition-all duration-[180ms]',
+        'font-[family-name:var(--font-inter)] font-semibold',
+        sm ? 'px-[14px] py-[5px] text-[0.75rem]' : 'px-[18px] py-[9px] text-[0.82rem]',
+        disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
+        variantClasses[variant],
+      ].join(' ')}
+    >
       {children}
     </button>
   );
@@ -104,13 +109,9 @@ export function SectionCard({ title, action, children }: {
   title: string; action?: React.ReactNode; children: React.ReactNode;
 }) {
   return (
-    <div style={{ ...card, marginBottom: 24 }}>
-      <div style={{
-        padding: '16px 22px', display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', borderBottom: `1px solid ${CLR.borderLight}`,
-        background: `linear-gradient(to right, #fff, ${CLR.cream})`,
-      }}>
-        <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 700, color: CLR.saffronDark }}>
+    <div className="bg-white border-[1.5px] border-saffron-pale rounded-[14px] overflow-hidden mb-6 shadow-[0_2px_12px_rgba(232,98,26,0.07)]">
+      <div className="px-6 py-[18px] flex items-center gap-3 flex-wrap border-b-[1.5px] border-saffron-pale bg-gradient-to-r from-white to-[#FFF8F2]">
+        <span className="font-[family-name:var(--font-cormorant)] text-[1.05rem] text-saffron-dark mr-auto">
           {title}
         </span>
         {action}
@@ -125,46 +126,59 @@ export function StatCard({ icon, label, value, sub, color }: {
   icon: string; label: string; value: string | number; sub: string; color?: string;
 }) {
   return (
-    <div style={{
-      ...card, padding: '22px 24px', position: 'relative', overflow: 'hidden',
-      borderTop: `4px solid ${CLR.saffron}`,
-    }}>
-      <div style={{ position: 'absolute', top: 18, right: 18, fontSize: 22, width: 42, height: 42, background: CLR.saffronPale, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.9 }}>
+    <div className="bg-white border-[1.5px] border-saffron-pale rounded-[16px] px-6 pt-[24px] pb-[20px] relative overflow-hidden shadow-[0_4px_18px_rgba(232,98,26,0.09)] transition-all duration-[180ms] hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(232,98,26,0.14)]">
+      {/* gradient top bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-saffron to-gold" />
+      <div className="absolute top-[18px] right-[18px] text-[1.7rem] w-[44px] h-[44px] bg-saffron-pale rounded-[12px] flex items-center justify-center opacity-85">
         {icon}
       </div>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: CLR.textLight, marginBottom: 8 }}>
+      <div className="text-[0.71rem] font-semibold tracking-[0.1em] uppercase text-text-light mb-[10px]">
         {label}
       </div>
-      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 700, lineHeight: 1, color: color ?? CLR.saffronDark, marginBottom: 6 }}>
+      <div
+        className="font-[family-name:var(--font-cormorant)] text-[2.4rem] font-bold leading-none"
+        style={{ color: color ?? CLR.saffronDark }}
+      >
         {value}
       </div>
-      <div style={{ fontSize: 12, color: CLR.textLight }}>{sub}</div>
+      <div className="text-[0.72rem] text-text-light mt-1.5">{sub}</div>
     </div>
   );
 }
 
 // ─── Table helpers ─────────────────────────────────────────────────────────────
 export const Th = ({ children }: { children: React.ReactNode }) => (
-  <th style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: CLR.saffronDark, padding: '11px 14px', textAlign: 'left', background: CLR.saffronPale, whiteSpace: 'nowrap' }}>
+  <th className="text-[0.68rem] font-bold tracking-[0.1em] uppercase text-saffron-dark px-4 py-3 text-left bg-saffron-pale whitespace-nowrap border-b-[1.5px] border-[rgba(232,98,26,0.15)]">
     {children}
   </th>
 );
 
 export const Td = ({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) => (
-  <td style={{ fontSize: 13, padding: '11px 14px', color: CLR.brown, borderBottom: `1px solid ${CLR.borderLight}`, verticalAlign: 'middle', ...style }}>
+  <td
+    className="text-[0.83rem] px-4 py-3 text-brown border-b border-border-light align-middle"
+    style={style}
+  >
     {children}
   </td>
 );
 
 export function EmptyRow({ cols, msg = 'No data yet.' }: { cols: number; msg?: string }) {
   return (
-    <tr><td colSpan={cols} style={{ textAlign: 'center', padding: 36, color: CLR.textLight, fontSize: 13 }}>{msg}</td></tr>
+    <tr>
+      <td colSpan={cols} className="text-center py-9 px-[14px] text-text-light text-[13px]">
+        {msg}
+      </td>
+    </tr>
   );
 }
 
 export function LoadingRow({ cols }: { cols: number }) {
   return (
-    <tr><td colSpan={cols} style={{ textAlign: 'center', padding: 36, color: CLR.textLight, fontSize: 13 }}>Loading…</td></tr>
+    <tr>
+      <td colSpan={cols} className="text-center py-9 px-[14px] text-text-light text-[13px]">
+        Loading…
+      </td>
+    </tr>
   );
 }
 
@@ -175,16 +189,25 @@ export function Modal({ title, onClose, children, width = 480 }: {
   return (
     <div
       onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(30,15,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 600, padding: 16, backdropFilter: 'blur(3px)' }}>
-      <div onClick={e => e.stopPropagation()}
-        style={{ background: '#fff', borderRadius: 14, width: '100%', maxWidth: width, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(30,15,0,0.22)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 24px', borderBottom: `1px solid ${CLR.borderLight}`, background: `linear-gradient(135deg, ${CLR.saffronDark}, ${CLR.saffron})` }}>
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 700, color: '#fff' }}>{title}</span>
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', width: 28, height: 28, borderRadius: 50, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>✕</button>
+      className="fixed inset-0 bg-[rgba(30,15,0,0.5)] flex items-center justify-center z-[600] p-4 backdrop-blur-[3px]"
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="bg-white rounded-[14px] w-full max-h-[90vh] overflow-y-auto shadow-[0_20px_60px_rgba(30,15,0,0.22)]"
+        style={{ maxWidth: width }}
+      >
+        <div className="flex justify-between items-center px-6 py-[18px] border-b border-border-light bg-gradient-to-br from-saffron-dark to-saffron">
+          <span className="font-[family-name:var(--font-cormorant)] text-[18px] font-bold text-white">
+            {title}
+          </span>
+          <button
+            onClick={onClose}
+            className="bg-[rgba(255,255,255,0.15)] border-none text-white w-7 h-7 rounded-full cursor-pointer flex items-center justify-center text-[14px]"
+          >
+            ✕
+          </button>
         </div>
-        <div style={{ padding: 24 }}>
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );
@@ -193,11 +216,13 @@ export function Modal({ title, onClose, children, width = 480 }: {
 // ─── DetailGrid ───────────────────────────────────────────────────────────────
 export function DetailGrid({ rows }: { rows: [string, React.ReactNode][] }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '10px 20px', marginBottom: 20 }}>
+    <div className="grid gap-x-5 gap-y-2.5 mb-5" style={{ gridTemplateColumns: 'auto 1fr' }}>
       {rows.map(([k, v], i) => (
         <React.Fragment key={i}>
-          <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: CLR.textLight, paddingTop: 2 }}>{k}</span>
-          <span style={{ fontSize: 13, color: CLR.brown }}>{v}</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.07em] text-text-light pt-0.5">
+            {k}
+          </span>
+          <span className="text-[13px] text-brown">{v}</span>
         </React.Fragment>
       ))}
     </div>

@@ -1,283 +1,438 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { CLR, Btn, inputSt, ALL_MEALS, mealIcon } from './shared';
+import { useToast } from '@/context/toast';
+import {
+  useGetSettingsQuery,
+  usePatchMealRatesMutation,
+  usePatchSlotLimitsMutation,
+  usePatchBookingWindowMutation,
+} from '@/services/settingsApi';
+import { ALL_MEALS } from './shared';
 import type { MealType } from '@/types';
 
-const DEFAULT_RATES: Record<MealType, number> = { Breakfast: 20, Lunch: 40, Dinner: 35 };
-const DEFAULT_LIMITS: Record<string, Record<MealType, number>> = {
-  Thiruvanmiyur: { Breakfast: 100, Lunch: 100, Dinner: 100 },
-  NLBR: { Breakfast: 80, Lunch: 80, Dinner: 80 },
-};
-const DEFAULT_WINDOW = { openDays: 7, openTime: '06:00', closeDays: 2, closeTime: '21:00', autoOpen: true, autoClose: true };
+// MUI
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Switch from '@mui/material/Switch';
+import Divider from '@mui/material/Divider';
+import InputAdornment from '@mui/material/InputAdornment';
+import Chip from '@mui/material/Chip';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Skeleton from '@mui/material/Skeleton';
+
+// MUI Icons
+import SettingsIcon from '@mui/icons-material/Settings';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import SaveIcon from '@mui/icons-material/Save';
+import CheckIcon from '@mui/icons-material/Check';
+import FreeBreakfastIcon from '@mui/icons-material/FreeBreakfast';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import NightlightIcon from '@mui/icons-material/Nightlight';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import LockIcon from '@mui/icons-material/Lock';
+
+const SAFFRON      = '#E8621A';
+const SAFFRON_DARK = '#C44D0D';
+const SAFFRON_PALE = '#FEF0E6';
+const GREEN        = '#2D7A3A';
+const RED          = '#C0392B';
 
 const LOCATIONS = ['Thiruvanmiyur', 'NLBR'] as const;
-type Location = typeof LOCATIONS[number];
 
-const sectionStyle: React.CSSProperties = {
-  background: '#fff',
-  border: `1.5px solid ${CLR.saffronPale}`,
-  borderRadius: 14,
-  padding: 28,
-  marginBottom: 24,
-  boxShadow: '0 2px 12px rgba(232,98,26,0.07)',
+const MEAL_CONFIG: Record<MealType, { icon: React.ReactNode; bg: string; border: string }> = {
+  Breakfast: { icon: <FreeBreakfastIcon sx={{ fontSize: 18 }} />, bg: '#FFF8F0', border: '#FFD9B3' },
+  Lunch:     { icon: <WbSunnyIcon       sx={{ fontSize: 18 }} />, bg: '#FFFBF0', border: '#FFE8A0' },
+  Dinner:    { icon: <NightlightIcon    sx={{ fontSize: 18 }} />, bg: '#F2F0FF', border: '#C9C0FF' },
 };
 
-const sectionHeaderStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginBottom: 6,
-  flexWrap: 'wrap' as const,
-  gap: 12,
+const FIELD_SX = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '9px', bgcolor: '#fff', fontSize: '0.88rem',
+    '& fieldset': { borderColor: '#E8D8C0' },
+    '&:hover fieldset': { borderColor: SAFFRON },
+    '&.Mui-focused fieldset': { borderColor: SAFFRON },
+  },
+  '& .MuiInputLabel-root.Mui-focused': { color: SAFFRON },
 };
 
-const sectionTitleStyle: React.CSSProperties = {
-  fontFamily: 'Cormorant Garamond, serif',
-  fontSize: 18,
-  fontWeight: 700,
-  color: CLR.saffronDark,
-  margin: 0,
-};
-
-const descStyle: React.CSSProperties = {
-  fontSize: 13,
-  color: CLR.textLight,
-  marginBottom: 20,
-};
+function SectionCard({ icon, title, description, onSave, saving, saved, hasChanges, children }: {
+  icon: React.ReactNode; title: string; description: string;
+  onSave: () => void; saving: boolean; saved: boolean; hasChanges: boolean; children: React.ReactNode;
+}) {
+  const showBtn = hasChanges || saving || saved;
+  return (
+    <Card elevation={0} sx={{ border: '1.5px solid #FEF0E6', borderRadius: '14px', mb: 3, boxShadow: '0 2px 12px rgba(232,98,26,0.07)', overflow: 'visible' }}>
+      <Box sx={{ px: 3.5, pt: 3, pb: 2, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ width: 40, height: 40, borderRadius: '10px', bgcolor: SAFFRON_PALE, display: 'flex', alignItems: 'center', justifyContent: 'center', color: SAFFRON_DARK, flexShrink: 0 }}>
+            {icon}
+          </Box>
+          <Box>
+            <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 700, color: SAFFRON_DARK, lineHeight: 1.2 }}>
+              {title}
+            </Typography>
+            <Typography sx={{ fontSize: '0.8rem', color: '#9A7A5A', mt: 0.25 }}>{description}</Typography>
+          </Box>
+        </Box>
+        {showBtn && (
+          <Button
+            variant="contained"
+            size="small"
+            disabled={saving}
+            startIcon={saving ? <CircularProgress size={14} color="inherit" /> : saved ? <CheckIcon sx={{ fontSize: 16 }} /> : <SaveIcon sx={{ fontSize: 16 }} />}
+            onClick={onSave}
+            sx={{
+              borderRadius: '50px', textTransform: 'none', fontWeight: 600, fontSize: '0.82rem',
+              bgcolor: saved ? GREEN : SAFFRON,
+              boxShadow: saved ? '0 2px 8px rgba(45,122,58,0.3)' : '0 3px 14px rgba(232,98,26,0.35)',
+              '&:hover': { bgcolor: saved ? GREEN : SAFFRON_DARK },
+              px: 2.5, transition: 'all 0.2s',
+            }}
+          >
+            {saving ? 'Saving…' : saved ? 'Saved!' : 'Save'}
+          </Button>
+        )}
+      </Box>
+      <Divider sx={{ borderColor: '#F2E8D8' }} />
+      <CardContent sx={{ px: 3.5, py: 3 }}>
+        {children}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function SettingsPage() {
-  const [rates, setRates] = useState<Record<MealType, number>>(DEFAULT_RATES);
-  const [limits, setLimits] = useState<Record<string, Record<MealType, number>>>(DEFAULT_LIMITS);
-  const [window_, setWindow] = useState(DEFAULT_WINDOW);
-  const [savedRates, setSavedRates] = useState(false);
-  const [savedLimits, setSavedLimits] = useState(false);
-  const [savedWindow, setSavedWindow] = useState(false);
+  const { data: settings, isLoading } = useGetSettingsQuery();
+  const [patchMealRates]    = usePatchMealRatesMutation();
+  const [patchSlotLimits]   = usePatchSlotLimitsMutation();
+  const [patchBookingWindow] = usePatchBookingWindowMutation();
+  const { showToast } = useToast();
 
-  // Load from localStorage on mount
+  // local state held as strings so the user can clear and retype freely
+  const [rates,  setRates]  = useState<Record<MealType, string>>({ Breakfast: '20', Lunch: '40', Dinner: '35' });
+  const [limits, setLimits] = useState<Record<string, Record<MealType, string>>>({
+    Thiruvanmiyur: { Breakfast: '100', Lunch: '100', Dinner: '100' },
+    NLBR:          { Breakfast: '80',  Lunch: '80',  Dinner: '80'  },
+  });
+  const [autoOpen,   setAutoOpen]   = useState(true);
+  const [autoClose,  setAutoClose]  = useState(true);
+  const [openDays,   setOpenDays]   = useState('7');
+  const [closeDays,  setCloseDays]  = useState('2');
+
+  const [savingRates,  setSavingRates]  = useState(false);
+  const [savingLimits, setSavingLimits] = useState(false);
+  const [savingWindow, setSavingWindow] = useState(false);
+  const [savedRates,   setSavedRates]   = useState(false);
+  const [savedLimits,  setSavedLimits]  = useState(false);
+  const [savedWindow,  setSavedWindow]  = useState(false);
+
   useEffect(() => {
-    const r = localStorage.getItem('hkm_default_rates');
-    if (r) setRates(JSON.parse(r));
-    const l = localStorage.getItem('hkm_slot_limits');
-    if (l) setLimits(JSON.parse(l));
-    const w = localStorage.getItem('hkm_booking_window');
-    if (w) setWindow(JSON.parse(w));
-  }, []);
+    if (!settings) return;
+    setRates({
+      Breakfast: String(settings.defaultMealRates.Breakfast),
+      Lunch:     String(settings.defaultMealRates.Lunch),
+      Dinner:    String(settings.defaultMealRates.Dinner),
+    });
+    setLimits({
+      Thiruvanmiyur: {
+        Breakfast: String(settings.defaultSlotLimits.Thiruvanmiyur.Breakfast),
+        Lunch:     String(settings.defaultSlotLimits.Thiruvanmiyur.Lunch),
+        Dinner:    String(settings.defaultSlotLimits.Thiruvanmiyur.Dinner),
+      },
+      NLBR: {
+        Breakfast: String(settings.defaultSlotLimits.NLBR.Breakfast),
+        Lunch:     String(settings.defaultSlotLimits.NLBR.Lunch),
+        Dinner:    String(settings.defaultSlotLimits.NLBR.Dinner),
+      },
+    });
+    setAutoOpen(settings.bookingWindowOpen);
+    setAutoClose(settings.bookingWindowClose);
+    setOpenDays(String(settings.bookingOpenDays));
+    setCloseDays(String(settings.bookingCloseDays));
+  }, [settings]);
 
-  function saveRates() {
-    localStorage.setItem('hkm_default_rates', JSON.stringify(rates));
-    setSavedRates(true);
+  async function saveRates() {
+    setSavingRates(true);
+    await patchMealRates({
+      Breakfast: Number(rates.Breakfast) || 0,
+      Lunch:     Number(rates.Lunch)     || 0,
+      Dinner:    Number(rates.Dinner)    || 0,
+    });
+    setSavingRates(false); setSavedRates(true);
+    showToast('Meal rates saved successfully', 'success');
     setTimeout(() => setSavedRates(false), 2000);
   }
 
-  function saveLimits() {
-    localStorage.setItem('hkm_slot_limits', JSON.stringify(limits));
-    setSavedLimits(true);
+  async function saveLimits() {
+    setSavingLimits(true);
+    await patchSlotLimits({
+      Thiruvanmiyur: {
+        Breakfast: Number(limits.Thiruvanmiyur.Breakfast) || 0,
+        Lunch:     Number(limits.Thiruvanmiyur.Lunch)     || 0,
+        Dinner:    Number(limits.Thiruvanmiyur.Dinner)    || 0,
+      },
+      NLBR: {
+        Breakfast: Number(limits.NLBR.Breakfast) || 0,
+        Lunch:     Number(limits.NLBR.Lunch)     || 0,
+        Dinner:    Number(limits.NLBR.Dinner)    || 0,
+      },
+    });
+    setSavingLimits(false); setSavedLimits(true);
+    showToast('Slot limits saved successfully', 'success');
     setTimeout(() => setSavedLimits(false), 2000);
   }
 
-  function saveWindow() {
-    localStorage.setItem('hkm_booking_window', JSON.stringify(window_));
-    setSavedWindow(true);
+  async function saveWindow() {
+    setSavingWindow(true);
+    await patchBookingWindow({
+      bookingWindowOpen:  autoOpen,
+      bookingWindowClose: autoClose,
+      bookingOpenDays:    Number(openDays)  || 0,
+      bookingCloseDays:   Number(closeDays) || 0,
+    });
+    setSavingWindow(false); setSavedWindow(true);
+    showToast('Booking window settings saved', 'success');
     setTimeout(() => setSavedWindow(false), 2000);
   }
 
-  const mealCardColors: Record<MealType, { bg: string; border: string; icon: string }> = {
-    Breakfast: { bg: '#FFF8F0', border: '#FFD9B3', icon: '🌅' },
-    Lunch:     { bg: '#FFFBF0', border: '#FFE8A0', icon: '☀️' },
-    Dinner:    { bg: '#F2F0FF', border: '#C9C0FF', icon: '🌙' },
-  };
+  const hasRatesChanged = !settings ? false : (
+    rates.Breakfast !== String(settings.defaultMealRates.Breakfast) ||
+    rates.Lunch     !== String(settings.defaultMealRates.Lunch)     ||
+    rates.Dinner    !== String(settings.defaultMealRates.Dinner)
+  );
 
-  const locColors: Record<Location, { bg: string; color: string }> = {
-    Thiruvanmiyur: { bg: CLR.saffronPale, color: CLR.saffronDark },
-    NLBR:          { bg: CLR.redPale,     color: CLR.red },
-  };
+  const hasLimitsChanged = !settings ? false : LOCATIONS.some(loc =>
+    ALL_MEALS.some(meal => limits[loc]?.[meal] !== String(settings.defaultSlotLimits[loc][meal]))
+  );
+
+  const hasWindowChanged = !settings ? false : (
+    autoOpen  !== settings.bookingWindowOpen   ||
+    autoClose !== settings.bookingWindowClose  ||
+    openDays  !== String(settings.bookingOpenDays)  ||
+    closeDays !== String(settings.bookingCloseDays)
+  );
+
+  if (isLoading) {
+    return (
+      <Box>
+        <Skeleton variant="rounded" height={40} sx={{ mb: 3 }} />
+        {[0, 1, 2].map(i => <Skeleton key={i} variant="rounded" height={200} sx={{ mb: 3 }} />)}
+      </Box>
+    );
+  }
 
   return (
-    <div style={{ width: '100%' }}>
+    <Box>
 
-      {/* ── Section 1: Global Default Meal Rates ── */}
-      <div style={sectionStyle}>
-        <div style={sectionHeaderStyle}>
-          <h2 style={sectionTitleStyle}>💰 Global Default Meal Rates</h2>
-          <Btn onClick={saveRates} variant={savedRates ? 'success' : 'primary'}>
-            {savedRates ? '✓ Saved!' : '💾 Save Rates'}
-          </Btn>
-        </div>
-        <p style={descStyle}>Set the default price (₹) per plate for each meal type. These are used when creating new slot dates without a custom override.</p>
+      {/* ── PAGE HEADER ── */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3.5 }}>
+        <SettingsIcon sx={{ color: SAFFRON_DARK, fontSize: 28 }} />
+        <Box>
+          <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.9rem', fontWeight: 700, color: SAFFRON_DARK, lineHeight: 1.15 }}>
+            Default Settings
+          </Typography>
+          <Typography sx={{ fontSize: '0.85rem', color: '#9A7A5A' }}>
+            Configure global defaults for rates, limits and booking windows
+          </Typography>
+        </Box>
+      </Box>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+      {/* ── SECTION 1: Meal Rates ── */}
+      <SectionCard
+        icon={<CurrencyRupeeIcon />}
+        title="Global Default Meal Rates"
+        description="Default price (₹) per plate — used when creating new slot dates without a custom override"
+        onSave={saveRates}
+        saving={savingRates}
+        saved={savedRates}
+        hasChanges={hasRatesChanged}
+      >
+        <Grid container spacing={2.5}>
           {ALL_MEALS.map(meal => {
-            const { bg, border, icon } = mealCardColors[meal];
+            const { icon, bg, border } = MEAL_CONFIG[meal];
             return (
-              <div key={meal} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 10, padding: '18px 16px' }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: CLR.textMid, marginBottom: 10 }}>
-                  {icon} {meal}
-                </label>
-                <div style={{ display: 'flex', alignItems: 'center', border: `1.5px solid ${border}`, borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
-                  <span style={{ padding: '9px 10px', fontSize: 14, fontWeight: 700, color: CLR.saffronDark, background: CLR.saffronPale, borderRight: `1px solid ${border}`, flexShrink: 0 }}>₹</span>
-                  <input
+              <Grid key={meal} size={4}>
+                <Box sx={{ bgcolor: bg, border: `1.5px solid ${border}`, borderRadius: '10px', p: 2.25 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, color: '#5A3A1A' }}>
+                    {icon}
+                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#5A3A1A' }}>
+                      {meal}
+                    </Typography>
+                  </Box>
+                  <TextField
+                    fullWidth
+                    size="small"
                     type="number"
-                    min={0}
                     value={rates[meal]}
-                    onChange={e => setRates(r => ({ ...r, [meal]: Number(e.target.value) }))}
-                    style={{ ...inputSt, border: 'none', borderRadius: 0, background: 'transparent', flex: 1, width: 'auto' }}
+                    onChange={e => setRates(r => ({ ...r, [meal]: e.target.value }))}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Typography sx={{ fontWeight: 700, color: SAFFRON_DARK, fontSize: '0.9rem' }}>₹</Typography>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                    sx={{
+                      ...FIELD_SX,
+                      '& .MuiOutlinedInput-root': {
+                        ...FIELD_SX['& .MuiOutlinedInput-root'],
+                        bgcolor: '#fff',
+                        '& fieldset': { borderColor: border },
+                      },
+                    }}
                   />
-                </div>
-              </div>
+                </Box>
+              </Grid>
             );
           })}
-        </div>
-      </div>
+        </Grid>
+      </SectionCard>
 
-      {/* ── Section 2: Global Default Slot Limits ── */}
-      <div style={sectionStyle}>
-        <div style={sectionHeaderStyle}>
-          <h2 style={sectionTitleStyle}>🎟️ Global Default Slot Limits</h2>
-          <Btn onClick={saveLimits} variant={savedLimits ? 'success' : 'primary'}>
-            {savedLimits ? '✓ Saved!' : '💾 Save Limits'}
-          </Btn>
-        </div>
-        <p style={descStyle}>Set the maximum number of coupons available per meal per location. These defaults apply when a new slot date is created.</p>
+      {/* ── SECTION 2: Slot Limits ── */}
+      <SectionCard
+        icon={<ConfirmationNumberIcon />}
+        title="Global Default Slot Limits"
+        description="Maximum coupons per meal per location — applied when a new slot date is created"
+        onSave={saveLimits}
+        saving={savingLimits}
+        saved={savedLimits}
+        hasChanges={hasLimitsChanged}
+      >
+        {/* Table header */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '160px repeat(3, 1fr)', gap: 2, bgcolor: SAFFRON_PALE, borderRadius: '8px', px: 2, py: 1.25, mb: 1 }}>
+          <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9A7A5A' }}>Location</Typography>
+          {ALL_MEALS.map(meal => (
+            <Box key={meal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, color: SAFFRON_DARK }}>
+              {MEAL_CONFIG[meal].icon}
+              <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: SAFFRON_DARK }}>{meal}</Typography>
+            </Box>
+          ))}
+        </Box>
 
-        <div style={{ border: `1.5px solid ${CLR.borderLight}`, borderRadius: 10, overflow: 'hidden' }}>
-          {/* Column headers */}
-          <div style={{ display: 'grid', gridTemplateColumns: '180px repeat(3, 1fr)', background: CLR.saffronPale, padding: '10px 16px', gap: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: CLR.textLight }}>Location</div>
+        {/* Rows */}
+        {LOCATIONS.map((loc, idx) => (
+          <Box
+            key={loc}
+            sx={{
+              display: 'grid', gridTemplateColumns: '160px repeat(3, 1fr)', gap: 2,
+              px: 2, py: 1.75, alignItems: 'center',
+              borderTop: idx > 0 ? '1px solid #F2E8D8' : 'none',
+            }}
+          >
+            <Chip
+              label={loc}
+              size="small"
+              sx={{
+                bgcolor: loc === 'Thiruvanmiyur' ? SAFFRON_PALE : '#FDECEA',
+                color:   loc === 'Thiruvanmiyur' ? SAFFRON_DARK : RED,
+                fontWeight: 700, fontSize: '0.72rem', borderRadius: '50px', width: 'fit-content',
+              }}
+            />
             {ALL_MEALS.map(meal => (
-              <div key={meal} style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: CLR.saffronDark, textAlign: 'center' }}>
-                {mealIcon(meal)} {meal}
-              </div>
+              <TextField
+                key={meal}
+                size="small"
+                type="number"
+                value={limits[loc]?.[meal] ?? ''}
+                onChange={e => setLimits(l => ({ ...l, [loc]: { ...l[loc], [meal]: e.target.value } }))}
+                sx={{ ...FIELD_SX, '& input': { textAlign: 'center' } }}
+              />
             ))}
-          </div>
+          </Box>
+        ))}
+      </SectionCard>
 
-          {/* Rows */}
-          {LOCATIONS.map((loc, idx) => {
-            const { bg, color } = locColors[loc];
-            return (
-              <div key={loc} style={{ display: 'grid', gridTemplateColumns: '180px repeat(3, 1fr)', padding: '14px 16px', gap: 12, borderTop: idx > 0 ? `1px solid ${CLR.borderLight}` : undefined, alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 50, background: bg, color }}>{loc}</span>
-                </div>
-                {ALL_MEALS.map(meal => (
-                  <input
-                    key={meal}
-                    type="number"
-                    min={0}
-                    value={limits[loc]?.[meal] ?? 0}
-                    onChange={e => setLimits(l => ({
-                      ...l,
-                      [loc]: { ...l[loc], [meal]: Number(e.target.value) },
-                    }))}
-                    style={{ ...inputSt, textAlign: 'center', width: '100%' }}
-                  />
-                ))}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* ── SECTION 3: Booking Window ── */}
+      <SectionCard
+        icon={<AccessTimeIcon />}
+        title="Booking Window Automation"
+        description="Configure when the booking window opens and closes automatically relative to the event date"
+        onSave={saveWindow}
+        saving={savingWindow}
+        saved={savedWindow}
+        hasChanges={hasWindowChanged}
+      >
+        <Grid container spacing={2.5}>
 
-      {/* ── Section 3: Booking Window Automation ── */}
-      <div style={sectionStyle}>
-        <div style={sectionHeaderStyle}>
-          <h2 style={sectionTitleStyle}>⏰ Booking Window Automation</h2>
-          <Btn onClick={saveWindow} variant={savedWindow ? 'success' : 'primary'}>
-            {savedWindow ? '✓ Saved!' : '💾 Save Window'}
-          </Btn>
-        </div>
-        <p style={descStyle}>Configure when the booking window opens and closes automatically relative to the event date.</p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
-
-          {/* Auto-Open Rule */}
-          <div style={{ border: `1.5px solid ${CLR.borderLight}`, borderRadius: 12, padding: 20, background: '#FAFFFC' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 18 }}>🟢</span>
-                <span style={{ fontWeight: 700, fontSize: 14, color: CLR.brown }}>Auto-Open Rule</span>
-              </div>
-              {/* Toggle */}
-              <div
-                onClick={() => setWindow(w => ({ ...w, autoOpen: !w.autoOpen }))}
-                style={{ width: 44, height: 24, borderRadius: 12, cursor: 'pointer', transition: 'background 0.2s', background: window_.autoOpen ? CLR.saffron : CLR.border, position: 'relative', flexShrink: 0 }}>
-                <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: window_.autoOpen ? 22 : 2, transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12, color: CLR.textLight, marginBottom: 14 }}>
-              <span style={{ fontWeight: 600, color: window_.autoOpen ? CLR.green : CLR.textLight }}>
-                {window_.autoOpen ? 'Active' : 'Inactive'}
-              </span>
-              {' — '}Opens {window_.openDays} day{window_.openDays !== 1 ? 's' : ''} prior at {window_.openTime}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: CLR.textMid, marginBottom: 5 }}>Days Before Event</label>
-                <input
-                  type="number"
-                  min={1}
-                  value={window_.openDays}
-                  onChange={e => setWindow(w => ({ ...w, openDays: Number(e.target.value) }))}
-                  style={inputSt}
+          {/* Auto-Open */}
+          <Grid size={6}>
+            <Box sx={{ border: '1.5px solid #C8F0D0', borderRadius: '12px', p: 2.5, bgcolor: '#FAFFFC', height: '100%' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LockOpenIcon sx={{ color: GREEN, fontSize: 20 }} />
+                  <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#3B1F0A' }}>Auto-Open Rule</Typography>
+                </Box>
+                <Switch
+                  checked={autoOpen}
+                  onChange={e => setAutoOpen(e.target.checked)}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': { color: SAFFRON },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: SAFFRON },
+                  }}
                 />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: CLR.textMid, marginBottom: 5 }}>Open Time</label>
-                <input
-                  type="time"
-                  value={window_.openTime}
-                  onChange={e => setWindow(w => ({ ...w, openTime: e.target.value }))}
-                  style={inputSt}
-                />
-              </div>
-            </div>
-          </div>
+              </Box>
 
-          {/* Auto-Close Rule */}
-          <div style={{ border: `1.5px solid ${CLR.borderLight}`, borderRadius: 12, padding: 20, background: '#FFF8F8' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 18 }}>🔴</span>
-                <span style={{ fontWeight: 700, fontSize: 14, color: CLR.brown }}>Auto-Close Rule</span>
-              </div>
-              {/* Toggle */}
-              <div
-                onClick={() => setWindow(w => ({ ...w, autoClose: !w.autoClose }))}
-                style={{ width: 44, height: 24, borderRadius: 12, cursor: 'pointer', transition: 'background 0.2s', background: window_.autoClose ? CLR.saffron : CLR.border, position: 'relative', flexShrink: 0 }}>
-                <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: window_.autoClose ? 22 : 2, transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12, color: CLR.textLight, marginBottom: 14 }}>
-              <span style={{ fontWeight: 600, color: window_.autoClose ? CLR.red : CLR.textLight }}>
-                {window_.autoClose ? 'Active' : 'Inactive'}
-              </span>
-              {' — '}Closes {window_.closeDays} day{window_.closeDays !== 1 ? 's' : ''} prior at {window_.closeTime}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: CLR.textMid, marginBottom: 5 }}>Days Before Event</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={window_.closeDays}
-                  onChange={e => setWindow(w => ({ ...w, closeDays: Number(e.target.value) }))}
-                  style={inputSt}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: CLR.textMid, marginBottom: 5 }}>Close Time</label>
-                <input
-                  type="time"
-                  value={window_.closeTime}
-                  onChange={e => setWindow(w => ({ ...w, closeTime: e.target.value }))}
-                  style={inputSt}
-                />
-              </div>
-            </div>
-          </div>
+              <Alert severity={autoOpen ? 'success' : 'info'} icon={false} sx={{ mb: 2, py: 0.5, fontSize: '0.78rem', borderRadius: '8px' }}>
+                <strong>{autoOpen ? 'Active' : 'Inactive'}</strong>
+                {' — '}Opens {openDays} day{openDays !== '1' ? 's' : ''} before the event
+              </Alert>
 
-        </div>
-      </div>
+              <TextField
+                fullWidth size="small" type="number" label="Days Before Event"
+                value={openDays}
+                onChange={e => setOpenDays(e.target.value)}
+                slotProps={{ htmlInput: { min: 1 } }}
+                sx={FIELD_SX}
+              />
+            </Box>
+          </Grid>
 
-    </div>
+          {/* Auto-Close */}
+          <Grid size={6}>
+            <Box sx={{ border: '1.5px solid #FFCDD2', borderRadius: '12px', p: 2.5, bgcolor: '#FFF8F8', height: '100%' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LockIcon sx={{ color: RED, fontSize: 20 }} />
+                  <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#3B1F0A' }}>Auto-Close Rule</Typography>
+                </Box>
+                <Switch
+                  checked={autoClose}
+                  onChange={e => setAutoClose(e.target.checked)}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': { color: RED },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: RED },
+                  }}
+                />
+              </Box>
+
+              <Alert severity={autoClose ? 'error' : 'info'} icon={false} sx={{ mb: 2, py: 0.5, fontSize: '0.78rem', borderRadius: '8px' }}>
+                <strong>{autoClose ? 'Active' : 'Inactive'}</strong>
+                {' — '}Closes {closeDays} day{closeDays !== '1' ? 's' : ''} before the event
+              </Alert>
+
+              <TextField
+                fullWidth size="small" type="number" label="Days Before Event"
+                value={closeDays}
+                onChange={e => setCloseDays(e.target.value)}
+                slotProps={{ htmlInput: { min: 0 } }}
+                sx={FIELD_SX}
+              />
+            </Box>
+          </Grid>
+
+        </Grid>
+      </SectionCard>
+
+    </Box>
   );
 }

@@ -10,6 +10,7 @@ export const API_BASE_URL =
  */
 export const baseApi = createApi({
   reducerPath: 'api',
+  refetchOnMountOrArgChange: true,
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
     prepareHeaders: (headers) => {
@@ -28,6 +29,11 @@ export const baseApi = createApi({
     'SlotDate',
     'MealMenu',
     'Festival',
+    'Dashboard',
+    'Registration',
+    'Payment',
+    'Settings',
+    'SlotManagement',
   ],
   endpoints: () => ({}),
 });

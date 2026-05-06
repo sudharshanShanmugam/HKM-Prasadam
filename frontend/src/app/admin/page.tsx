@@ -2,169 +2,287 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGetPrasadamBookingsQuery } from '@/services/prasadamBookingsApi';
-import { useGetPartyEnquiriesQuery } from '@/services/partyEnquiriesApi';
-import { useGetInternalOrdersQuery } from '@/services/internalOrdersApi';
 import SlotManagementPage from './SlotManagementPage';
-import { CLR, SIDEBAR_W, Btn } from './components/shared';
+
 import DashboardPage from './components/DashboardPage';
 import RegistrationsPage from './components/RegistrationsPage';
-import MenusPage from './components/MenusPage';
 import PartyEnquiriesPage from './components/PartyEnquiriesPage';
 import InternalOrdersPage from './components/InternalOrdersPage';
 import SettingsPage from './components/SettingsPage';
+import PaymentsPage from './components/PaymentsPage';
+
+// MUI
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Badge from '@mui/material/Badge';
+import Divider from '@mui/material/Divider';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+
+// MUI Icons
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import PaymentIcon from '@mui/icons-material/Payment';
+import SettingsIcon from '@mui/icons-material/Settings';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import CelebrationIcon from '@mui/icons-material/Celebration';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PublicIcon from '@mui/icons-material/Public';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type Page = 'dashboard' | 'registrations' | 'slots' | 'menus' | 'birthday' | 'internal' | 'settings';
+type Page = 'dashboard' | 'registrations' | 'slots' | 'birthday' | 'internal' | 'settings' | 'payments';
+
+const SIDEBAR_W = 260;
+const SIDEBAR_BG = '#D86A32';
 
 // ─── Admin Shell ──────────────────────────────────────────────────────────────
 function AdminShell({ onLogout }: { onLogout: () => void }) {
   const [page, setPage] = useState<Page>('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Minimal data just for sidebar badges
-  const { data: bookings = [] }  = useGetPrasadamBookingsQuery({});
-  const { data: enquiries = [] } = useGetPartyEnquiriesQuery({});
-  const { data: orders = [] }    = useGetInternalOrdersQuery({});
+  const nav = (p: Page) => { setPage(p); setMobileOpen(false); };
 
-  const pendingOrders    = orders.filter(o => !o.accepted).length;
-  const pendingEnquiries = enquiries.filter(e => e.status === 'pending').length;
-
-  const nav = (p: string) => { setPage(p as Page); setSidebarOpen(false); };
-
-  const navItems: { page: Page; icon: string; label: string; badge?: number }[] = [
-    { page: 'dashboard',     icon: '📊', label: 'Dashboard' },
-    { page: 'registrations', icon: '📋', label: 'All Registrations', badge: bookings.length },
-    { page: 'settings',      icon: '⚙️', label: 'Default Settings' },
-    { page: 'slots',         icon: '📅', label: 'Slot Management' },
-    { page: 'menus',         icon: '🍽',  label: 'Meal Menus' },
-    { page: 'birthday',      icon: '🎉', label: 'Party Enquiries', badge: pendingEnquiries },
-    { page: 'internal',      icon: '🏛',  label: 'Internal Orders',  badge: pendingOrders },
+  const navItems: { page: Page; icon: React.ReactNode; label: string; badge?: number }[] = [
+    { page: 'dashboard',     icon: <DashboardIcon fontSize="small" />,      label: 'Dashboard' },
+    { page: 'registrations', icon: <ListAltIcon fontSize="small" />,        label: 'All Registrations' },
+    { page: 'payments',      icon: <PaymentIcon fontSize="small" />,        label: 'Payments' },
+    { page: 'settings',      icon: <SettingsIcon fontSize="small" />,       label: 'Default Settings' },
+    { page: 'slots',         icon: <CalendarMonthIcon fontSize="small" />,  label: 'Slot Management' },
+    { page: 'birthday',      icon: <CelebrationIcon fontSize="small" />,    label: 'Party Enquiries' },
+    { page: 'internal',      icon: <AccountBalanceIcon fontSize="small" />, label: 'Internal Orders' },
   ];
 
   const today = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  const activeItem = navItems.find(n => n.page === page);
 
-  return (
-    <div style={{ display: 'flex', width: '100%', minHeight: '100vh', fontFamily: 'Inter, sans-serif', background: '#F4F6F9' }}>
+  const drawerContent = (
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', bgcolor: SIDEBAR_BG }}>
+      {/* Brand */}
+      <Box sx={{ px: 2.5, pt: 2.5, pb: 2, borderBottom: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ bgcolor: '#fff', borderRadius: '12px', px: 2, py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Box
+            component="img"
+            src="/iskcon-logo.png"
+            alt="ISKCON Thiruvanmiyur Chennai"
+            sx={{ width: '100%', maxWidth: 160, height: 'auto', objectFit: 'contain', display: 'block' }}
+          />
+        </Box>
+      </Box>
 
-      {/* ── SIDEBAR OVERLAY (mobile) ── */}
-      {sidebarOpen && (
-        <div onClick={() => setSidebarOpen(false)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 299 }} />
-      )}
-
-      {/* ── SIDEBAR ── */}
-      <nav style={{
-        width: SIDEBAR_W, minHeight: '100vh', background: CLR.sidebar,
-        position: 'fixed', left: 0, top: 0, bottom: 0,
-        display: 'flex', flexDirection: 'column', zIndex: 300,
-        overflowY: 'auto',
-        transform: sidebarOpen ? 'translateX(0)' : undefined,
-        boxShadow: '4px 0 20px rgba(0,0,0,0.15)',
-      }}>
-        {/* Brand */}
-        <div style={{ padding: '22px 18px 18px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <div style={{ width: 36, height: 36, background: CLR.saffron, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
-              🪷
-            </div>
-            <div>
-              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>HKM Prasadam</div>
-              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Admin Panel</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Nav */}
-        <div style={{ padding: '12px 0', flex: 1 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', padding: '8px 18px 4px' }}>
-            Menu
-          </div>
+      {/* Nav */}
+      <Box sx={{ flex: 1, overflowY: 'auto' }}>
+        <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', px: 2.5, pt: 2.5, pb: 0.5 }}>
+          Menu
+        </Typography>
+        <List dense disablePadding>
           {navItems.map(({ page: p, icon, label, badge }) => {
             const active = page === p;
             return (
-              <button key={p} onClick={() => nav(p)} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                width: '100%', padding: '10px 18px', border: 'none',
-                background: active ? CLR.sidebarActive : 'transparent',
-                color: active ? CLR.saffron : 'rgba(255,255,255,0.6)',
-                fontSize: 13, fontWeight: active ? 600 : 400,
-                cursor: 'pointer', textAlign: 'left',
-                borderLeft: `3px solid ${active ? CLR.saffron : 'transparent'}`,
-                transition: 'all 0.15s', fontFamily: 'Inter, sans-serif',
-              }}>
-                <span style={{ fontSize: 15, width: 20, textAlign: 'center', flexShrink: 0 }}>{icon}</span>
-                <span style={{ flex: 1 }}>{label}</span>
-                {badge != null && badge > 0 && (
-                  <span style={{ fontSize: 10, fontWeight: 700, background: CLR.saffron, color: '#fff', padding: '2px 7px', borderRadius: 50 }}>{badge}</span>
-                )}
-              </button>
+              <ListItemButton
+                key={p}
+                onClick={() => nav(p)}
+                sx={{
+                  px: 2.5,
+                  py: 1.25,
+                  borderLeft: '3px solid',
+                  borderLeftColor: active ? '#fff' : 'transparent',
+                  bgcolor: active ? 'rgba(255,255,255,0.22)' : 'transparent',
+                  boxShadow: active ? 'inset 0 0 0 1px rgba(255,255,255,0.12)' : 'none',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.14)',
+                    borderLeftColor: 'rgba(255,255,255,0.4)',
+                  },
+                  transition: 'all 0.15s',
+                }}
+              >
+                <ListItemIcon sx={{ color: '#fff', minWidth: 34, opacity: active ? 1 : 0.75 }}>
+                  {badge != null && badge > 0 ? (
+                    <Badge
+                      badgeContent={badge}
+                      sx={{
+                        '& .MuiBadge-badge': {
+                          bgcolor: 'rgba(255,255,255,0.95)',
+                          color: '#C44D0D',
+                          fontSize: '0.6rem',
+                          fontWeight: 700,
+                          minWidth: 18,
+                          height: 18,
+                        },
+                      }}
+                    >
+                      {icon}
+                    </Badge>
+                  ) : icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={label}
+                  slotProps={{
+                    primary: {
+                      style: {
+                        fontSize: '0.85rem',
+                        fontWeight: active ? 600 : 500,
+                        color: '#fff',
+                        opacity: active ? 1 : 0.78,
+                        fontFamily: 'Inter, sans-serif',
+                      },
+                    },
+                  }}
+                />
+              </ListItemButton>
             );
           })}
-        </div>
+        </List>
+      </Box>
 
-        {/* Footer */}
-        <div style={{ padding: '14px 18px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginBottom: 10, lineHeight: 1.5 }}>
-            HKM Chennai<br />Thiruvanmiyur &amp; NLBR
-          </div>
-          <button onClick={() => window.location.href = '/'} style={{
-            width: '100%', padding: '7px 0', marginBottom: 6,
-            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-            color: 'rgba(255,255,255,0.5)', fontSize: 12, borderRadius: 7,
-            cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-          }}>
-            ← Public Site
-          </button>
-          <button onClick={onLogout} style={{
-            width: '100%', padding: '7px 0',
-            background: 'rgba(192,57,43,0.15)', border: '1px solid rgba(192,57,43,0.2)',
-            color: '#e57373', fontSize: 12, borderRadius: 7,
-            cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-          }}>
-            🚪 Logout
-          </button>
-        </div>
-      </nav>
+      {/* Footer */}
+      <Divider sx={{ borderColor: 'rgba(255,255,255,0.15)' }} />
+      <Box sx={{ px: 2.5, py: 2 }}>
+        <Typography sx={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)', textAlign: 'center', mb: 2, lineHeight: 1.6 }}>
+          HKM Chennai<br />Thiruvanmiyur &amp; NLBR
+        </Typography>
+        <Button
+          fullWidth
+          onClick={() => window.location.href = '/'}
+          startIcon={<PublicIcon sx={{ fontSize: 14 }} />}
+          sx={{
+            mb: 1, py: 0.75, borderRadius: '50px', fontSize: '0.78rem',
+            color: 'rgba(255,255,255,0.75)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.35)' },
+            textTransform: 'none', fontFamily: 'Inter, sans-serif',
+          }}
+        >
+          Public Site
+        </Button>
+        <Button
+          fullWidth
+          onClick={onLogout}
+          startIcon={<LogoutIcon sx={{ fontSize: 14 }} />}
+          sx={{
+            py: 0.75, borderRadius: '50px', fontSize: '0.78rem',
+            color: '#ffb3b3',
+            border: '1px solid rgba(192,57,43,0.3)',
+            bgcolor: 'rgba(192,57,43,0.2)',
+            '&:hover': { bgcolor: 'rgba(192,57,43,0.35)' },
+            textTransform: 'none', fontFamily: 'Inter, sans-serif',
+          }}
+        >
+          Logout
+        </Button>
+      </Box>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#F4F6F9' }}>
+
+      {/* ── MUI DRAWER (desktop permanent) ── */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: SIDEBAR_W,
+          flexShrink: 0,
+          display: { xs: 'none', md: 'block' },
+          '& .MuiDrawer-paper': {
+            width: SIDEBAR_W,
+            boxSizing: 'border-box',
+            bgcolor: SIDEBAR_BG,
+            border: 'none',
+            boxShadow: '4px 0 24px rgba(232,98,26,0.22)',
+          },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+
+      {/* ── MUI DRAWER (mobile temporary) ── */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': {
+            width: SIDEBAR_W,
+            boxSizing: 'border-box',
+            bgcolor: SIDEBAR_BG,
+            border: 'none',
+          },
+        }}
+        ModalProps={{ keepMounted: true }}
+      >
+        {drawerContent}
+      </Drawer>
 
       {/* ── MAIN ── */}
-      <div style={{ marginLeft: SIDEBAR_W, flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', minWidth: 0 }}>
 
-        {/* TOPBAR */}
-        <div style={{
-          height: 60, background: '#fff', borderBottom: `1px solid ${CLR.borderLight}`,
-          display: 'flex', alignItems: 'center', padding: '0 28px', gap: 14,
-          position: 'sticky', top: 0, zIndex: 100,
-          boxShadow: '0 1px 8px rgba(60,20,0,0.06)',
-        }}>
-          {/* Mobile hamburger */}
-          <button onClick={() => setSidebarOpen(s => !s)} style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-            ☰
-          </button>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 700, color: CLR.saffronDark }}>
-            {navItems.find(n => n.page === page)?.icon}{' '}
-            {navItems.find(n => n.page === page)?.label ?? 'Admin'}
-          </div>
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 12, color: CLR.saffronDark, background: CLR.saffronPale, border: `1px solid rgba(232,98,26,0.18)`, padding: '5px 12px', borderRadius: 50, fontWeight: 500 }}>
-              📅 {today}
-            </span>
-            <Btn sm variant="primary" onClick={() => window.location.href = '/'}>🪷 Public Site</Btn>
-          </div>
-        </div>
+        {/* MUI APPBAR TOPBAR */}
+        <AppBar
+          position="sticky"
+          elevation={0}
+          sx={{
+            bgcolor: '#fff',
+            borderBottom: '2px solid #FEF0E6',
+            boxShadow: '0 2px 12px rgba(232,98,26,0.08)',
+            zIndex: 100,
+          }}
+        >
+          <Toolbar sx={{ gap: 2, minHeight: '64px !important', px: { xs: 2, md: 4 } }}>
+            {/* Mobile hamburger */}
+            <Button
+              onClick={() => setMobileOpen(s => !s)}
+              sx={{ display: { md: 'none' }, minWidth: 0, p: 1, color: '#C44D0D' }}
+            >
+              ☰
+            </Button>
+
+            <Typography sx={{
+              fontFamily: 'Cormorant Garamond, serif',
+              fontSize: '1.35rem', fontWeight: 700, color: '#C44D0D',
+            }}>
+              {activeItem?.label ?? 'Admin'}
+            </Typography>
+
+            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Chip
+                label={today}
+                size="small"
+                sx={{
+                  bgcolor: '#FEF0E6',
+                  color: '#C44D0D',
+                  border: '1px solid rgba(232,98,26,0.2)',
+                  fontWeight: 500,
+                  fontSize: '0.78rem',
+                  fontFamily: 'Inter, sans-serif',
+                  borderRadius: '50px',
+                  height: 32,
+                }}
+              />
+            </Box>
+          </Toolbar>
+        </AppBar>
 
         {/* PAGE CONTENT */}
-        <div style={{ flex: 1, padding: 28, overflowY: 'auto' }}>
-          {page === 'dashboard'     && <DashboardPage onNav={nav} />}
+        <Box sx={{ flex: 1, p: { xs: 2, md: 3.5 }, overflow: 'auto' }}>
+          {page === 'dashboard'     && <DashboardPage onNav={p => nav(p as Page)} />}
           {page === 'registrations' && <RegistrationsPage />}
-          {page === 'slots'         && <SlotManagementPage onNav={nav} />}
-          {page === 'menus'         && <MenusPage />}
+          {page === 'slots'         && <SlotManagementPage onNav={p => nav(p as Page)} />}
           {page === 'birthday'      && <PartyEnquiriesPage />}
           {page === 'internal'      && <InternalOrdersPage />}
           {page === 'settings'      && <SettingsPage />}
-        </div>
-      </div>
-    </div>
+          {page === 'payments'      && <PaymentsPage />}
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

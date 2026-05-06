@@ -223,10 +223,6 @@ export default function InternalPage() {
             <div className="page-header" style={{ position: 'relative' }}>
               <button className="back-btn" onClick={() => setView('book')}>← Back</button>
               <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.1rem', fontWeight: 700, color: 'var(--brown-dark)' }}>📦 My Bookings</div>
-              <div className="demo-chip" style={{ position: 'absolute', top: 0, right: 0 }} onClick={() => setBkMobile('9845012345')}>
-                <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--saffron-dark)', letterSpacing: '.05em' }}>DEMO</div>
-                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--brown-dark)', letterSpacing: '.04em' }}>9845012345</div>
-              </div>
             </div>
 
             {!activeMobile ? (
@@ -269,7 +265,7 @@ export default function InternalPage() {
                       </div>
                       <div style={{ fontWeight: 600, fontSize: '.92rem', marginBottom: 4 }}>{o.name}</div>
                       <div className="order-meta">
-                        <span>📅 {fmtDate(o.date)}</span>
+                        <span>{fmtDate(o.date)}</span>
                         <span>🏛 {o.dept}</span>
                         {o.meal && <span>{mealLabel(o.meal)}</span>}
                         <span>🍽 {o.count} plates</span>
