@@ -795,8 +795,8 @@ export default function SlotManagementPage({ onNav }: { onNav?: (p: string) => v
             {/* ── 3 MEAL CARDS ── */}
             <DialogContent sx={{ p: 2.5, bgcolor: '#FBF6EE' }}>
 
-              {/* ── STATUS BAR ── */}
-              <Box sx={{
+              {/* ── STATUS BAR — only when meals are configured ── */}
+              {(slot?.meals?.filter(m => !slot?.mealStatus?.[m]?.removed).length ?? 0) > 0 && <Box sx={{
                 bgcolor: '#fff',
                 border: `1.5px solid ${isStopped ? '#fecaca' : '#F2E8D8'}`,
                 borderRadius: '12px',
@@ -850,9 +850,24 @@ export default function SlotManagementPage({ onNav }: { onNav?: (p: string) => v
                     ? <><PlayCircleOutlineIcon sx={{ fontSize: 16 }} />Resume Entire Date</>
                     : <><Box component="span" sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: RED, display: 'inline-block', flexShrink: 0 }} />Stop Entire Date</>}
                 </Button>
-              </Box>
-              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
-                {mealConfig.map(({ meal, icon, color, bg }) => {
+              </Box>}
+              {(() => {
+                const activeMealConfig = mealConfig.filter(({ meal }) =>
+                  slot?.meals?.includes(meal) && !slot?.mealStatus?.[meal]?.removed
+                );
+                if (activeMealConfig.length === 0) {
+                  return (
+                    <Box sx={{ textAlign: 'center', py: 4, color: '#9A7A5A' }}>
+                      <Typography sx={{ fontSize: '1.5rem', mb: 0.75 }}>🎟</Typography>
+                      <Typography sx={{ fontSize: '0.82rem' }}>No meals configured or booked for this date</Typography>
+                    </Box>
+                  );
+                }
+                const maxW = activeMealConfig.length === 1 ? 220 : activeMealConfig.length === 2 ? 460 : '100%';
+                const cols = activeMealConfig.length === 1 ? '1fr' : activeMealConfig.length === 2 ? '1fr 1fr' : 'repeat(3, 1fr)';
+                return (
+              <Box sx={{ display: 'grid', gridTemplateColumns: cols, gap: 1.5, maxWidth: maxW, mx: 'auto' }}>
+                {activeMealConfig.map(({ meal, icon, color, bg }) => {
                   const count      = bk?.[meal] ?? 0;
                   const limTV      = slot?.slotLimits?.Thiruvanmiyur?.[meal] ?? 0;
                   const limNL      = slot?.slotLimits?.NLBR?.[meal] ?? 0;
@@ -932,14 +947,18 @@ export default function SlotManagementPage({ onNav }: { onNav?: (p: string) => v
                   );
                 })}
               </Box>
+                ); // end activeMealConfig.length > 0 branch
+              })()} {/* end IIFE */}
 
-              {/* Total row */}
-              <Box sx={{ mt: 1.5, px: 2, py: 1.25, bgcolor: '#fff', borderRadius: '10px', border: '1px solid #F2E8D8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography sx={{ fontSize: '0.75rem', color: '#9A7A5A' }}>Total coupons booked</Typography>
-                <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 700, color: SD }}>
-                  {(bk?.Breakfast ?? 0) + (bk?.Lunch ?? 0) + (bk?.Dinner ?? 0)}
-                </Typography>
-              </Box>
+              {/* Total row — only when there are bookings */}
+              {bk && (bk.Breakfast + bk.Lunch + bk.Dinner) > 0 && (
+                <Box sx={{ mt: 1.5, px: 2, py: 1.25, bgcolor: '#fff', borderRadius: '10px', border: '1px solid #F2E8D8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography sx={{ fontSize: '0.75rem', color: '#9A7A5A' }}>Total coupons booked</Typography>
+                  <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 700, color: SD }}>
+                    {(bk.Breakfast ?? 0) + (bk.Lunch ?? 0) + (bk.Dinner ?? 0)}
+                  </Typography>
+                </Box>
+              )}
             </DialogContent>
 
             <DialogActions sx={{ px: 2.5, py: 1.5, borderTop: '1px solid #F2E8D8', justifyContent: 'flex-end' }}>

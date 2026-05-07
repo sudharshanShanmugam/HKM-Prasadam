@@ -133,7 +133,12 @@ export default function PublicPage() {
     });
     const dto: CreatePrasadamBookingDto = { name: regName, mobile: regMobile, email: regEmail, location: regLoc as 'Thiruvanmiyur' | 'NLBR', date: regDate, meals: regMeals, total: totalAmount, paymentProof };
     const res = await createBooking(dto);
-    if ('data' in res && res.data) { setSuccessId(res.data.id); goTo('success'); }
+    if ('data' in res && res.data) {
+      setSuccessId(res.data.id);
+      setRegName(''); setRegMobile(''); setRegEmail(''); setRegLoc(''); setRegDate('');
+      setRegMeals({ Breakfast: 0, Lunch: 0, Dinner: 0 }); setPayProof(null);
+      goTo('success');
+    }
   }
 
   // My bookings
@@ -160,7 +165,12 @@ export default function PublicPage() {
     if (!/^\d{10}$/.test(bdyMobile)) { alert('Enter a valid 10-digit mobile'); return; }
     const dto: CreatePartyEnquiryDto = { name: bdyName, mobile: bdyMobile, email: bdyEmail, eventDate: bdyDate, address: bdyAddress, meals: bdyMeals, preferredMenu: bdyMenu, preferredPrice: bdyPrice ? Number(bdyPrice) : undefined };
     const res = await createEnquiry(dto);
-    if ('data' in res && res.data) { setBdySuccessId(res.data.id); goTo('bdy-success'); }
+    if ('data' in res && res.data) {
+      setBdySuccessId(res.data.id);
+      setBdyName(''); setBdyMobile(''); setBdyEmail(''); setBdyDate(''); setBdyAddress('');
+      setBdyMeals({ Breakfast: 0, Lunch: 0, Dinner: 0 }); setBdyMenu(''); setBdyPrice('');
+      goTo('bdy-success');
+    }
   }
 
   function goTo(v: View) {
@@ -273,7 +283,7 @@ export default function PublicPage() {
         minHeight: '100vh',
         background: 'radial-gradient(ellipse at 30% 60%, #FFCBA8 0%, #FFD9BC 30%, #FFE8D4 60%, #FFF3EC 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        pt: `${HEADER_H + 60}px`, pb: 10, px: 5,
+        pt: { xs: `${HEADER_H + 32}px`, md: `${HEADER_H + 60}px` }, pb: { xs: 7, md: 10 }, px: { xs: 2.5, md: 5 },
         position: 'relative', overflow: 'hidden',
         '&::before': {
           content: '""', position: 'absolute', inset: 0,
@@ -283,15 +293,15 @@ export default function PublicPage() {
       }}>
         <Box sx={{ maxWidth: 660, textAlign: 'center', position: 'relative', zIndex: 1 }}>
           {/* ISKCON Logo */}
-          <Box component="img" src="/iskcon-logo.png" alt="ISKCON Thiruvanmiyur Chennai" sx={{ height: 90, display: 'block', mx: 'auto', mb: 4.5, objectFit: 'contain' }} />
+          <Box component="img" src="/iskcon-logo.png" alt="ISKCON Thiruvanmiyur Chennai" sx={{ height: { xs: 64, md: 90 }, display: 'block', mx: 'auto', mb: { xs: 3, md: 4.5 }, objectFit: 'contain' }} />
 
           <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: { xs: '2.6rem', md: '4rem' }, fontWeight: 700, color: BROWN, lineHeight: 1.05, mb: 1.25 }}>
             Prasadam Seva
           </Typography>
-          <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: S, mb: 2.25, letterSpacing: '0.01em' }}>
+          <Typography sx={{ fontSize: { xs: '1rem', md: '1.25rem' }, fontWeight: 700, color: S, mb: 2.25, letterSpacing: '0.01em' }}>
             Serve with Devotion
           </Typography>
-          <Typography sx={{ fontSize: '0.97rem', color: '#888', lineHeight: 1.75, maxWidth: 480, mx: 'auto', mb: 4.5 }}>
+          <Typography sx={{ fontSize: { xs: '0.88rem', md: '0.97rem' }, color: '#888', lineHeight: 1.75, maxWidth: 480, mx: 'auto', mb: 4.5 }}>
             Offer prasadam and receive Krishna&apos;s blessings. Every meal served is an act of love and devotion.
           </Typography>
           <Box sx={{ display: 'flex', gap: 1.75, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -321,12 +331,12 @@ export default function PublicPage() {
       </Box>
 
       {/* ── WAYS TO SERVE ── */}
-      <Box component="section" sx={{ py: 11, px: { xs: 2.5, md: 5 }, bgcolor: '#FDFAF4' }}>
+      <Box component="section" sx={{ py: { xs: 8, md: 11 }, px: { xs: 2.5, md: 5 }, bgcolor: '#FDFAF4' }}>
         <Box sx={{ textAlign: 'center', mb: 6.5 }}>
           <Box component="span" sx={{ display: 'inline-block', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: S, bgcolor: SP, px: 1.75, py: 0.5, borderRadius: '50px', mb: 1.75 }}>
             How to Participate
           </Box>
-          <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.5rem', color: BROWN, mb: 1.25 }}>
+          <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: { xs: '1.9rem', md: '2.5rem' }, color: BROWN, mb: 1.25 }}>
             Ways to Serve
           </Typography>
           <Typography sx={{ fontSize: '0.92rem', color: TXT_LIGHT, lineHeight: 1.7, maxWidth: 520, mx: 'auto' }}>
@@ -354,7 +364,7 @@ export default function PublicPage() {
               '&:hover': { transform: 'translateY(-6px)', boxShadow: '0 16px 40px rgba(232,98,26,0.13)', borderColor: S },
               '&:hover::before': { transform: 'scaleX(1)' },
             }}>
-              <CardContent sx={{ p: 4 }}>
+              <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
                 <Box sx={{
                   width: 62, height: 62, borderRadius: '16px', bgcolor: c.bg,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -377,7 +387,7 @@ export default function PublicPage() {
 
       {/* ── SEVA QUOTE ── */}
       <Box component="section" id="seva-section" sx={{
-        py: 11, px: 5, textAlign: 'center', position: 'relative', overflow: 'hidden',
+        py: { xs: 8, md: 11 }, px: { xs: 2.5, md: 5 }, textAlign: 'center', position: 'relative', overflow: 'hidden',
         background: 'radial-gradient(ellipse at 30% 60%, #FFCBA8 0%, #FFD9BC 30%, #FFE8D4 60%, #FFF3EC 100%)',
         '&::before': {
           content: '"✦  ॐ  ✦"', position: 'absolute', top: 28, left: '50%', transform: 'translateX(-50%)',
@@ -389,7 +399,7 @@ export default function PublicPage() {
             Start Your Seva
           </Box>
           <Box sx={{ width: 48, height: 2, background: `linear-gradient(to right, ${S}, ${GOLD})`, borderRadius: 1, mx: 'auto', mb: 3.5 }} />
-          <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.65rem', fontStyle: 'italic', color: BROWN, lineHeight: 1.65, maxWidth: 560, mx: 'auto', mb: 2 }}>
+          <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: { xs: '1.25rem', md: '1.65rem' }, fontStyle: 'italic', color: BROWN, lineHeight: 1.65, maxWidth: 560, mx: 'auto', mb: 2 }}>
             &ldquo;If one offers Me with love and devotion a leaf, a flower, a fruit, or water, I will accept it.&rdquo;
           </Typography>
           <Typography sx={{ fontSize: '0.82rem', color: TXT_LIGHT, letterSpacing: '0.06em', mb: 4 }}>
@@ -408,13 +418,13 @@ export default function PublicPage() {
       </Box>
 
       {/* ── ABOUT ── */}
-      <Box component="section" id="about-section" sx={{ py: 11, px: { xs: 2.5, md: 5 }, bgcolor: CREAM }}>
+      <Box component="section" id="about-section" sx={{ py: { xs: 8, md: 11 }, px: { xs: 2.5, md: 5 }, bgcolor: CREAM }}>
         <Box sx={{ maxWidth: 1100, mx: 'auto', display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: { xs: 4.5, md: 8 }, alignItems: 'center' }}>
           <Box>
             <Box component="span" sx={{ display: 'inline-block', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: S, bgcolor: SP, px: 1.75, py: 0.5, borderRadius: '50px', mb: 1.75 }}>
               About Us
             </Box>
-            <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.4rem', color: BROWN, mb: 2.25 }}>
+            <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: { xs: '1.9rem', md: '2.4rem' }, color: BROWN, mb: 2.25 }}>
               About HKM Chennai
             </Typography>
             <Typography sx={{ fontSize: '0.88rem', color: TXT_MID, lineHeight: 1.8, mb: 2 }}>
@@ -423,7 +433,7 @@ export default function PublicPage() {
             <Typography sx={{ fontSize: '0.88rem', color: TXT_MID, lineHeight: 1.8, mb: 4 }}>
               Through our Annadanam program, we serve nutritious and delicious prasadam to devotees, visitors, and the underprivileged.
             </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.75 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(3, 1fr)' }, gap: { xs: 1, md: 1.75 } }}>
               {[['500+', 'Meals Daily'], ['2', 'HKM Centres'], ['365', 'Days a Year']].map(([n, l]) => (
                 <Box key={l} sx={{
                   textAlign: 'center', bgcolor: '#fff', border: `1px solid ${BORDER}`,
@@ -433,7 +443,7 @@ export default function PublicPage() {
                   '&::before': { content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: `linear-gradient(to right, ${S}, ${GOLD})` },
                   '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 20px rgba(232,98,26,0.12)' },
                 }}>
-                  <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.2rem', fontWeight: 700, color: S }}>
+                  <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: { xs: '1.6rem', md: '2.2rem' }, fontWeight: 700, color: S }}>
                     {n}
                   </Typography>
                   <Typography sx={{ fontSize: '0.7rem', color: TXT_LIGHT, mt: 0.5, fontWeight: 500 }}>
@@ -554,9 +564,9 @@ export default function PublicPage() {
       background: 'radial-gradient(ellipse at 30% 60%, #FFCBA8 0%, #FFD9BC 30%, #FFE8D4 60%, #FFF3EC 100%)',
     }}>
       {/* Page header */}
-      <Box sx={{ textAlign: 'center', pt: 4.5, pb: 1, px: 5 }}>
+      <Box sx={{ textAlign: 'center', pt: 4.5, pb: 1, px: { xs: 2.5, md: 5 } }}>
         <Box component="img" src="/iskcon-logo.png" alt="ISKCON Thiruvanmiyur Chennai" sx={{ height: 64, display: 'block', mx: 'auto', mb: 2.75, objectFit: 'contain' }} />
-        <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.4rem', fontWeight: 700, color: BROWN, mb: 1 }}>
+        <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: { xs: '1.8rem', md: '2.4rem' }, fontWeight: 700, color: BROWN, mb: 1 }}>
           Prasadam Coupon Booking
         </Typography>
         <Typography sx={{ fontSize: '0.88rem', color: '#888' }}>
@@ -789,7 +799,7 @@ export default function PublicPage() {
         </Box>
 
         {!bkMobile ? (
-          <Box sx={{ bgcolor: '#fff', borderRadius: '20px', p: 5, boxShadow: '0 4px 24px rgba(60,20,0,0.08)', border: `1px solid ${BORDER}`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5, textAlign: 'center' }}>
+          <Box sx={{ bgcolor: '#fff', borderRadius: '20px', p: { xs: 3, md: 5 }, boxShadow: '0 4px 24px rgba(60,20,0,0.08)', border: `1px solid ${BORDER}`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5, textAlign: 'center' }}>
             <Typography sx={{ fontSize: '2.5rem', lineHeight: 1 }}>📱</Typography>
             <Box>
               <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 700, color: BROWN }}>Find Your Bookings</Typography>
@@ -835,7 +845,7 @@ export default function PublicPage() {
 
             <Box sx={{ bgcolor: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(60,20,0,0.08)', border: `1px solid ${BORDER}` }}>
               {/* Card header */}
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '20px 24px', borderBottom: `1px solid ${BORDER}` }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: { xs: '16px 16px', sm: '20px 24px' }, borderBottom: `1px solid ${BORDER}`, flexWrap: 'wrap', gap: 1 }}>
                 <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 700, color: BROWN }}>
                   Booking History
                 </Typography>
@@ -874,7 +884,7 @@ export default function PublicPage() {
                   ) : myBookings.map(b => {
                     const sc = statusColor(b.status);
                     return (
-                      <Box key={b.id} sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${BORDER}`, '&:last-child': { borderBottom: 0 }, '&:hover': { bgcolor: '#FDFAF4' } }}>
+                      <Box key={b.id} sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, px: { xs: 1.5, sm: 3 }, py: 2, borderBottom: `1px solid ${BORDER}`, '&:last-child': { borderBottom: 0 }, '&:hover': { bgcolor: '#FDFAF4' } }}>
                         <Box sx={{ display: 'inline-block', fontSize: '0.65rem', fontWeight: 700, color: SD, bgcolor: SP, px: 1.25, py: 0.4, borderRadius: '50px', flexShrink: 0 }}>{b.id}</Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                           <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, color: BROWN }}>{b.name}</Typography>
@@ -884,13 +894,15 @@ export default function PublicPage() {
                           <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: sc.dot }} />
                           <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: sc.text }}>{b.status}</Typography>
                         </Box>
-                        <IconButton
-                          size="small"
-                          onClick={() => setCouponBooking(b)}
-                          sx={{ color: SD, bgcolor: SP, border: `1px solid ${BORDER}`, borderRadius: '8px', flexShrink: 0, '&:hover': { bgcolor: '#FEE8D4' } }}
-                        >
-                          <ConfirmationNumberIcon sx={{ fontSize: 18 }} />
-                        </IconButton>
+                        {b.status === 'approved' && (
+                          <IconButton
+                            size="small"
+                            onClick={() => setCouponBooking(b)}
+                            sx={{ color: SD, bgcolor: SP, border: `1px solid ${BORDER}`, borderRadius: '8px', flexShrink: 0, '&:hover': { bgcolor: '#FEE8D4' } }}
+                          >
+                            <ConfirmationNumberIcon sx={{ fontSize: 18 }} />
+                          </IconButton>
+                        )}
                       </Box>
                     );
                   })
@@ -903,7 +915,7 @@ export default function PublicPage() {
                   ) : myEnquiries.map(e => {
                     const sc = statusColor(e.status);
                     return (
-                      <Box key={e.id} sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${BORDER}`, '&:last-child': { borderBottom: 0 }, '&:hover': { bgcolor: '#FDFAF4' } }}>
+                      <Box key={e.id} sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, px: { xs: 1.5, sm: 3 }, py: 2, borderBottom: `1px solid ${BORDER}`, '&:last-child': { borderBottom: 0 }, '&:hover': { bgcolor: '#FDFAF4' } }}>
                         <Box sx={{ display: 'inline-block', fontSize: '0.65rem', fontWeight: 700, color: GOLD, bgcolor: GOLD_PALE, px: 1.25, py: 0.4, borderRadius: '50px', flexShrink: 0 }}>{e.id}</Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                           <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, color: BROWN }}>{e.name}</Typography>
@@ -944,7 +956,7 @@ export default function PublicPage() {
         </Box>
 
         <Box sx={{ bgcolor: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(60,20,0,0.1)', border: `1px solid rgba(232,98,26,0.12)`, position: 'relative', '&::before': { content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: `linear-gradient(to right, ${S}, ${GOLD})` } }}>
-          <Box sx={{ p: '24px 28px', borderBottom: `1px solid ${BORDER}`, bgcolor: '#FDFAF4' }}>
+          <Box sx={{ p: { xs: '18px 18px', sm: '24px 28px' }, borderBottom: `1px solid ${BORDER}`, bgcolor: '#FDFAF4' }}>
             <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', fontWeight: 700, color: BROWN, mb: 0.4 }}>
               🏠 Door Delivery Enquiry
             </Typography>
@@ -953,7 +965,7 @@ export default function PublicPage() {
             </Typography>
           </Box>
 
-          <Box sx={{ p: '24px 28px', display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box sx={{ p: { xs: '18px 18px', sm: '24px 28px' }, display: 'flex', flexDirection: 'column', gap: 3 }}>
             {/* Info banner */}
             <Box sx={{ bgcolor: SP, border: `1px solid rgba(232,98,26,0.25)`, borderRadius: '10px', p: '12px 16px', display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography sx={{ fontSize: '0.82rem', color: SD }}>
@@ -969,7 +981,7 @@ export default function PublicPage() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 <TextField fullWidth size="small" label="Full Name *"
                   placeholder="Your full name" value={bdyName} onChange={e => setBdyName(e.target.value)} sx={FIELD_SX} />
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
                   <TextField fullWidth size="small" label="Mobile *"
                     placeholder="10-digit number" slotProps={{ htmlInput: { maxLength: 10 } }}
                     value={bdyMobile} onChange={e => setBdyMobile(e.target.value.replace(/\D/g, ''))} sx={FIELD_SX} />
@@ -989,7 +1001,7 @@ export default function PublicPage() {
                 <Box>
                   <TextField size="small" label="Event Date *"
                     type="date" slotProps={{ htmlInput: { min: minBdyDate }, inputLabel: { shrink: true } }}
-                    value={bdyDate} onChange={e => setBdyDate(e.target.value)} sx={{ maxWidth: 200, ...FIELD_SX }} />
+                    value={bdyDate} onChange={e => setBdyDate(e.target.value)} sx={{ maxWidth: { xs: '100%', sm: 200 }, ...FIELD_SX }} />
                   <Typography sx={{ fontSize: '0.7rem', color: TXT_LIGHT, mt: 0.5 }}>Minimum 7 days from today</Typography>
                 </Box>
                 <TextField fullWidth size="small" label="Delivery Address *"
@@ -1208,7 +1220,7 @@ export default function PublicPage() {
               { label: 'Quantity',    value: `${couponTotalQty} person${couponTotalQty !== 1 ? 's' : ''}` },
               { label: 'Amount Paid', value: <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: S }}>₹{couponBooking.total}/-</Typography> },
             ].map(({ label, value }, i, arr) => (
-              <Box key={label} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, py: 1.5, borderBottom: i < arr.length - 1 ? `1px solid ${BORDER}` : 'none' }}>
+              <Box key={label} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: { xs: 2, sm: 3 }, py: 1.5, borderBottom: i < arr.length - 1 ? `1px solid ${BORDER}` : 'none' }}>
                 <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: TXT_LIGHT }}>{label}</Typography>
                 {typeof value === 'string'
                   ? <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, color: BROWN }}>{value}</Typography>
@@ -1217,7 +1229,7 @@ export default function PublicPage() {
             ))}
 
             {/* QR + coupon number */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 3, py: 2.25, bgcolor: CREAM, borderTop: `1.5px dashed ${BORDER}`, mt: 0.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, px: { xs: 2, sm: 3 }, py: 2.25, bgcolor: CREAM, borderTop: `1.5px dashed ${BORDER}`, mt: 0.5 }}>
               <Box sx={{ bgcolor: '#fff', p: 1, borderRadius: '8px', border: `1px solid ${BORDER}`, flexShrink: 0 }}>
                 <QRCodeSVG value={couponBooking.id} size={72} fgColor={BROWN} />
               </Box>

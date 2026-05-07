@@ -136,38 +136,120 @@ export default function PaymentPage({
   if (successId) {
     return (
       <Box sx={{ minHeight: '100vh', background: BG, pt: '72px', pb: 8 }}>
+        <style>{`
+          @keyframes popBounce { 0% { transform: scale(0); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 80% { transform: scale(0.96); } 100% { transform: scale(1); opacity: 1; } }
+          @keyframes checkPop  { 0% { transform: scale(0) rotate(-20deg); opacity: 0; } 65% { transform: scale(1.18) rotate(4deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+          @keyframes ripple    { 0%  { transform: scale(0.85); opacity: 0.55; } 100% { transform: scale(1.55); opacity: 0; } }
+          @keyframes floatDot  { 0%,100% { transform: translateY(0) scale(1);   opacity: 0.9; }
+                                 50%      { transform: translateY(-7px) scale(1.2); opacity: 0.6; } }
+          @keyframes sparkle   { 0%,100% { transform: scale(0) rotate(0deg);   opacity: 0; }
+                                 40%,60% { transform: scale(1) rotate(180deg);  opacity: 1; }
+                                 80%     { transform: scale(0.6) rotate(280deg); opacity: 0.4; } }
+          @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        `}</style>
         <Box sx={{ maxWidth: 480, mx: 'auto', px: 2, mt: 5, textAlign: 'center' }}>
 
-          <Box sx={{
-            width: 96, height: 96, borderRadius: '50%', mx: 'auto', mb: 3,
-            background: 'linear-gradient(135deg, #d4edda, #b8e4c4)',
-            border: '3px solid #b2dfbc',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '2.6rem', lineHeight: 1,
-            animation: 'popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-            '@keyframes popIn': { from: { transform: 'scale(0)', opacity: 0 }, to: { transform: 'scale(1)', opacity: 1 } },
-          }}>
+          {/* ── Success Icon ── */}
+          <Box sx={{ position: 'relative', width: 110, height: 110, mx: 'auto', mb: 4 }}>
+
+            {/* Ripple rings */}
+            {[0, 1, 2].map(i => (
+              <Box key={i} sx={{
+                position: 'absolute',
+                top: '50%', left: '50%',
+                width: 110, height: 110,
+                marginTop: '-55px', marginLeft: '-55px',
+                borderRadius: '50%',
+                border: `2px solid rgba(34,197,94,${0.5 - i * 0.14})`,
+                animation: `ripple 2.4s ${i * 0.7}s ease-out infinite`,
+              }} />
+            ))}
+
+            {/* Sparkle dots — 6 around the circle */}
+            {[
+              { top: '-10px',  left: '50%', ml: '-4px', color: '#F59E0B', delay: '0.55s', size: 8 },
+              { top: '16%',    left: '-10px',            color: '#E8621A', delay: '0.7s',  size: 7 },
+              { top: '16%',    right: '-10px',           color: '#34D399', delay: '0.85s', size: 7 },
+              { bottom: '6%',  left: '6%',               color: '#F59E0B', delay: '1.0s',  size: 6 },
+              { bottom: '6%',  right: '6%',              color: '#E8621A', delay: '1.1s',  size: 6 },
+              { bottom: '-9px', left: '50%', ml: '-3px', color: '#34D399', delay: '0.65s', size: 7 },
+            ].map((dot, i) => (
+              <Box key={i} sx={{
+                position: 'absolute',
+                width: dot.size, height: dot.size,
+                borderRadius: '50%',
+                bgcolor: dot.color,
+                top: dot.top, left: dot.left, right: dot.right,
+                bottom: dot.bottom,
+                marginLeft: dot.ml,
+                boxShadow: `0 0 6px ${dot.color}88`,
+                animation: `sparkle 2.8s ${dot.delay} ease-in-out infinite`,
+              }} />
+            ))}
+
+            {/* Main circle — light mint gradient */}
+            <Box sx={{
+              position: 'absolute', inset: 0,
+              borderRadius: '50%',
+              background: 'linear-gradient(145deg, #ECFDF5 0%, #D1FAE5 45%, #A7F3D0 100%)',
+              border: '3px solid #6EE7B7',
+              boxShadow: '0 8px 32px rgba(52,211,153,0.35), 0 0 0 6px rgba(52,211,153,0.1), 0 0 0 12px rgba(52,211,153,0.05)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              animation: 'popBounce 0.55s cubic-bezier(0.34,1.2,0.64,1) both',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""', position: 'absolute',
+                top: '10%', left: '12%',
+                width: '38%', height: '38%',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(255,255,255,0.72) 0%, transparent 70%)',
+              },
+            }}>
+              <CheckIcon sx={{
+                fontSize: 52,
+                color: '#059669',
+                filter: 'drop-shadow(0 2px 8px rgba(5,150,105,0.3))',
+                animation: 'checkPop 0.4s 0.25s cubic-bezier(0.34,1.4,0.64,1) both',
+              }} />
+            </Box>
           </Box>
 
-          <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.1rem', fontWeight: 700, color: BR, mb: 1 }}>
+          <Typography sx={{
+            fontFamily: 'Cormorant Garamond, serif',
+            fontSize: { xs: '1.9rem', md: '2.2rem' },
+            fontWeight: 700, color: BR, mb: 0.75,
+            animation: 'fadeSlideUp 0.4s 0.4s ease both',
+          }}>
             Payment Submitted!
           </Typography>
-          <Typography sx={{ fontSize: '0.88rem', color: BR2, lineHeight: 1.75, mb: 3.5 }}>
+          <Typography sx={{
+            fontSize: '0.88rem', color: BR2, lineHeight: 1.75, mb: 3.5,
+            maxWidth: 360, mx: 'auto',
+            animation: 'fadeSlideUp 0.4s 0.5s ease both',
+          }}>
             Your screenshot has been received. Our team will verify your UPI payment and confirm your booking shortly.
           </Typography>
 
-          <Box sx={{ bgcolor: '#fff', border: '1.5px solid #E8D8C0', borderRadius: '14px', px: 4, py: 2.5, mb: 3, display: 'inline-block' }}>
-            <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: MID, mb: 0.5 }}>
+          <Box sx={{
+            bgcolor: '#fff',
+            border: '1.5px solid #E8D8C0',
+            borderRadius: '16px',
+            px: 4, py: 2.5, mb: 3,
+            display: 'inline-block',
+            boxShadow: '0 4px 20px rgba(232,98,26,0.1)',
+            animation: 'fadeSlideUp 0.4s 0.6s ease both',
+          }}>
+            <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MID, mb: 0.75 }}>
               Booking Reference
             </Typography>
-            <Typography sx={{ fontSize: '1.15rem', fontWeight: 700, color: S, letterSpacing: '0.08em', fontFamily: 'monospace' }}>
+            <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: S, letterSpacing: '0.1em', fontFamily: 'monospace' }}>
               {successId}
             </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3.5 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3.5, animation: 'fadeSlideUp 0.4s 0.7s ease both' }}>
             <Chip
-              icon={<Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: GOLD, animation: 'pulse 1.5s infinite', '@keyframes pulse': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.3 } }, ml: '8px !important' }} />}
+              icon={<Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: GOLD, animation: 'floatDot 1.6s ease-in-out infinite', ml: '8px !important' }} />}
               label="Payment Approval Pending"
               sx={{ bgcolor: GP, color: GOLD, fontWeight: 700, fontSize: '0.8rem', border: `1.5px solid #E8C54A`, px: 0.5, height: 36 }}
             />
