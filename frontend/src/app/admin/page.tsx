@@ -10,6 +10,7 @@ import PartyEnquiriesPage from './components/PartyEnquiriesPage';
 import InternalOrdersPage from './components/InternalOrdersPage';
 import SettingsPage from './components/SettingsPage';
 import PaymentsPage from './components/PaymentsPage';
+import AdminUsersPage from './components/AdminUsersPage';
 
 // MUI
 import Drawer from '@mui/material/Drawer';
@@ -36,29 +37,66 @@ import CelebrationIcon from '@mui/icons-material/Celebration';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PublicIcon from '@mui/icons-material/Public';
+import PeopleIcon from '@mui/icons-material/People';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type Page = 'dashboard' | 'registrations' | 'slots' | 'birthday' | 'internal' | 'settings' | 'payments';
+type Page = 'dashboard' | 'registrations' | 'slots' | 'party' | 'internal' | 'settings' | 'payments' | 'users';
 
 const SIDEBAR_W = 260;
 const SIDEBAR_BG = '#D86A32';
 
+type Role = 'superadmin' | 'admin' | 'kitchen_manager' | 'accounts_manager' | 'gita_counter' | 'prasadam_hall';
+
+const ALL_ROLES: Role[] = ['superadmin', 'admin', 'kitchen_manager', 'accounts_manager', 'gita_counter', 'prasadam_hall'];
+
+// Pages each role is allowed to see
+const ROLE_PAGES: Record<Role, Page[]> = {
+  superadmin:       ['dashboard', 'registrations', 'payments', 'settings', 'slots', 'party', 'internal', 'users'],
+  admin:            ['dashboard', 'registrations', 'payments', 'settings', 'slots', 'party', 'internal'],
+  accounts_manager: ['payments'],
+  kitchen_manager:  ['internal'],
+  gita_counter:     ['registrations'],
+  prasadam_hall:    ['registrations', 'internal'],
+};
+
+function getRole(): Role {
+  if (typeof window === 'undefined') return 'superadmin';
+  // Prefer stored role (set on login)
+  const stored = localStorage.getItem('hkm_admin_role');
+  if (stored && ['superadmin', 'admin', 'accounts'].includes(stored)) return stored as Role;
+  // Fall back to decoding the JWT payload
+  try {
+    const token = localStorage.getItem('hkm_admin_token') ?? '';
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const r = payload?.role;
+    if (r && ALL_ROLES.includes(r as Role)) return r as Role;
+  } catch { /* ignore */ }
+  // Legacy sessions pre-date roles — treat as superadmin
+  return 'superadmin';
+}
+
 // ─── Admin Shell ──────────────────────────────────────────────────────────────
 function AdminShell({ onLogout }: { onLogout: () => void }) {
-  const [page, setPage] = useState<Page>('dashboard');
+  const role = getRole();
+  const allowed = ROLE_PAGES[role];
+
+  const [page, setPage] = useState<Page>(allowed[0]);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const nav = (p: Page) => { setPage(p); setMobileOpen(false); };
 
-  const navItems: { page: Page; icon: React.ReactNode; label: string; badge?: number }[] = [
+  const ALL_NAV: { page: Page; icon: React.ReactNode; label: string; badge?: number }[] = [
     { page: 'dashboard',     icon: <DashboardIcon fontSize="small" />,      label: 'Dashboard' },
     { page: 'registrations', icon: <ListAltIcon fontSize="small" />,        label: 'All Registrations' },
     { page: 'payments',      icon: <PaymentIcon fontSize="small" />,        label: 'Payments' },
     { page: 'settings',      icon: <SettingsIcon fontSize="small" />,       label: 'Default Settings' },
     { page: 'slots',         icon: <CalendarMonthIcon fontSize="small" />,  label: 'Slot Management' },
-    { page: 'birthday',      icon: <CelebrationIcon fontSize="small" />,    label: 'Party Enquiries' },
+    { page: 'party',         icon: <CelebrationIcon fontSize="small" />,    label: 'Party Enquiries' },
     { page: 'internal',      icon: <AccountBalanceIcon fontSize="small" />, label: 'Internal Orders' },
+    { page: 'users',         icon: <PeopleIcon fontSize="small" />,         label: 'Admin Users' },
   ];
+
+  const navItems = ALL_NAV.filter(n => allowed.includes(n.page));
 
   const today = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   const activeItem = navItems.find(n => n.page === page);
@@ -161,6 +199,20 @@ function AdminShell({ onLogout }: { onLogout: () => void }) {
           }}
         >
           Public Site
+        </Button>
+        <Button
+          fullWidth
+          onClick={() => window.open('/internal', '_blank')}
+          startIcon={<AccountBalanceIcon sx={{ fontSize: 14 }} />}
+          sx={{
+            mb: 1, py: 0.75, borderRadius: '50px', fontSize: '0.78rem',
+            color: 'rgba(255,255,255,0.75)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.35)' },
+            textTransform: 'none', fontFamily: 'Inter, sans-serif',
+          }}
+        >
+          Internal Booking
         </Button>
         <Button
           fullWidth
@@ -276,10 +328,11 @@ function AdminShell({ onLogout }: { onLogout: () => void }) {
           {page === 'dashboard'     && <DashboardPage onNav={p => nav(p as Page)} />}
           {page === 'registrations' && <RegistrationsPage />}
           {page === 'slots'         && <SlotManagementPage onNav={p => nav(p as Page)} />}
-          {page === 'birthday'      && <PartyEnquiriesPage />}
+          {page === 'party'      && <PartyEnquiriesPage />}
           {page === 'internal'      && <InternalOrdersPage />}
           {page === 'settings'      && <SettingsPage />}
           {page === 'payments'      && <PaymentsPage />}
+          {page === 'users'         && <AdminUsersPage />}
         </Box>
       </Box>
     </Box>
@@ -301,6 +354,8 @@ export default function AdminPage() {
 
   function logout() {
     localStorage.removeItem('hkm_admin_token');
+    localStorage.removeItem('hkm_admin_role');
+    localStorage.removeItem('hkm_admin_name');
     router.replace('/admin/login');
   }
 

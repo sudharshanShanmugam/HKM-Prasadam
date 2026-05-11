@@ -34,6 +34,7 @@ export const baseApi = createApi({
     'Payment',
     'Settings',
     'SlotManagement',
+    'AdminUsers',
   ],
   endpoints: () => ({}),
 });

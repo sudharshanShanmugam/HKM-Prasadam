@@ -892,21 +892,24 @@ export default function SlotManagementPage({ onNav }: { onNav?: (p: string) => v
                       </Box>
 
                       {/* Count */}
-                      <Box sx={{ px: 1.5, pt: 1.25, pb: 0.75, textAlign: 'center' }}>
-                        <Typography sx={{
-                          fontFamily: 'Cormorant Garamond, serif',
-                          fontSize: '1.6rem', fontWeight: 700, lineHeight: 1,
-                          color: isRemoved ? '#C0B090' : '#3B1F0A',
-                          textDecoration: isRemoved ? 'line-through' : 'none',
-                        }}>
-                          {count}
+                      <Box sx={{ px: 1.5, pt: 1.5, pb: 0.75, textAlign: 'center' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 0.5 }}>
+                          <Typography sx={{
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: '2.6rem', fontWeight: 800, lineHeight: 1,
+                            color: isRemoved ? '#C0B090' : color,
+                            textDecoration: isRemoved ? 'line-through' : 'none',
+                            letterSpacing: '-0.02em',
+                          }}>
+                            {count}
+                          </Typography>
                           {totalLimit > 0 && (
-                            <Box component="span" sx={{ fontSize: '0.85rem', fontWeight: 500, color: '#9A7A5A' }}>
+                            <Typography sx={{ fontSize: '1rem', fontWeight: 600, color: '#9A7A5A', lineHeight: 1 }}>
                               /{totalLimit}
-                            </Box>
+                            </Typography>
                           )}
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.6rem', color: '#9A7A5A', mt: 0.25 }}>coupons</Typography>
+                        </Box>
+                        <Typography sx={{ fontSize: '0.62rem', fontWeight: 600, color: '#9A7A5A', mt: 0.4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>coupons</Typography>
 
                         {/* Fill bar */}
                         {pct !== null && (
@@ -952,9 +955,9 @@ export default function SlotManagementPage({ onNav }: { onNav?: (p: string) => v
 
               {/* Total row — only when there are bookings */}
               {bk && (bk.Breakfast + bk.Lunch + bk.Dinner) > 0 && (
-                <Box sx={{ mt: 1.5, px: 2, py: 1.25, bgcolor: '#fff', borderRadius: '10px', border: '1px solid #F2E8D8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography sx={{ fontSize: '0.75rem', color: '#9A7A5A' }}>Total coupons booked</Typography>
-                  <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 700, color: SD }}>
+                <Box sx={{ mt: 1.5, px: 2.5, py: 1.5, bgcolor: '#fff', borderRadius: '10px', border: `1.5px solid #F2E8D8`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#9A7A5A', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Total coupons booked</Typography>
+                  <Typography sx={{ fontFamily: 'Inter, sans-serif', fontSize: '1.7rem', fontWeight: 800, color: SD, letterSpacing: '-0.02em' }}>
                     {(bk.Breakfast ?? 0) + (bk.Lunch ?? 0) + (bk.Dinner ?? 0)}
                   </Typography>
                 </Box>

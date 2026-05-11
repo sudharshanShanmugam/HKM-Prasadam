@@ -12,10 +12,13 @@ import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import IconButton from '@mui/material/IconButton';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import LoginIcon from '@mui/icons-material/Login';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const S  = '#E8621A';
 const SD = '#C44D0D';
@@ -34,9 +37,10 @@ const FIELD_SX = {
 export default function AdminLoginPage() {
   const router = useRouter();
   const [login, { isLoading }] = useLoginMutation();
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [error,    setError]    = useState('');
+  const [email,       setEmail]       = useState('');
+  const [password,    setPassword]    = useState('');
+  const [showPass,    setShowPass]    = useState(false);
+  const [error,       setError]       = useState('');
 
   useEffect(() => {
     if (localStorage.getItem('hkm_admin_token')) router.replace('/admin');
@@ -48,6 +52,8 @@ export default function AdminLoginPage() {
     const res = await login({ email, password });
     if ('data' in res && res.data) {
       localStorage.setItem('hkm_admin_token', res.data.token);
+      localStorage.setItem('hkm_admin_role',  res.data.role ?? 'admin');
+      localStorage.setItem('hkm_admin_name',  res.data.name ?? '');
       router.replace('/admin');
     } else if ('error' in res) {
       const err = res.error as { status?: number };
@@ -140,7 +146,7 @@ export default function AdminLoginPage() {
             <TextField
               fullWidth
               label="Password"
-              type="password"
+              type={showPass ? 'text' : 'password'}
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
@@ -149,6 +155,20 @@ export default function AdminLoginPage() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <LockIcon sx={{ fontSize: 18, color: '#C0A080' }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPass(v => !v)}
+                        edge="end"
+                        size="small"
+                        sx={{ color: '#C0A080', '&:hover': { color: SD } }}
+                      >
+                        {showPass
+                          ? <VisibilityOffIcon sx={{ fontSize: 18 }} />
+                          : <VisibilityIcon   sx={{ fontSize: 18 }} />}
+                      </IconButton>
                     </InputAdornment>
                   ),
                 },

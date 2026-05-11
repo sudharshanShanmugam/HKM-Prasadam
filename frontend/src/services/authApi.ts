@@ -1,7 +1,7 @@
 import { baseApi } from './api';
 
 interface LoginDto { email: string; password: string }
-interface LoginResponse { token: string; email: string }
+interface LoginResponse { token: string; email: string; name: string; role: string }
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

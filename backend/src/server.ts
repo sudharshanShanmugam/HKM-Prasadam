@@ -8,6 +8,7 @@ import { requireAuth } from './middleware/requireAuth';
 import swaggerSpec from './config/swagger';
 
 import authRouter             from './routes/auth';
+import adminUsersRouter       from './routes/adminUsers';
 import prasadamBookingsRouter from './routes/prasadamBookings';
 import partyEnquiriesRouter   from './routes/partyEnquiries';
 import internalOrdersRouter   from './routes/internalOrders';
@@ -24,7 +25,24 @@ import slotManagementRouter  from './routes/slotManagement';
 
 const app = express();
 
-connectDB();
+// ─── Seed initial superadmin from env if no admin users exist ─────────────────
+async function seedInitialAdmin() {
+  const { default: AdminUser } = await import('./models/AdminUser');
+  const bcrypt = await import('bcryptjs');
+  const count = await AdminUser.countDocuments();
+  if (count === 0) {
+    const email = process.env.ADMIN_EMAIL;
+    const hash  = process.env.ADMIN_PASSWORD_HASH;
+    if (email && hash) {
+      await AdminUser.create({ name: 'Super Admin', email, passwordHash: hash, role: 'superadmin' });
+      console.log(`✅ Seeded initial superadmin: ${email}`);
+    } else {
+      console.warn('⚠️  No ADMIN_EMAIL/ADMIN_PASSWORD_HASH in .env — no admin user created');
+    }
+  }
+}
+
+connectDB().then(seedInitialAdmin);
 
 const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? '')
   .split(',')
@@ -40,6 +58,7 @@ app.use(express.json({ limit: '15mb' }));
 
 // ─── Legacy / public routes ───────────────────────────────────────────────────
 app.use('/api/auth',              authRouter);
+app.use('/api/admin-users',       requireAuth, adminUsersRouter);
 app.use('/api/prasadam-bookings', prasadamBookingsRouter);
 app.use('/api/party-enquiries',   partyEnquiriesRouter);
 app.use('/api/internal-orders',   internalOrdersRouter);

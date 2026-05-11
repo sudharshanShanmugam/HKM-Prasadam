@@ -7,6 +7,8 @@ import type { PartyEnquiry, UpdatePartyEnquiryDto, EnquiryStatus } from '@/types
 // MUI
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
@@ -37,11 +39,11 @@ import FreeBreakfastIcon from '@mui/icons-material/FreeBreakfast';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import NightlightIcon from '@mui/icons-material/Nightlight';
 import SearchIcon from '@mui/icons-material/Search';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import ListAltIcon from '@mui/icons-material/ListAlt';
+import InventoryIcon from '@mui/icons-material/Inventory';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
-import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 
@@ -54,6 +56,8 @@ const GREEN      = '#1B7A4A';
 const GREEN_PALE = '#E6F5EC';
 const RED        = '#B91C1C';
 const RED_PALE   = '#FEE2E2';
+const TXT_LIGHT  = '#9A7A5A';
+const BORDER     = '#F2E8D8';
 
 const MEAL_META = {
   Breakfast: { icon: <FreeBreakfastIcon sx={{ fontSize: 20 }} />, bg: '#FFFBEE', border: '#F5D78E', subBg: '#F9F3D0' },
@@ -213,6 +217,30 @@ function rowBg(status: EnquiryStatus) {
   if (status === 'pending') return '#FFFDF0';
   if (status === 'accepted') return '#F4FDF6';
   return '#FDF8F8';
+}
+
+// ─── Stat Card (matches InternalOrdersPage style) ────────────────────────────
+function StatCard({ icon, label, value, color, iconBg }: {
+  icon: React.ReactNode; label: string; value: number;
+  color: string; iconBg: string;
+}) {
+  return (
+    <Card elevation={0} sx={{ border: '1.5px solid #FEF0E6', borderRadius: '14px', boxShadow: '0 2px 10px rgba(232,98,26,0.07)' }}>
+      <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, p: '18px 20px !important' }}>
+        <Box sx={{ width: 44, height: 44, borderRadius: '12px', bgcolor: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color, flexShrink: 0 }}>
+          {icon}
+        </Box>
+        <Box>
+          <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: TXT_LIGHT }}>
+            {label}
+          </Typography>
+          <Typography sx={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.9rem', fontWeight: 700, color, lineHeight: 1.1 }}>
+            {value}
+          </Typography>
+        </Box>
+      </CardContent>
+    </Card>
+  );
 }
 
 // ─── Section label ────────────────────────────────────────────────────────────
@@ -607,13 +635,6 @@ export default function PartyEnquiriesPage() {
 
   const quickUpdate = (id: string, data: UpdatePartyEnquiryDto) => updateEnquiry({ id, data });
 
-  const STAT_CARDS = [
-    { icon: <ListAltIcon      sx={{ fontSize: 22, color: SD }}    />, iconBg: SP,         count: total,    label: 'Total' },
-    { icon: <HourglassEmptyIcon sx={{ fontSize: 22, color: GOLD }} />, iconBg: GOLD_PALE, count: pending,  label: 'Pending' },
-    { icon: <ThumbUpAltIcon   sx={{ fontSize: 22, color: GREEN }} />, iconBg: GREEN_PALE, count: accepted, label: 'Accepted' },
-    { icon: <ThumbDownAltIcon sx={{ fontSize: 22, color: RED }}   />, iconBg: RED_PALE,   count: declined, label: 'Declined' },
-  ];
-
   return (
     <Box>
       {/* PAGE HEADER */}
@@ -630,24 +651,20 @@ export default function PartyEnquiriesPage() {
       </Box>
 
       {/* STAT CARDS */}
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 3 }}>
-        {STAT_CARDS.map(({ icon, iconBg, count, label }) => (
-          <Card key={label} elevation={0} sx={{
-            flex: '1 1 130px', minWidth: 130, border: '1.5px solid #FEF0E6',
-            borderRadius: '14px', px: 2, py: 1.75,
-            display: 'flex', alignItems: 'center', gap: 1.5,
-            boxShadow: '0 2px 8px rgba(232,98,26,0.06)',
-          }}>
-            <Box sx={{ width: 42, height: 42, borderRadius: '12px', bgcolor: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              {icon}
-            </Box>
-            <Box>
-              <Typography sx={{ fontSize: '1.45rem', fontWeight: 700, color: '#3B1F0A', lineHeight: 1.1 }}>{count}</Typography>
-              <Typography sx={{ fontSize: '0.72rem', color: '#9A7A5A', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</Typography>
-            </Box>
-          </Card>
-        ))}
-      </Box>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid size={3}>
+          <StatCard icon={<InventoryIcon />}      label="Total"    value={total}    color={SD}    iconBg={SP}         />
+        </Grid>
+        <Grid size={3}>
+          <StatCard icon={<HourglassEmptyIcon />} label="Pending"  value={pending}  color={GOLD}  iconBg={GOLD_PALE}  />
+        </Grid>
+        <Grid size={3}>
+          <StatCard icon={<TaskAltIcon />}        label="Accepted" value={accepted} color={GREEN} iconBg={GREEN_PALE} />
+        </Grid>
+        <Grid size={3}>
+          <StatCard icon={<CancelIcon />}         label="Declined" value={declined} color={RED}   iconBg={RED_PALE}   />
+        </Grid>
+      </Grid>
 
       {/* UPCOMING STRIP */}
       {upcoming.length > 0 && (
@@ -683,38 +700,46 @@ export default function PartyEnquiriesPage() {
       )}
 
       {/* FILTER BAR */}
-      <Box sx={{ display: 'flex', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
-        <TextField
-          size="small" placeholder="Search name, mobile, ID…"
-          value={search} onChange={e => setSearch(e.target.value)}
-          slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 18, color: '#9A7A5A' }} /></InputAdornment> } }}
-          sx={{
-            flex: '1 1 220px', minWidth: 200,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '10px', fontSize: '0.83rem',
-              '& fieldset': { borderColor: '#E8D8C0' },
-              '&:hover fieldset': { borderColor: S },
-              '&.Mui-focused fieldset': { borderColor: S },
-            },
-          }}
-        />
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel sx={{ fontSize: '0.83rem', '&.Mui-focused': { color: SD } }}>Status</InputLabel>
-          <Select
-            label="Status" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+      <Card elevation={0} sx={{ border: `1.5px solid ${BORDER}`, borderRadius: '12px', p: '12px 16px', mb: 2, boxShadow: '0 1px 6px rgba(232,98,26,0.06)' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
+          <FilterListIcon sx={{ fontSize: 16, color: TXT_LIGHT }} />
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: TXT_LIGHT }}>
+            Filters
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+          <TextField
+            size="small" placeholder="Search name, mobile, ID…"
+            value={search} onChange={e => setSearch(e.target.value)}
+            slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 16, color: TXT_LIGHT }} /></InputAdornment> } }}
             sx={{
-              borderRadius: '10px', fontSize: '0.83rem',
-              '& .MuiOutlinedInput-notchedOutline': { borderColor: '#E8D8C0' },
-              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: S },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: S },
-            }}>
-            <MenuItem value="">All Statuses</MenuItem>
-            <MenuItem value="pending">Pending</MenuItem>
-            <MenuItem value="accepted">Accepted</MenuItem>
-            <MenuItem value="declined">Declined</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+              flex: '1 1 220px', minWidth: 200,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '9px', bgcolor: '#fff', fontSize: '0.82rem',
+                '& fieldset': { borderColor: '#E8D8C0' },
+                '&:hover fieldset': { borderColor: S },
+                '&.Mui-focused fieldset': { borderColor: S },
+              },
+            }}
+          />
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <InputLabel sx={{ fontSize: '0.82rem', '&.Mui-focused': { color: SD } }}>Status</InputLabel>
+            <Select
+              label="Status" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+              sx={{
+                borderRadius: '9px', bgcolor: '#fff', fontSize: '0.82rem',
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#E8D8C0' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: S },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: S },
+              }}>
+              <MenuItem value="">All Statuses</MenuItem>
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="accepted">Accepted</MenuItem>
+              <MenuItem value="declined">Declined</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Card>
 
       {/* TABLE CARD */}
       <Card elevation={0} sx={{ border: '1.5px solid #FEF0E6', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 2px 12px rgba(232,98,26,0.07)' }}>

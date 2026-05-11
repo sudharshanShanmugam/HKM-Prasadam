@@ -1,12 +1,15 @@
+import { Router, Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import AdminUser from '../models/AdminUser';
+
+const router = Router();
+
 /**
  * @swagger
- * tags:
- *   name: Auth
- *   description: Admin authentication
- *
  * /api/auth/login:
  *   post:
- *     summary: Admin login — returns a JWT token
+ *     summary: Admin login
  *     tags: [Auth]
  *     security: []
  *     requestBody:
@@ -17,11 +20,15 @@
  *             type: object
  *             required: [email, password]
  *             properties:
- *               email:    { type: string, example: admin@hkm.org }
- *               password: { type: string, example: secret123 }
+ *               email:
+ *                 type: string
+ *                 example: admin@hkmchennai.org
+ *               password:
+ *                 type: string
+ *                 example: secret123
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Login successful — returns JWT token and user info
  *         content:
  *           application/json:
  *             schema:
@@ -33,18 +40,19 @@
  *                   properties:
  *                     token: { type: string }
  *                     email: { type: string }
+ *                     name:  { type: string }
+ *                     role:  { type: string, enum: [superadmin, admin, kitchen_manager, accounts_manager, gita_counter, prasadam_hall] }
  *       400:
  *         description: Missing email or password
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
-
-import { Router, Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-const router = Router();
-
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body as { email?: string; password?: string };
 
@@ -53,27 +61,25 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL ?? '';
-  const adminHash  = process.env.ADMIN_PASSWORD_HASH ?? '';
-
-  if (email.toLowerCase() !== adminEmail.toLowerCase()) {
+  const user = await AdminUser.findOne({ email: email.toLowerCase() });
+  if (!user) {
     res.status(401).json({ success: false, message: 'Invalid credentials' });
     return;
   }
 
-  const match = await bcrypt.compare(password, adminHash);
+  const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) {
     res.status(401).json({ success: false, message: 'Invalid credentials' });
     return;
   }
 
   const token = jwt.sign(
-    { email: adminEmail, role: 'admin' },
+    { id: user._id, email: user.email, name: user.name, role: user.role },
     process.env.JWT_SECRET as string,
     { expiresIn: process.env.JWT_EXPIRES_IN ?? '7d' } as jwt.SignOptions
   );
 
-  res.json({ success: true, data: { token, email: adminEmail } });
+  res.json({ success: true, data: { token, email: user.email, name: user.name, role: user.role } });
 });
 
 export default router;
