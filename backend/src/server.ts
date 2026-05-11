@@ -1,11 +1,11 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import swaggerUi from 'swagger-ui-express';
+
 import connectDB from './config/db';
 import errorHandler from './middleware/errorHandler';
 import { requireAuth } from './middleware/requireAuth';
-import swaggerSpec from './config/swagger';
+import { setupSwagger } from './config/swagger';
 
 import authRouter             from './routes/auth';
 import adminUsersRouter       from './routes/adminUsers';
@@ -75,12 +75,7 @@ app.use('/api/slot-management',   slotManagementRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
-// ─── Swagger UI ───────────────────────────────────────────────────────────────
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customSiteTitle: 'HKM Prasadam API Docs',
-  customCss: '.swagger-ui .topbar { background-color: #C44D0D; }',
-}));
-app.get('/api/docs.json', (_req, res) => res.json(swaggerSpec));
+setupSwagger(app);
 
 app.use((_req, res) => res.status(404).json({ success: false, message: 'Route not found' }));
 app.use(errorHandler);

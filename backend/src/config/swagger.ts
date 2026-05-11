@@ -1,4 +1,6 @@
 import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { Express } from 'express';
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -136,7 +138,17 @@ const options: swaggerJsdoc.Options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: ['./src/routes/*.ts'],
+  apis: ['./src/routes/*.ts', './src/swagger/*.ts'],
 };
 
-export default swaggerJsdoc(options);
+const swaggerSpec = swaggerJsdoc(options);
+
+export function setupSwagger(app: Express): void {
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customSiteTitle: 'HKM Prasadam API Docs',
+    customCss: '.swagger-ui .topbar { background-color: #C44D0D; }',
+  }));
+  app.get('/api/docs.json', (_req, res) => res.json(swaggerSpec));
+}
+
+export default swaggerSpec;

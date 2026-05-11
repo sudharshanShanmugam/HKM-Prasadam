@@ -1,10 +1,3 @@
-/**
- * @swagger
- * tags:
- *   name: Dashboard
- *   description: Admin dashboard stats and today's slot overview
- */
-
 import { Router, Request, Response } from 'express';
 import PrasadamBooking from '../models/PrasadamBooking';
 import SlotDate from '../models/SlotDate';
@@ -14,35 +7,7 @@ import { requireAuth } from '../middleware/requireAuth';
 
 const router = Router();
 
-/**
- * @swagger
- * /api/dashboard/today-slots:
- *   get:
- *     summary: Today's slot details and booking counts per meal per location
- *     tags: [Dashboard]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Today's slot and booking breakdown
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean }
- *                 data:
- *                   type: object
- *                   properties:
- *                     date:          { type: string }
- *                     slot:          { $ref: '#/components/schemas/SlotDate' }
- *                     totalBookings: { type: number }
- *                     bookings:
- *                       type: object
- *                       properties:
- *                         Thiruvanmiyur: { $ref: '#/components/schemas/Meals' }
- *                         NLBR:          { $ref: '#/components/schemas/Meals' }
- */
+
 // GET /api/dashboard/today-slots
 router.get('/today-slots', requireAuth, async (_req: Request, res: Response) => {
   try {
@@ -80,33 +45,7 @@ router.get('/today-slots', requireAuth, async (_req: Request, res: Response) => 
   }
 });
 
-/**
- * @swagger
- * /api/dashboard/stats:
- *   get:
- *     summary: Summary counts for dashboard cards
- *     tags: [Dashboard]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Aggregated stats
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean }
- *                 data:
- *                   type: object
- *                   properties:
- *                     totalBookings:    { type: number }
- *                     todayBookings:    { type: number }
- *                     totalCoupons:     { type: number }
- *                     pendingPayments:  { type: number }
- *                     pendingEnquiries: { type: number }
- *                     pendingOrders:    { type: number }
- */
+
 router.get('/stats', requireAuth, async (_req: Request, res: Response) => {
   try {
     const today = new Date().toISOString().slice(0, 10);
