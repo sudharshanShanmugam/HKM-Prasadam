@@ -21,6 +21,7 @@ yarn-error.log*
 .idea/
 *.swp
 *.swo
+.claude/
 
 # ── OS ──────────────────────────────────────────────────
 Thumbs.db
